@@ -10,7 +10,7 @@
 #   BrickSim/.venv   bricksim + Isaac Sim 5.1   BrickSim physics runs
 #   isdnenv          cuRobo + Viser             planner, viewer, force queries
 #   Issac            Isaac Sim 6.0 + Newton     dual_arm_sim, USD viewers, WP0
-#   mjenv            MuJoCo twin (v3.1; CPU     tests/test_{clutch,planner,control,env}.py,
+#   mjenv            MuJoCo twin (v3.1; CPU     tests/test_{clutch,planner,control,env,brace_bandit}.py,
 #                    physics, CUDA torch)
 #                                               orchestration/twin_executor.py, experiments/*,
 #                                               tasks/*, stability.py, bracing.py,
@@ -41,9 +41,9 @@ fi
 # v4 (plan_v4 §2.8): Newton + cuRobo overlay, all in the Isaac interpreter.
 # Matched before the twin's experiments/* rule.
 case "$script" in
-    */tests/test_vision.py|*/tests/test_cell.py|*/tests/test_motion.py)
+    */tests/test_vision.py|*/tests/test_v4_vision.py|*/tests/test_aim.py|*/tests/test_cell.py|*/tests/test_motion.py|*/tests/test_arm_protocol.py|*/tests/test_manual.py)
         cd "$HERE"; exec "$ISAAC_PY" -m pytest "${script#$HERE/}" "$@" ;;
-    */cell/*.py|*/motion/plan_curobo.py|*/vision.py|*/scripts/1[0-2]_*.py|*/experiments/v4*.py|*/experiments/analyze_v4.py)
+    */cell/*.py|*/motion/plan_curobo.py|*/vision.py|*/scripts/1[0-3]_*.py|*/scripts/fixture_check.py|*/experiments/v4*.py|*/experiments/analyze_v4.py)
         cd "$HERE"; exec "$ISAAC_PY" -u "$script" "$@" ;;
 esac
 
@@ -51,7 +51,7 @@ esac
 # imports (sim.mj, orchestration, tasks, experiments) resolve.
 twin=0
 case "$script" in
-    */tests/test_clutch.py|*/tests/test_planner.py|*/tests/test_control.py|*/tests/test_env.py) twin=2 ;;
+    */tests/test_clutch.py|*/tests/test_planner.py|*/tests/test_control.py|*/tests/test_env.py|*/tests/test_brace_bandit.py) twin=2 ;;
     */twin_executor.py|*/experiments/*.py|*/tasks/*.py|*/stability.py|*/bracing.py|*/sim/mj/*.py) twin=1 ;;
     */planner.py) case " $* " in *" --frame twin "*|*" --frame=twin "*) twin=1 ;; esac ;;
 esac

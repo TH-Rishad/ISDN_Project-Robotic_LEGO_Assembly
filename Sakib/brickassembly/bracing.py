@@ -122,7 +122,7 @@ def candidates(brick, placed, clearance=None):
     return [(y, z) for y in ys for z in zs if feasible(brick, placed, y, z, clearance)]
 
 
-def _brace_obj(placed, y, z, grip=GRIP_N):
+def _brace_obj(placed, y, z, grip, mu):
     """The grasp as the force model sees it: pad friction on each gripped
     brick in proportion to its share of the pad contact. (An equal split let
     a brick caught by 3 mm of pad count as fully held; the LP then preferred
@@ -132,19 +132,42 @@ def _brace_obj(placed, y, z, grip=GRIP_N):
     ids = tuple(sorted(area))
     tot = sum(area.values())
     return ST.Brace(bricks=ids, point=(x, y, z), grip_N=grip,
-                    shares=tuple(area[i] / tot for i in ids),
-                    moment_max_Nm=1.0 * 2 * grip * PAD_MOMENT_ARM)
+                    shares=tuple(area[i] / tot for i in ids), mu=mu,
+                    moment_max_Nm=mu * 2 * grip * PAD_MOMENT_ARM)
 
 
 def predicted(brick, placed, brace=None):
     return ST.insertion_utilisation(brick, placed, braces=[brace] if brace else [])
 
 
+def brace_at(brick, placed, y, z, lean_deg, grip_N=GRIP_N, mu=1.0, unbraced=None,
+             strategy="learned"):
+    """§2.6 brace dict for an explicit grasp: pad centre (y, z), lean_deg about
+    the grip axis (x; +45 is what lean_for gives when y is below the placer,
+    so the hand's housing sits further from it). Not gated by any threshold."""
+    r0 = unbraced or predicted(brick, placed)
+    if not gripped(placed, y, z):
+        return _record(brick, placed, None, r0, strategy, "no_feasible_grasp")
+    br = _brace_obj(placed, y, z, grip_N, mu)
+    return _record(brick, placed, (y, z, br, predicted(brick, placed, br)), r0, strategy,
+                   "explicit_grasp", tilt=[math.radians(lean_deg), 0.0, 0.0])
+
+
 def assign(brick, placed, strategy, safety_factor=ST.SAFETY_FACTOR, unbraced=None,
-           clearance=None):
-    """§2.6 brace dict for inserting `brick` onto `placed`, or None."""
+           clearance=None, grip_N=GRIP_N, mu=1.0, selector=None):
+    """§2.6 brace dict for inserting `brick` onto `placed`, or None. grip_N
+    (per finger) and mu are the grasp the LP plans with (defaults: the twin's).
+    strategy "learned": `selector(brick, placed)` returns None or (y, z, lean_deg);
+    it decides both whether to brace and where, so it is dispatched before the
+    LP-threshold return below (a learned policy may brace where u0 x SF < 1)."""
     if strategy == "none" or not placed:
         return None
+    if strategy == "learned":
+        if selector is None:
+            raise ValueError("strategy 'learned' needs a selector(brick, placed) -> None | (y, z, lean_deg)")
+        pick = selector(brick, placed)
+        return None if pick is None else brace_at(brick, placed, *pick, grip_N=grip_N, mu=mu,
+                                                  unbraced=unbraced)
     r0 = unbraced or predicted(brick, placed)
     if r0.s * safety_factor < 1.0:
         return None
@@ -159,7 +182,7 @@ def assign(brick, placed, strategy, safety_factor=ST.SAFETY_FACTOR, unbraced=Non
         best = None
         press = FF_PRESS_MARGIN * sum(P.supports(brick, placed).values()) * ST.F_INSERT_PER_STUD
         for y, z in pool:
-            br = _brace_obj(placed, y, z)
+            br = _brace_obj(placed, y, z, grip_N, mu)
             r = predicted(brick, placed, br)
             # lowest predicted utilisation (§3.6, nominal press); among equals,
             # the lowest at the press the executor applies; then the grasp whose
@@ -181,14 +204,15 @@ def assign(brick, placed, strategy, safety_factor=ST.SAFETY_FACTOR, unbraced=Non
         on = [(y, z) for y, z in cands if target[0] in gripped(placed, y, z)]
         tz = P.brick_pose(target)[2] + P.BRICK_H / 2
         y, z = min(on, key=lambda c: (abs(c[0] - py), abs(c[1] - tz)))
-        br = _brace_obj(placed, y, z)
+        br = _brace_obj(placed, y, z, grip_N, mu)
         return _record(brick, placed, (y, z, br, predicted(brick, placed, br)), r0, strategy,
                        "nearest_placed_brick")
     raise ValueError(strategy)
 
 
-def _record(brick, placed, choice, r0, strategy, rationale):
-    """The §2.6 brace fields (plus what the executor and the analysis need)."""
+def _record(brick, placed, choice, r0, strategy, rationale, tilt=None):
+    """The §2.6 brace fields (plus what the executor and the analysis need).
+    tilt: explicit lean rotation vector about x; None keeps lean_for's."""
     py = P.brick_pose(brick)[1]
     out = {"arm": "A", "rationale": rationale, "strategy": strategy,
            "predicted_failure_joint": list(r0.weakest) if r0.weakest else None,
@@ -210,7 +234,8 @@ def _record(brick, placed, choice, r0, strategy, rationale):
     nom = ST.analyze(placed, loads=ST.insertion_loads(brick, placed, press=press_nom),
                      braces=[br], util_cap=FF_UTIL_CAP)
     ff = nom.brace_wrench[0] / press_nom if nom.feasible and press_nom else np.zeros(6)
-    tilt = lean_for(brick, y)                        # rotation vector about x (the grip axis)
+    if tilt is None:
+        tilt = lean_for(brick, y)                    # rotation vector about x (the grip axis)
     w = r.brace_wrench[0]
     out.update({
         "feasible": True,
@@ -220,7 +245,7 @@ def _record(brick, placed, choice, r0, strategy, rationale):
         "gripped_bricks": list(br.bricks),
         "brace_pose": [round(br.point[0], 5), round(y, 5), round(z, 5)],
         "brace_tilt_rotvec": [round(v, 4) for v in tilt],
-        "brace_force_N": GRIP_N,                    # grip per finger
+        "brace_force_N": br.grip_N,                 # grip per finger
         "brace_axis": [1, 0, 0],                    # the fingers close along x
         # what the stabilizer must supply to the structure (world frame, N and
         # N*m); the arm feels the opposite. WP7 compares this with measurement.
@@ -231,4 +256,6 @@ def _record(brick, placed, choice, r0, strategy, rationale):
         "feedforward_wrench_per_N": [round(float(v), 5) for v in ff],
         "end_effector": "parallel_jaw",
     })
+    if br.mu != 1.0:                                 # keeps the frozen v3.1 twin plans byte-identical
+        out["brace_mu"] = br.mu
     return out

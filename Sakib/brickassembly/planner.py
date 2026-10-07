@@ -300,6 +300,30 @@ def grasp_for(brick, placed):
             "accessible": touched(axis) == 0}
 
 
+def pinch_blocked(brick, placed, grasp):
+    """Same-layer placed cells flush against the two pinched faces, within the brick's span: the
+    fingers cannot go down there (v4_pipeline_pyramid_inaccessible_grasp). Unlike `accessible`,
+    in-line and diagonal neighbours under the finger overhang are not counted (the cube builds with those),
+    and only cells under the finger window (FINGER_W about the grasp centre, tcp_offset_m included) count:
+    a long face's far end is free."""
+    _, k = cells(brick)
+    beside = set()
+    for p in placed:
+        if p[4] == k:
+            beside |= cells(p)[0]
+    _, _, i0, j0, _, _ = brick
+    nx, ny = footprint(brick[1], brick[5])
+    half = FINGER_W / 2 - 0.0001
+    ox, oy = grasp["tcp_offset_m"]
+    if grasp["yaw_offset_deg"] == 90:     # fingers on the +-x faces, window along y
+        mid = (j0 + ny / 2) * PITCH + oy
+        span = range(max(j0, math.floor((mid - half) / PITCH)), min(j0 + ny, math.ceil((mid + half) / PITCH)))
+        return sum((s, t) in beside for s in (i0 - 1, i0 + nx) for t in span)
+    mid = (i0 + nx / 2) * PITCH + ox
+    span = range(max(i0, math.floor((mid - half) / PITCH)), min(i0 + nx, math.ceil((mid + half) / PITCH)))
+    return sum((t, s) in beside for s in (j0 - 1, j0 + ny) for t in span)
+
+
 def brace_for(brick, placed, strategy):
     """§3.6 -- brace field for one step, or None. Strategies: none/nearest/weakest_joint."""
     if strategy == "none" or not placed:
@@ -393,7 +417,7 @@ def _bricksim_crosscheck(structure_id, order):
 
 
 def build_plan(structure_id, strategy="weakest_joint", crosscheck=False, brace_model="grasp_lp",
-               clearance=None):
+               clearance=None, brace_grip_N=None, brace_mu=None):
     """Emit an assembly_plan.json dict per §2.6.
 
     brace_model: "grasp_lp" (v3.1: bracing.py over stability.py's force
@@ -402,6 +426,8 @@ def build_plan(structure_id, strategy="weakest_joint", crosscheck=False, brace_m
     clearance: callable(brick, y, z, tilt) -> bool, the hands-fit check for a
     brace grasp (sim/mj/checks.BraceClearance in the twin's frame); None
     keeps the 28 mm rule.
+    brace_grip_N, brace_mu: the grasp the LP plans with (per-finger grip, pad
+    friction); None keeps bracing.py's defaults (70 N, mu 1).
     """
     bricks = STRUCTURES[structure_id]
     order = sequence(bricks)
@@ -409,6 +435,8 @@ def build_plan(structure_id, strategy="weakest_joint", crosscheck=False, brace_m
     if brace_model == "grasp_lp":
         import bracing
         import stability
+        grasp_kw = {k: v for k, v in (("grip_N", brace_grip_N), ("mu", brace_mu))
+                    if v is not None}
     for n, b in enumerate(order):
         bid, btype, i, j, k, yaw = b
         sup = supports(b, placed)
@@ -419,7 +447,7 @@ def build_plan(structure_id, strategy="weakest_joint", crosscheck=False, brace_m
             r0 = stability.insertion_utilisation(b, placed) if placed else None
             utils.append((r0.s, r0.weakest) if r0 else (0.0, None))
             brace = bracing.assign(b, placed, strategy, unbraced=r0,
-                                   clearance=clearance) if placed else None
+                                   clearance=clearance, **grasp_kw) if placed else None
         else:
             brace = brace_for(b, placed, strategy)
         grasp = grasp_for(b, placed)
@@ -450,6 +478,8 @@ def build_plan(structure_id, strategy="weakest_joint", crosscheck=False, brace_m
             "stability_method": "stablelego_force_balance (stability.py, capacity.Patch)",
             "bracing_strategy": strategy,
             "brace_model": brace_model,
+            "brace_grip_N": brace_grip_N if brace_grip_N is not None else bracing.GRIP_N,
+            "brace_mu": brace_mu if brace_mu is not None else 1.0,
             "weakest_joint": list(worst[1]) if worst[1] else None,
             "max_util_unbraced": round(worst[0], 4),
             "single_arm_fails": bool(worst[0] >= 1.0),

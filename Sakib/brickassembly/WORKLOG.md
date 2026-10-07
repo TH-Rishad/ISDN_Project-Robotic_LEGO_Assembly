@@ -2,7 +2,7 @@
 
 Generated from `ledger.jsonl` by `scripts/worklog.py` — do not edit by hand.
 
-163 entries. Later entries supersede earlier ones; retractions are marked.
+254 entries. Later entries supersede earlier ones; retractions are marked.
 
 ## WP0 — Environment & platform verification
 
@@ -93,6 +93,320 @@ Generated from `ledger.jsonl` by `scripts/worklog.py` — do not edit by hand.
 
 - **decided** `v4_agent_routing`
     - outcome: plan revisions go to a new plan-reviser agent (opus, high effort); the planner agent (opus, xhigh) is used only for start-of-phase long-horizon plans of record. Recorded because r4 was the first revision routed this way; the plan text says plan-reviser wherever a revision goes to the planner
+
+- **probe** `v4_p4_brace_weld`
+    - finding: P4 brace/weld probe (scripts/13_brace_weld_probe.py, parts A, B, C; outputs results/v4/p4_brace_weld/*). Part A (arch and S3 builds, current brace executor): arch step 10 arm-arm contact A-hand <-> B-arm mean 161 N during transport, 220-231 N from pre-insert to release, peak 442 N, correlation with welded-brick displacement 0.938; S3 steps 13/14 arm-arm peaks 173/243 N, 1026 N with a stiff weld; S…
+    - implication: a brace can change an outcome essentially only at S3 step 13 above about 9 N (through a break); the r4 weld is too soft (F3), nothing breaks (F4), and the brace executor pushes far harder than the brace model assumes (F1, F2); motivates plan v4 r5
+
+- **problem** `v4_brace_overforce`
+    - finding: user observed braced builds bending and springing back; P4 traced it to three faults. F1: arm-arm contact between A's hand and B's arm during the brace is the dominant load (arch step 10 mean 161 N transport, 220-231 N pre-insert to release, peak 442 N, correlation 0.938 with welded-brick displacement; S3 13/14 peaks 173/243 N, 1026 N with a stiff weld). F2: the brace position target is 2 mm insid…
+    - implication: the r4 statement that a brace cannot change an outcome once a brick is welded is contradicted (arch step 10 brace window: 51.4 mm peak, 21.9 mm remaining 1 s after retract); fixed by plan v4 r5 (r5-1 weld stiffness, r5-4 brace executor, r5-5 hand-off protocol and hands-fit)
+
+- **decided** `v4_joint_scope_r5`
+    - outcome: U4 = yes now: rigid, breakable joints in v4. WP5 splits: WP5a (stiff, breakable, grouped weld pool and its break model) is done now, before WP1, in the r5 J stages; WP5b (detent n*f_insert, v3.1 forces, contact spike, E5) still decides after M1
+    - rationale: the user wants the joint model rigid and breakable now; WP5a needs no contact spike, since loads among welded bricks go through welds and only the new brick (3-6 N) and the arms touch the structure
+
+- **decided** `v4_pipeline_gt_now`
+    - outcome: image -> structure on ground truth now: a GT-first pipeline (stage PL): the user gives 1-2 drawings, the sim rebuilds the drawn shape from simulator poses (not vision); vision-only M1 unchanged
+
+- **decided** `v4_plan_r5`
+    - outcome: plan of record v4 amended to r5 (2026-09-30): weld stiffened (r5-1), structure collision group (r5-2), breakable clutch (r5-3), brace executor to grasp_lp semantics commanding no push (r5-4), acyclic hand-off protocol and executed-path hands-fit (r5-5), new stages J-pre, J-e, J-d (M0-J) and PL before WP1 (r5-6); gates J-a, J-b, J-c, J-pre, J-e, J-d, PL. M0, M0.5 and M1 slip about 4 agent-days (+ <…
+
+- **deviated** `v4_clutch_weld_stiffness`
+    - rationale: P4 part B: the r4 weld gives a column lateral stiffness of 0.70-1.35 N/mm and a 15 mm set after 50 N; ungrouped with the new solimp: column lateral 23-24 N/mm, vertical about 560 N/mm, cantilever 34 / 65-70 N/mm, set <= 0.03 mm, stable at 16 and 32 substeps. Gate J-a (grouped): column lateral secant >= 20 N/mm and vertical >= 300 N/mm at 1-50 N, cantilever >= 30 N/mm, set <= 0.05 mm after 50 N
+
+- **deviated** `v4_structure_collision_group`
+    - rationale: drops (i) bearing/friction between same-course welded neighbours, (ii) non-interpenetration among welded bricks (bounded by gate G3, M2 <= 1.0 mm), (iii) load sharing through contact; external loads on welded bricks (the pressed brick, B's and A's fingers) remain contacts. Readout with collisions off <= 0.12% (measured / reviewer-reported); runtime shape_collision_group.assign without re-capture (…
+
+- **deviated** `v4_clutch_breakable`
+    - rationale: U4 = yes now (WP5a). Restricted model accepted by the user (U-r5-5); J-c quantifies what frame sampling misses (pulses at u = 1.5 for 1-60 substeps, substep vs frame readout) and reports shear/torsion
+
+- **deviated** `v4_build_ends_at_first_failure`
+    - rationale: the grouped weld-only idealisation (v4_structure_collision_group) is valid only before the first failure; a brick is welded only onto grouped welded supports and post-break states are never scored (Codex round 1 finding 2). U-r5-2
+
+- **deviated** `v4_brace_executor_r5`
+    - rationale: F2 and F1 (v4_brace_overforce). The hold is measured, not assumed: gate G5 (max per-brick |F_A| <= 10 N [assumed threshold], realised grip >= 0.8x nominal over the closed-hold interval, contacted set within gripped_bricks); no 'cannot overload' claim. Newton plans change (brace_force_N 14.3, mu, expected_reaction_wrench, predicted_util_braced; feed-forward fields emitted but unused)
+
+- **deviated** `v4_handoff_protocol_r5`
+    - rationale: Codex round 1 found the zone deadlock/park; round 2 confirmed the acyclic protocol with the real Arm class and ideal tracking (arch 5,940, S3 9,104, all-braced S3 13,355 updates, no cycle). Margin: 12 mm provisional (P3 step5.json padding_needed_mm 12.08 at time scale 1.0 is cuRobo evidence), then max(5 mm, p99 + 2 mm) of the waypoint executor's measured deviation from J-pre (empirical padding); r…
+
+- **deviated** `v4_milestone_order_r5`
+    - rationale: U-r5-4 (J before WP1); M0, M0.5 and M1 slip about 4 agent-days (+ <= 1 day if the WP1 seating pull fires; pre-registered branch of J-pre). v3.1 frozen and not comparable; P0/P0' historical; P3 step 8 used P0' cube inserts and is re-run on P0'' before use; P3 steps 5/7 tracking/padding transfer only to cuRobo paths, steps 1-4 and 6 unaffected; P1(f) rows void, re-run under r5; P2 unaffected
+
+- **result** `v4_j_s0`
+    - result: plan v4 r5 step S0 (diagnostic: is there a crown-failure path that needs no brace?), three unbraced runs of scripts/13_brace_weld_probe.py part A with --strategy none, n = 1 per config (descriptive). (1) arch, none, default weld eq_solimp (0.95, 0.99, 0.001, 0.5, 2.0): placed 11/11, completed, error null, no divergence, 6134 frames, sim 102.23 s; crown b_010 seated: final_error 0.29 mm, dz -0.24 m…
+    - implication: the arch crown miss does not occur without the brace, so it is caused by the brace execution (consistent with F1, the B-arm to A-hand contact, v4_brace_overforce; F1 is not separately proven as the cause by S0). S3's unbraced b_015 loss (dz -72.06 mm, tilt 90.03 deg, matching P0' S3 grasp_lp r0's b_015 loss exactly and r1's dz; r2 lost it differently (-68.68 mm, 180 deg), per v4_p0_baseline_stiff_…
+
+- **decided** `v4_r5_phase_gated_execution`
+    - outcome: plan v4 r5 is executed in phases > segments > subtasks; reviews and plan revisions only at phase gates, in-phase check failures logged and carried to the gate. No criterion changed. Phase 1 Joint model: S1 stiff weld + grouping (done, commit a890b68), S2 break model, S4a recording; gate J-a + J-b + J-c together. Phase 2 Brace and build: J-pre one-pass build + margin measurement, S3 brace / hand-of…
+
+- **result** `v4_j_a_weld_grouped`
+    - result: J-a PASS (plan v4 r5, segment S1; probe part B --group, weld solimp 0.9999, 16 substeps, plate + bricks in STRUCT_GROUP, torquescale null). Secant stiffness min over F = 1, 5, 10, 20, 50 N: column lateral (x) 23.128 N/mm (range 23.128-23.252; gate >= 20); column vertical up 560.408 and down 560.408 N/mm (ranges 560.408-561.346 up, 560.408-561.58 down; gate >= 300); cantilever down 32.303 N/mm (ran…
+
+- **result** `v4_j_b_readout_carried`
+    - result: J-b (grouped readout, solimp 0.9999, 16 substeps; tolerance 1 % or 1 mN (F) / 0.1 mN.m (M_patch) absolute, u 1 %): statics_pass true on the pre-registered single end-of-frame reading (statics_failing empty; jacobian_pass_local and jacobian_pass_world true; bridge_pass true), but statics_pass_all_30_samples false: 22 of 2250 sample readings over 30 frames fail (worst sample F error 19.5841 mN, M er…
+
+- **result** `v4_j_b_chatter_diagnosis`
+    - result: Diagnosis of the per-frame weld-force error in J-b (question: A micro-vibration or B readout defect, pre- vs post-integration pose). Not physical vibration: static and dynamic force balance residuals are equal (max per brick, mN: column 10.974 static / 10.9739 dyn on brick2; cantilever 22.3988 / 22.3972 on brick2; bridge 24.6456 / 24.6493 on brick2), m*a_com is at most 0.0106 mN; brick motion is a…
+
+- **result** `v4_j_c_break_rule`
+    - result: J-c PASS on its pre-registered items (i), (ii), (iii), (v) (plan v4 r5, segment S2; test fixture: body forces on weld-held bricks in grouped static scenes, solimp 0.9999, 16 substeps, break rule dual_arm_sim.JointBreaker with U_BREAK 1.0, BREAK_SAMPLES 2, BREAK_SETTLE_S 0.1, raw end-of-frame u from mjw_data.efc.force at the solve-time pose). (i) 2x4 pull-off, ramp 60 N/s: first break at 92.0 N (fr…
+
+- **GATE** `v4_phase1_joint_model` → **changes_requested (J-b); J-a pass, J-c pass**
+    - result: changes_requested (J-b); J-a pass, J-c pass
+    - status: Phase 1 'Joint model' gate (plan v4 r5; phase commits a890b68, 4ad91a7, 0dd4f8b; base f227fd4), reviewed once by Codex (adversarial review of f227fd4..HEAD). Code approved: JointBreaker signs, moment shift, rotation, settle and the 2-consecutive rule; in-place grouping; build ends at first failure; record.py read-only. J-a PASS (v4_j_a_weld_grouped). J-c PASS on its pre-registered items (v4_j_c_br…
+
+- **deviated** `v4_jb_accepted_with_known_cause`
+    - rationale: J-c shows the break decision lands within 2 % of the model near threshold (2x4 pull-off +1.77 %, cantilever -1.11 %) and no false break at analytic u 0.98 on the full 2x4 patch (0 of 120 frames >= 1; the cantilever, with its own +0.025 bias, reads 1.005 there); the cause is solver-side weld-force error of tens of mN (GPU solve exits after 1-2 iterations), not a readout defect (v4_j_b_chatter_diagn…
+
+- **result** `v4_j_pre`
+    - result: J-pre (plan v4 r5 Phase 2, segment 1; commit 245697b; scripts/13_brace_weld_probe.py part A, the r5 breakable joints, the legacy brace executor, grasp_lp, strategy weakest_joint, n = 1 per structure, descriptive). cube: placed 8/8, built 8, brace_required 0, no breaks, no failure, u peak by step at most 0.0339 (step 4), sim 74.88 s, 4493 frames. hollow_box: placed 12/12, built 12, brace_required 0…
+
+- **result** `v4_brace_executor_seg2`
+    - result: Phase 2 segment 2 (S3.1-S3.4): the grasp-and-hold brace with contact guard and the acyclic hand-off protocol (commit 73a4bd5), plus brace grip and mu plumbed into the LP (commit de853f3), run once on arch (new executor, and --legacy-brace as the control) and once on S3 (new executor), n = 1 each, descriptive. arch, new executor: placed 10/11, built 9, joint_break at step 10 (failure joint_break, c…
+
+- **problem** `v4_s3_step1_loss_divergence`
+    - finding: S3 with the r5 joints loses b_001 at step 1 (failure gate_miss, failed_at_step 1, built 1; snap lateral 240.87 mm, tilt 90.03 deg at 18.583 s in J-pre) and the simulation then diverges at t=37.42 s (step 3, B release, A park) in J-pre (results/v4/j/pre/j_pre.jsonl). The seg2 S3 run with the new brace executor (results/v4/j/seg2/S3_new.jsonl) shows the same: b_001 lost at step 1 (lateral 206.86 mm,…
+
+- **decided** `v4_brace_to_rl`
+    - outcome: hand-planned bracing stops; bracing goes to an RL workflow. Dropped from r5: S3.5 dry-run hands-fit, J-e, the G1/G5 brace gate items, and the fixed / none / legacy brace controls. Stays in the code, unused by default: the committed grasp-and-hold brace executor and the acyclic hand-off protocol (commit 73a4bd5), the grip and mu plumbing (de853f3), and --legacy-brace. Bracing becomes a separately p…
+    - rationale: J-pre and seg2 (v4_j_pre, v4_brace_executor_seg2): the hand-planned brace does not save the arch (legacy u 2.0862 in J-pre; new grasp-hold brace and hand-off protocol u 1.1365, still joint_break at step 10, 2 arm_arm events, realised grip 25.5 / 7.52 N against 14.3 N nominal, contact with 5 bricks while 2 were gripped), and the LP brace helps little at the executor's grip (S3 step 13 braced 1.9688…
+
+- **decided** `v4_pipeline_unbraced_now`
+    - outcome: the image -> structure pipeline runs unbraced now: no stabilizer (strategy none) and the r5 breakable joints; an overloaded joint breaks and ends the build (v4_build_ends_at_first_failure). This is the pipeline default until the RL bracing phase delivers a policy
+    - rationale: J-pre: cube 8/8 and hollow_box 12/12 need no brace and record no break (v4_j_pre); ledger v4_j_s0 (before the breakable joints) built the arch 11/11 with strategy none under both weld settings. Not shown by any file: an unbraced arch or S3 build under the r5 breakable joints; the planner's unbraced utilisation is 0.9458 for the arch (step 10) and 3.4311 for S3 (step 13), so an unbraced break is po…
+
+- **deviated** `v4_r5_phases_revised`
+    - rationale: v4_brace_to_rl and v4_pipeline_unbraced_now (user direction 2026-09-30): hand-planned bracing is dropped from v4's critical path, so J-e, S3.5, the brace gate items and the brace controls leave Phase 2; the image pipeline moves up into Phase 2
+
+- **decided** `v4_rl_brace_plan`
+    - outcome: Phase R0 (feasibility) of the RL bracing plan (Docs/plan_v4_rl_brace.md, Phase 3) is ADOPTED with amendments A1-A7 (plan §11); Phases R1 and R2 remain a DRAFT, to be revised once at the G-R0 gate and only if R0 passes. Adopted: plan §0, §2 (task definition), §2.8 arms as used in R0, §4 Phase R0 with gate G-R0, the R0 rows of §5, the R0 items of §7 and §10. Not adopted (draft): §1 verdict tests, §3…
+    - rationale: Review history: the planner wrote the plan 2026-09-30; Codex round 1 CHANGES REQUESTED (12 findings; the planner revised once); the user asked for a second Codex pass and approved the compute budget (U-RL-7); Codex round 2 CHANGES REQUESTED (6 blocking, 1 for R0); escalated to the user after two rounds
+
+- **deviated** `v4_press_fixture`
+    - rationale: on the tested unbraced builds the native regime gives a brace policy almost no break signal (cube 8/8, arch 11/11, hollow_box 12/12, no breaks; u_peak cube 0.033-0.036, arch 0.057-0.059, hollow_box 0.318-0.424; plan §0 fact 1), so training needs a load source; the LP predicts a where problem under a design press (v4_rl_planner_lp_probe)
+
+- **deviated** `v4_step_episode_nominal_start`
+    - rationale: a build reaching every scored state costs full-build time per sample; the step-episode makes per-context sampling affordable within the approved budget
+
+- **deviated** `v4_brace_executor_e1`
+    - rationale: at about 0.5 m reach A holds with about 1.6 N/mm at the hand against 23-24 N/mm (column lateral) and 34-70 N/mm (cantilever) for the welded structure, so the committed hold is expected to carry a few percent of the load (plan §0 fact 3); R0 measures the reaction before anything else is spent
+
+- **probe** `v4_rl_planner_lp_probe`
+    - result: Planner [P] and Codex [R] LP numbers, exactly as in the plan §0 facts 2, 7 and 8. S3 step 13: unbraced u0 3.43; best braced 1.97 with the committed mask [P], 1.56 with the relaxed mask [R]; at half press 0.49 / 0.08. S3 step 14: 1.96 -> 0.44 / 0.00. Arch step 10: 0.95 -> 0.95. The LP costs 2-4 ms per solve. Candidates per critical step: 40-178 on S3, S5 and the arch; median 28 on a corbel family (…
+    - finding: unsaved CPU probe (planner [P] scripts not in the repo; [R] is Codex's recomputation), to be reproduced by segment S0.1 (--self-check writes results/v4/rl/r0/lp_probe.json) before any report cites it. The LP lets the brace supply any bounded wrench, so the braced values are optimistic, not executed benefits
+
+- **result** `v4_phase2_acceptance`
+    - result: Phase 2 segment (b), acceptance runs (commit 8ec883b): unbraced, ground-truth poses, breakable joints, 3 repeats each. cube 8/8 x3, arch 11/11 x3, hollow_box 12/12 x3; 0 breaks in all 9; failure null. Per shape [u_peak_max range; M2 peak excursion range mm (worst brick); M3 residual max mm; rtf range]: cube [0.0329-0.0362; 0.0234-0.0241 (b_004); 0.00010 (8.5e-5 to 9.8e-5); 1.442-1.446]; arch [0.05…
+
+- **problem** `v4_pipeline_pyramid_inaccessible_grasp`
+    - finding: The user's drawing (blueprints/user/pyramid_front.png + pyramid_side.png, --width 5; layers 5x5, 3x3, 1x1; 11 bricks; plans/sim_pyramid_none.json) run live by the user: steps 0 (b_000, 1x1) and 1 (b_001, 2x4) placed (final_error 0.23 / 0.19 mm, dz -0.37 / -0.31 mm, tilt 0.08 / 0.01 deg); step 2 (b_002, 1x4) gate miss (failure_mode gate: lateral 0.12 mm, dz +7.84 mm, tilt 0.9 deg, sim_time 26.98 s)…
+    - implication: Phase 2's gate is met on the acceptance shapes (free grasp faces at every step, v4_phase2_acceptance) and is NOT met on the user's drawing (G7: built 2 of 11). Filled layers cannot be built with the side-pinch grasp. Carried to the Phase 2 gate; addressed by the placer track (v4_placer_rl_primitives).
+
+- **decided** `v4_placer_rl_primitives`
+    - outcome: the placer arm is trained with RL for placement in tight spaces between several bricks, and the pyramid (with other filled-layer shapes) goes into the RL training set. RL controls placement primitives: a new drop-and-press primitive (release above the neighbours, then press the brick down from the top) is added, and RL chooses per brick how to place: grasp-insert vs drop-and-press, release height,…
+    - status: a plan of record for the placer track is being written by the planner, not yet adopted; the Phase 2 gate review by Codex is pending. The pyramid becomes a training and reference structure of the placer track.
+
+- **decided** `v4_session_2026_09_30_handoff`
+    - outcome: End-of-day state on branch v4-newton-vision (HEAD after this entry; work commits fd000b7..3ce7d90). DONE: plan v4 r5 adopted (fd000b7); S0 (f227fd4); workflow changed to phases > segments > subtasks with reviews and revisions only at phase gates (4c8cea7); Phase 1 Joint model closed: stiff grouped clutch welds (a890b68), breakable joints with build-ends-at-first-failure (4ad91a7), --record-all (0d…
+    - rationale: The user ended the session ('pack up the current progress and log everything and thats all for today'); two background agents were stopped mid-work (the placer planner, by the user; the S0.1 implementer, by the orchestrator).
+
+- **result** `v4_rl_r0_s01_done`
+    - result: RL bracing R0 segment S0.1 (task library) finished and verified, commit cf2b27c. Bug fixed: the no-brace feature vector had 38 numbers vs NF 37 (hand-counted zero padding in tasks/brace_bandit.py _candidate_features); it is now derived from the FEATURES list. Added test_hidden_job_order_and_workers (A6: identical hidden() draws under shuffled job order and a 3-worker pool). tests/test_brace_bandit…
+
+- **result** `v4_phase2_preflight_pinch_blocked`
+    - result: Phase 2 close-out (commit 3fe7a44), the pending small fix of v4_session_2026_09_30_handoff item 4. planner.pinch_blocked(brick, placed, grasp) counts same-layer placed cells flush against the two pinched faces under the finger window (FINGER_W 17.5 mm about the grasp centre, tcp_offset_m included); dual_arm_sim.make_plan prints a preflight WARNING listing those steps and stores them in preflight.i…
+
+- **decided** `v4_place_plan_draft`
+    - outcome: The placer RL plan (user decision v4_placer_rl_primitives) is drafted by the orchestrator as the user asked ("dont do planner just write yourself"): Docs/plan_v4_rl_place.md. Feasibility phase P0 first: a drop_press primitive (release above the flush neighbours' studs, then press the brick down with closed fingertips) behind a --place-json flag; a 16-setting screen of grasp height, release margin,…
+    - status: draft, not reviewed, not adopted; shown to the user before review.
+
+- **result** `v4_p2_cameras`
+    - result: P2 camera gate, 1x unless stated (plan §0 fact 1). (a) PASS at 1x and 2x: top 8.8 ms, wrist 3.3 ms per capture. (b) PASS: 600 tray bricks, 100 %, minimum 144 px. (c) PASS at 1x, 48/50 (single footprint 9/10; misses S5 step 12 and S3L step 4); FAIL at 2x, 44/50. Look pose: h_look 45 mm, offset 60 mm. (d) at 1x: yield 45/50; relative error rms 0.114 / 0.090 mm, yaw 0.057 deg, radial p95 0.234 mm, ma…
+    - finding: The cameras carry the information at 1x and not at 2x. The run was made before 2026-10-06 but never recorded; this entry records it. The orchestrator recomputed gate (c) and the V5 numbers from v5.jsonl.
+
+- **decided** `v4_perception_priority`
+    - outcome: The perception pipeline is built first, before the placer track and the remaining RL-bracing R0 runs; both wait until G-V3 (U-P6).
+
+- **decided** `v4_perception_plan`
+    - outcome: Phase 4 Perception plan (Docs/plan_v4_perception.md, revision r2): V1 (feasibility) is ADOPTED; V2 (vision-only executor) and V3 (RL observation) stay a DRAFT, revised once at G-V1. Review history: r0 -> Codex round 1 CHANGES REQUESTED (10 findings) -> r1 -> Codex round 2 CHANGES REQUESTED (1 blocker, 4 major) -> escalated to the user, who chose "Adopt with 5 fixes"; there is no third Codex round …
+
+- **deviated** `v4_scale_1x_matched_injection`
+    - rationale: P2 passed at 1x and failed (c) at 2x (44/50), P1(b) was never run and no capture tolerance has been measured, so the tolerance that matters is tested directly against measured V5 errors (plan §0 facts 1 and 4)
+
+- **deviated** `v4_perception_executor`
+    - rationale: Smallest executor change that replaces the GT servo (plan §0 fact 2); the 9.75 agent-day total assumes no tree or cuRobo
+
+- **deviated** `v4_preweld_screen`
+    - rationale: snap() runs at insert end with the hand still gripping and welds at once to the nominal relpose, so a screen after release would read the weld's pull, not the seat. The relative speed at snap, median 18.04 / p95 18.46 mm/s, is Codex-reported [R] and not recomputed. Two at-rest rules were a Codex round 2 major finding
+
+- **deviated** `v4_asbuilt_plan_anchored`
+    - rationale: RL inputs are plan-pure (plan §0 fact 5), so a plan-anchored model with verified, inferred and raised/missing statuses is enough; U-P1 recommended default taken
+
+- **deviated** `v4_b1_drift_measured`
+    - rationale: B1 was open in plan_v4 (U-r5-3); E5 measures it before the margin test uses it
+
+- **result** `v4_phase2_gate_review`
+    - result: Phase 2 gate review by Codex (2026-10-06, base 215499a): verdict CHANGES REQUESTED, 3 findings. (1) [high] the preflight finds the pinch-blocked grasps of the user's pyramid (steps 2, 3, 4, 6, 7, 8, 9 with 2, 4, 4, 1, 1, 1, 1 blocked cells) but only warns; queue_place still side-pinches and fails (step 2 dz +7.84 mm; the fingertips sit 5.5 mm below the seated brick's top). The gate wording is corr…
+
+- **GATE** `v4_phase2_gate` → **pass_with_recorded_exceptions**
+    - result: pass_with_recorded_exceptions
+    - status: Phase 2 'Unbraced build and image pipeline' gate, closed on the user's decision after the Codex review (v4_phase2_gate_review, CHANGES REQUESTED, 3 findings; the two scoring fixes in j_tables.py are in, the high finding is the exception). PASS on the three acceptance shapes (v4_phase2_acceptance, recomputed by Codex): cube 8/8, arch 11/11, hollow_box 12/12, 3 repeats each, unbraced, 0 breaks in al…
+
+- **result** `v4_v1_s1_cameras_vision`
+    - result: Perception V1 S1 (commits 4616b16, a7db1b8). cell/cameras.py: the camera half moved out of scripts/11_camera_probe.py; Cameras(model, seed) on the cell model, the wrist mount from B's FK (joint angles only). dual_arm_sim.py --save-captures (off by default; the render runs outside captured graphs). The probe --summary is byte-identical and --selfcheck is unchanged (49 blobs, fit max err 2.8 um, yaw…
+    - finding: The V5 estimator behind the acceptance rule reproduces the P2 camera numbers (45 of 50, radial p95 0.230 mm vs P2's 0.234 mm); the rule rejects the 5 renders with fewer than 4 studs on the held or target brick. The orchestrator recomputed the P2(d) numbers from scratch output; timings and the noise-model cost are implementer-reported.
+
+- **result** `v4_v1_s13a_executor_hooks`
+    - result: Perception V1 S1.3a (commit 565eaa8). dual_arm_sim.py flags, all off by default: --seed, --look (plan-scheduled looks; the second look yawed 180 deg on single-footprint targets), --aim gt|fk_oracle|fk_vision (plan §2.2a: the full hand-frame d_h from FK, dpsi added once to the remaining waypoints), --aim-inject, --shadow-vision, the D6 pre-weld screen in snap(), row["vision"]. Flags off: cube --tes…
+    - finding: The executor hooks are in and inert when off (cube 8/8, u_peak 0.0354). The smoke runs are single repeats and are not experiment results; the E1/E2 experiments are not yet run.
+
+- **deviated** `v4_v1_e2_manipulation_matched_control`
+    - rationale: The realised offset at the end of pre-insert is 1.0-1.2 mm with no injection in every aim mode including gt (the swing from the 22 mm descent after the look decays during insert) [implementer-reported]. On the cube a 0.4 mm injection gave realised minus control 0.39-0.49 mm; on S1 step 1 {0.4, -0.3 mm, 1.0 deg} gave 0.403 / -0.295 mm / 0.93 deg [implementer-reported]. In-phase change; the gate cri…
+
+- **problem** `v4_v1_braced_second_look_collision`
+    - finding: On braced single-footprint steps the 180 deg second look collides B's hand with A's: S3 step 11 with weakest_joint bracing and --look gave 7-9 arm_arm events (peak 270-956 N), a joint break and the second look rejected, in both --aim fk_vision and --aim gt --shadow-vision; the flags-off run of the same step passes [implementer-reported]. V1's experiments are unbraced, so it does not block V1. Carr…
+
+- **problem** `v4_arch_step10_nominal_start_break`
+    - finding: Arch step 10 with weakest_joint bracing, run as a nominal-start step-episode, breaks at frame 779 with all perception flags off [implementer-reported]. Not caused by the perception hooks. Relevant to RL bracing R0 (paused, U-P6).
+
+- **result** `v4_v1_e1_e1b_first_pass`
+    - result: E1 (36 builds) and E1b (54 step-episodes) ran on commit 488415c into results/v4/vision/v1/ (0 lost, 0 errors). Builds built-all of 3 (results/v4/vision/v1/tables.json): gt: cube 3, arch 3, hollow_box 3, S3 0; fk_oracle: cube 3, arch 3, hollow_box 3, S3 0; fk_vision: cube 2, arch 1, hollow_box 0 (perception_v5 at step 7 in all three), S3 0. fk_oracle passed the D6 screen on all 93 gated snaps. V5 (…
+    - finding: First pass, kept as the record. SUPERSEDED by the re-run after the yaw fix into results/v4/vision/v1_r1/ (E1, E1b, pool, E2, E2b, E4); the fk_vision build failures and the screen outcomes here are pre-fix and must not be quoted as V1 results.
+
+- **problem** `v4_v1_turned_look_yaw`
+    - finding: E1 rows: on two-look steps estimated from the turned look, the realised yaw at the end of pre-insert has median -0.333 deg (fk_oracle, n 36) and -0.335 deg (fk_vision, n 27) versus +-0.005 deg on one-look steps; the turned hand's FK yaw is 90.37 deg versus commanded 90.00. Cause: look_done added dpsi measured at the hand's actual yaw onto commanded waypoint yaws. Fixed in 77b551d: dpsi = wrap(T_ya…
+
+- **problem** `v4_contacts_look_not_held`
+    - finding: cell/contacts.py HELD_PHASES omitted "look", so finger contact with the held brick during a look was classed unintended and the brick displaced (HELD_PHASES is also used by cell/record.py flag_arm_welded). Fixed in 77b551d by adding "look". Affects the contact counts of the first-pass --look rows only (results/v4/vision/v1/).
+
+- **problem** `v4_s3_pick_marginal_2x2`
+    - finding: S3 fails at step 1 in every E1 arm including gt with --look (Phase 2 acceptance without --look reached 15/16). Cause [implementer-reported, frames from a diagnostic run]: at the pick of b_001 (2x2, feeder slot (100, -220) mm) the hand touches down about (+2.2, +1.5) mm off the command against about 2.1 mm finger-pad clearance; the fingers land on the brick top (finger joints pushed to 0.0113/0.010…
+
+- **result** `v4_v1_builds`
+    - result: E1 builds (T-V1a), re-run after the turned-look yaw fix into results/v4/vision/v1_r1/ (params_hash 0f312821b7c8c394; 36 builds). Built-all of 3 repeats, per repeat built/n. gt: cube 3 (8/8, 8/8, 8/8), arch 3 (11/11 x3), hollow_box 3 (12/12 x3). fk_oracle: cube 3 (8/8 x3), arch 3 (11/11 x3), hollow_box 3 (12/12 x3). fk_vision: cube 3 (8/8 x3), arch 1 (10/11, 11/11, 10/11; failures gate_miss, none, …
+    - finding: Supersedes the pre-fix E1 numbers in v4_v1_e1_e1b_first_pass (fk_vision cube 2, arch 1, hollow_box 0 there; cube is now 3, arch still 1, hollow_box still 0). The fk_vision arch failures are gate_miss in two of three repeats, and both of those repeats also have a screen fail at arch step 10 (arch step 10 is also one of the two native E2 contexts, see v4_v1_margin_injection). The fk_vision hollow_bo…
+
+- **result** `v4_v1_single_footprint`
+    - result: E1b (54 step-episodes, 9 single-footprint contexts x 2 arms x 3 repeats; 0 lost, 0 errors; params_hash 0f312821b7c8c394), success / screen-pass of 3 repeats per context, fk_oracle then fk_vision. S1 step 1: 3/3, 3/3 and 3/3, 3/3. S1 step 3: 3/3, 3/3 and 3/3, 3/3. S2A step 4: 3/3, 3/3 and 3/3, 2/3. S3 step 2: 3/3, 3/3 and 3/3, 3/3. S3 step 7: 3/3, 3/3 and 3/3, 3/3. S3L step 3: 3/3, 3/3 and 3/3, 3/3…
+    - finding: S5p13 step 12 fails in fk_oracle (0/3) as well as fk_vision (1/3), so it is a native context, not a perception effect (E2 lists it as native, v4_v1_margin_injection). The vision-specific failures are S5p13 step 4 (fk_vision 1/3 against fk_oracle 3/3) and one screen fail at S2A step 4. [Per-context counts computed from results/v4/vision/v1_r1/e1b/episodes.jsonl and rows/*.json; tables.json has no p…
+
+- **result** `v4_v1_v5_accuracy_pool`
+    - result: E3 V5 accuracy and yield (E1 + E1b, tables.json T_V1b_v5 and T_V1b_pool; pool hash 553a5a31d1cb1ebe, not partial). Steps 339, looks 498, accepted looks 418; yield all 0.929 (315/339), course 0.950 (171/180), single footprint 0.906 (144/159). Relative radial p95 mm (bootstrap CI): all 0.233 (0.209-0.300), course 0.204 (0.182-0.215), single 0.301 (0.221-0.374); yaw p95 deg (CI): all 0.194 (0.153-0.2…
+    - finding: Supersedes the pre-fix V5 numbers in v4_v1_e1_e1b_first_pass (342 steps, yield 0.930, radial p95 0.222 mm, yaw p95 0.20 deg): the re-run gives 339 steps, yield 0.929, radial p95 0.233 mm, yaw p95 0.194 deg. Single-footprint steps (two looks) have the lower yield and the wider radial p95 (0.301 against 0.204 mm). The yaw p95 CIs of the single-footprint arms reach 0.44-0.46 deg (fk_oracle, fk_vision…
+
+- **result** `v4_v1_drift_b1`
+    - result: E5 drift (B1; pool of 201 drift-checked supports, tables.json T_V1b_pool): drift_max 0.355 mm (3-D), 0.308 mm (xy), median 0.010 mm. Worst cases (3-D / xy mm): arch step 10 support b_006 fk_vision seed 0 0.355 / 0.308; arch step 10 b_007 fk_vision seed 2 0.289 / 0.260; arch step 10 b_006 fk_vision seed 2 0.230 / 0.221; arch step 10 b_007 fk_vision seed 0 0.154 / 0.141; arch step 9 b_007 fk_vision …
+    - finding: All five listed worst cases are arch steps 9-10 in the fk_vision arm; the median is 0.010 mm. Arch step 10 is also where fk_vision builds fail (v4_v1_builds) and one of the two native E2 contexts (v4_v1_margin_injection).
+
+- **result** `v4_v1_margin_injection`
+    - result: E2 matched injection (tables.json F_V1_e2). Contexts 33; native (a control fails the screen) 2: S5p13 step 12 and arch step 10; included 31. Screen pass at scale 1: all 117/124, course 74/76, single footprint 43/48. At scale 2: all 72/124, course 49/76, single footprint 23/48. Manipulation check under the amended rule (ledger v4_v1_e2_manipulation_matched_control; |realised - mean(controls) - inje…
+    - finding: At scale 2 the pass rate is 72/124 overall, 23/48 on single-footprint steps against 49/76 on course steps; failures start at 0.388 mm injected xy while passes extend to 0.881 mm, so the two ranges overlap and |injected xy| alone does not separate pass from fail. The manipulation check passes at 252/264 (0.955, just above the 95 % line), so the injection is valid and the E2 result stands as measure…
+
+- **result** `v4_v1_transfer`
+    - result: E2b transfer (tables.json F_V1_e2b; 6 episodes): 62 steps, 36 observed and 26 unobserved; of the 36 observed, 22 pass the screen and 34 agree with the E2 scale-2 outcome of the matched context (0.944; no_e2_match 0; native steps included 2).
+    - finding: Agreement of the E2b observed steps with E2 is 34 of 36 (0.944); the E2b pass count is 22 of 36. 26 of the 62 steps are unobserved. No gate verdict here; that is v4_G_V1.
+
+- **result** `v4_v1_cost`
+    - result: E4 cost (tables.json T_V1c_cost; 40 episodes per arm, 4 workers, 0 lost). gt: wall 521.4 s, 276.2 episodes/h, episode wall median 51.05 s, startup median 7.19 s, real-time factor median 0.278, success 4/40. fk_vision: wall 477.5 s, 301.6 episodes/h, episode wall median 46.75 s, startup median 7.18 s, real-time factor median 0.328, success 3/40; per-episode medians render 36.2 ms, vision 163.9 ms, …
+    - finding: A ratio above 1 means vision mode did not slow throughput in this fixture; it is not a speed-up claim: success is 4/40 (gt) and 3/40 (fk_vision) because these are fixture-on unbraced contexts, so the episodes are not builds. Provisional: V2's acquisition motions are not included.
+
+- **GATE** `v4_G_V1` → **ACC**
+    - result: ACC
+    - status: G-V1 (Phase 4 Perception V1 feasibility), computed by experiments/v4_vision.py tables on results/v4/vision/v1_r1 (tables.json G_V1). VALIDITY all pass: (a) E1 native clean on cube, arch, hollow_box; (b) 2 of 33 E2 contexts native (arch step 10, S5p13 step 12; limit 3); (c) manipulation check 252/264 = 0.9545 under the amended rule (v4_v1_e2_manipulation_matched_control; limit 95 %); (d) E2/E2b agr…
+
+- **result** `v4_G_V1_review`
+    - result: G-V1 review by Codex, two rounds, both CHANGES REQUESTED. Round 1: ACC is the correct outcome; the scale-2 failure seen through fk_oracle shows an insertion-margin limitation of the cell, not only perception accuracy, so the ACC remedies (perception-side) may not reach criterion 2. Round 2, the five r2 plan fixes checked in code: (1) FK lever arm and control path CONFIRMED; (2) one pre-weld screen…
+    - finding: Fix (3) is handled by v4_v1_e2b_continue (every E2b step scored). The round-1 point stands as a risk to the ACC branch: if scale 2 still fails through fk_oracle after the remedies, the user chooses among a lower success criterion, an insertion search, or stop (v4_v1_acc_branch).
+
+- **deviated** `v4_v1_acc_branch`
+    - rationale: G-V1 outcome is ACC (v4_G_V1): criteria 2, 3 and 4 fail while validity and criterion 1 pass. Codex round 1 warned that the scale-2 failure through fk_oracle is an insertion-margin limitation, so the remedies may not reach criterion 2; the user was told and chose the pre-registered branch.
+
+- **deviated** `v4_v1_e2b_continue`
+    - rationale: Codex round 2 (v4_G_V1_review, fix 3): all 6 E2b builds stopped early, 26 of 62 steps unscored, so the 22/36 rate is selected by early stopping. Continuing scores every step; later steps may sit on a structure holding a jammed brick, which is reported.
+
+- **deviated** `v4_pick_settle_hover`
+    - rationale: S3 fails at step 1 in every E1 arm including gt: at the 2x2 pick the hand touches down about (+2.2, +1.5) mm off against about 2.1 mm finger-pad clearance and the brick pops up (v4_s3_pick_marginal_2x2, cause implementer-reported). A settle hover was the first of the listed fix candidates.
+
+- **result** `v4_pick_settle_hover_regression`
+    - result: Settle hover (commit 9d551ad): descend to 9 mm above the grasp pose, wait until the hand xy error is below 0.5 mm (max 0.6 s), then a 0.3 s final descent. Orchestrator verified from run rows (results/v4/vision/pick_fix/rows, untracked). Before (HEAD 713acad): S3 without --look 1/16, gate_miss at step 1. After: S3 --look --aim gt 16/16, S3 without --look 16/16, cube 8/8, arch 11/11, hollow_box 12/1…
+    - finding: The regression check required by v4_pick_settle_hover passes: no acceptance shape regresses and S3 now builds 16/16 with and without --look. The implementer also found that HEAD's S3 without --look failed at step 1 (1/16), not 15/16 as in Phase 2's acceptance runs; the commits differ, and the fix cures it.
+
+- **result** `v4_v1_acc_sweep`
+    - result: ACC first diagnostic: experiments/v4_vision.py sweep on commit 9d551ad, results/v4/vision/v1_acc/ (tables.json F_V1_sweep): 372 fk_oracle step-episodes, 31 included E2 contexts (natives S5p13 step 12 and arch step 10 excluded), persistent injected offsets along the target's long and short axis, both signs, at 0.3 / 0.6 / 1.0 mm; 0 lost, 0 errors. Pass at 0.3 / 0.6 / 1.0 mm, all 31 contexts: long+ …
+    - finding: The executor's insertion tolerates about 0.3 mm of persistent offset, half the 0.6 mm cavity clearance. This is consistent with Codex's G-V1 reading (v4_G_V1_review) that the scale-2 failure is an insertion-margin limitation of the cell and not only perception accuracy, so perception-side remedies may not reach criterion 2.
+
+- **problem** `v4_v1_e5_drift_contaminated`
+    - finding: E5's drift_max (0.355 mm 3-D, 0.308 mm xy; results/v4/vision/v1_r1/pool.json) comes from arch step 10, fk_vision seeds 0 and 2, the snaps that jammed (screen fail, gate_miss; v4_v1_builds), so it is support displacement caused by the insertion itself. The next-worst record is 0.095 mm xy (arch step 9, b_007, seed 1); the median is 0.010 mm. Because the plan's capture-to-snap window includes insert…
+
+- **deviated** `v4_v1_e5_drift_to_insert_start`
+    - rationale: v4_v1_e5_drift_contaminated: the capture-to-snap window includes insertion contact, so a jammed insertion inflates drift_max and with it every E2 scale-2 vector.
+
+- **decided** `v4_v1_acc_camera_only`
+    - outcome: The ACC round stays the pre-registered branch with camera fixes only (v4_v1_acc_branch); no insertion search is added now. If the margin still fails after the round, the user chooses then among a lower success criterion, an insertion search, or stop.
+
+- **result** `v4_v1_acc_remedies`
+    - result: The four WP3 remedies applied once on merge commit 6967bbc (worktree branch commits fbb1b4e to 509f877; PARAMS_HASH e346d590acba5201): wrist_B 1280x960 (same VFOV and mount); a second look (hand turned 180 degrees) on every step; H_LOOK 35 mm; the edge fallback (support top-face outline sides >= 2 plus 2-3 studs) for single-footprint targets with fewer than 4 matched or collinear studs, used only …
+    - finding: Smoke only, not the ACC gate run: cube builds 8/8 with all screens passing in fk_vision at two seeds, arch seed 0 stops at step 7 where look 0 is rejected and the build falls to perception_v5. The cube successes at steps 3, 5, 7 rely on the edge estimator.
+
+- **deviated** `v4_v1_common_mode_fusion`
+    - rationale: e flips sign in the target estimate across the 180 degree turn but not in the hand-frame d_h, so a plain average doubles it in the result. Implementer-measured on cube steps 0 and 1: plain average 0.29 to 0.30 mm versus 0.08 to 0.15 mm per look.
+
+- **problem** `v4_v1_turned_look_offset`
+    - finding: A single turned look's estimate carries about 2|e| (about 0.6 mm) error at the insertion pose after the turn-back, because the camera offset no longer cancels between target and brick; scoring at the turned pose (t_L) hid it. This explains G-V1's fk_vision jams (cube seed 0 steps 5 and 7, arch seeds 0 and 2 step 10 were aimed from the turned look alone). Fixed: used estimates are scored at the ins…
+
+- **problem** `v4_v1_turned_insertion`
+    - finding: Implementer-reported, from per-frame logs: inserting with the hand turned 180 degrees failed in two ways. (a) Cube step 5, with shallower seating at steps 3 and 7: the brick sits 0.75 mm off the pad centre in the hand frame, the turn points that offset at the flush neighbour, the fingertip lands on its edge, the hand is held 0.5 to 2.2 mm above its command, and at release the stored press (Fz -85.…
+
+- **decided** `v4_v1_never_insert_turned`
+    - outcome: Never insert turned. Every step is inserted at look 0's hand yaw. Selection: both looks stud-accepted -> fused pair; look 0 studs alone -> look 0; look 0 edge plus look 1 studs or edge -> fused pair, edge-steered; look 0 edge alone -> used, edge-steered; look 0 not accepted -> perception_v5 in fk_vision (look 1 is never used alone); gt and fk_oracle use the same selection via shadow V5 and never f…
+
+- **result** `v4_v1acc_builds`
+    - result: E1 builds (T-V1a, tables.json T_V1a_builds), 3 repeats per arm and shape, built steps per repeat. gt and fk_oracle: cube 8/8 x3, arch 11/11 x3, hollow_box 12/12 x3, S3 16/16 x3, no failures, every screen passing (cube 24/24, arch 33/33, hollow_box 36/36, S3 48/48 snaps, both arms). fk_vision: cube 8/8, 8/8, 8/8 (screens 22/24 pass, screen fails at seed 0 steps 3 and 7; cell gate 24/24) and hollow_…
+    - finding: Criterion 1 (fk_oracle) holds on the three gated shapes; criterion 4 (fk_vision) fails on all three. The seed-1 step-0 jams occur only in fk_vision (arch and S3), with an accurate estimate; cause not identified (under Codex review). The cube and hollow_box fk_vision builds are physically complete, and fail only the counting rule because the edge fallback is not qualified (v4_v1acc_edge_qualificati…
+
+- **result** `v4_v1acc_single_footprint`
+    - result: E1b single-footprint step-episodes (54, 0 lost, 0 errors, 27 per arm; shapes S1 6, S2A 3, S3 6, S3L 3 and S5 prefix 13 steps 8 per arm plus 1 failed). tables.json carries no E1b success table; computed by the doc-writer from e1b/episodes.jsonl joined to the rows (step n's snap). fk_oracle: 26/27 success, cell gate 26/27, screen pass 24/27. fk_vision: 26/27 success, cell gate 26/27, screen pass 24/…
+    - finding: The two arms are indistinguishable on single-footprint steps (26/27, 24/27 screens each), so the oracle arm fails the same prefix:S5:13 context; E1b feeds the V5 pool and the edge qualification, not a gate criterion.
+
+- **result** `v4_v1acc_v5_pool`
+    - result: V5 accuracy and yield (T_V1b_v5) over 436 steps (E1 plus E1b, edge fallback not counted): yield all 0.860 (375/436), course 1.000 (199/199), single 0.743 (176/237). Step-level used-estimate error, p95 [95% CI]: all radial 0.205 mm [0.174, 0.225], yaw 0.161 deg [0.149, 0.178]; course radial 0.209 mm [0.169, 0.249], yaw 0.177 deg [0.161, 0.188]; single radial 0.189 mm [0.160, 0.217], yaw 0.050 deg […
+    - finding: Yield 0.860 and yaw p95 0.161 deg are what criterion 3 reads (it fails: single-footprint yield 0.743 is the shortfall; course is complete). The pool's 221 single vectors exceed the 176 stud-yielded single steps by 45, which equals the 45 edge-fallback cases (v4_v1acc_edge_qualification): the pool includes the edge vectors while the yield does not count them.
+
+- **result** `v4_v1acc_edge_qualification`
+    - result: Edge-fallback qualification (T_V1b_edge_fallback): n_cases 45 over n_steps 15 (all in the pool). Relative error p95 [95% CI]: radial 0.154 mm [0.127, 0.169], yaw 0.051 deg [0.043, 0.099]. E2 scale-2 single-footprint screen with edge vectors: 6/9 pass. qualified = false. This is the ACC round of G-V1 (merge commit 6967bbc, PARAMS_HASH e346d590acba5201, tables from `experiments/v4_vision.py tables -…
+    - finding: The edge fallback does not qualify (the E2 scale-2 single-footprint pass is 6/9), so edge-steered steps are counted perception_v5: this is what turns the cube and hollow_box fk_vision builds into failures in v4_v1acc_builds and keeps the yield at 0.860 in v4_v1acc_v5_pool. The radial and yaw p95 of the edge vectors themselves are in the same range as the stud vectors.
+
+- **result** `v4_v1acc_drift`
+    - result: E5 drift (T_V1b_pool, 208 drift steps, drift measured to insert onset per v4_v1_e5_drift_to_insert_start): max 0.0 mm 3-D and 0.0 mm xy (the worst five are about 1e-6 mm, median 1.4e-7 mm; cube step 7 b_005 fk_oracle seed 1 the largest at 1.1e-6 mm). Drift to the snap: max 0.084 mm 3-D, 0.063 mm xy; worst cases arch step 9 (support b_007) fk_oracle seed 0 (0.084 mm 3-D, 0.063 mm xy) and seed 2 (0.…
+    - finding: Supports do not drift before insertion; the up-to-0.084 mm that appears by the snap is the insertion itself loading the structure. Drift is not a source of the perception shortfall.
+
+- **result** `v4_v1acc_margin`
+    - result: E2 matched injection (F_V1_e2): 33 contexts, 2 native (arch step 10, S5p13 step 12; the other 31 included). Screen pass at scale 1: all 119/124, course 74/76, single 45/48. At scale 2: all 110/124, course 69/76, single 41/48. Manipulation check 264/264 (rule |realised - mean(controls) - injected| <= max(0.1 mm, 10 %), >= 95 %). This is the ACC round of G-V1 (merge commit 6967bbc, PARAMS_HASH e346d…
+    - finding: Criterion 2 fails on the E2 half: 110/124 at scale 2. The failures are not confined to single-footprint contexts (course loses 7/76 at scale 2, single 7/48). Validity (b) native contexts 2 of 33 and (c) manipulation 264/264 hold.
+
+- **result** `v4_v1acc_transfer`
+    - result: E2b --continue (F_V1_e2b): 62 scored steps observed, 47 pass the screen, 57 agree with E2's scale-2 result (0.919); 0 unobserved, 0 without an E2 match. Pre-failure steps: 44 observed, 36 pass, 44 agree (1.000). After-failure steps: 18 observed, 11 pass, 13 agree (0.722). Two native steps included. This is the ACC round of G-V1 (merge commit 6967bbc, PARAMS_HASH e346d590acba5201, tables from `expe…
+    - finding: E2 transfers to built-structure steps before the first failure (44/44 agree); after a failure the agreement drops to 13/18, and the all-step agreement 57/62 is above the 90 % validity bar (d). The marginal E2b result is 47/62, which fails criterion 2.
+
+- **result** `v4_v1acc_cost`
+    - result: E4 cost (T_V1c_cost), 40 episodes per arm, 4 workers, 0 lost. gt: 269.0 episodes/h (wall 535.3 s, episode wall median 50.85 s, startup median 7.225 s, rtf median 0.2855). fk_vision: 227.2 episodes/h (wall 633.7 s, episode wall median 63.65 s, startup median 7.285 s, rtf median 0.2725; per-look medians render 59.1 ms, vision 391.0 ms, mask 132.2 ms, looks sim time 2.583 s). ratio fk_vision/gt 0.845…
+    - finding: Cost is not binding: vision costs 15.5 % of throughput (1 - 0.845, computed from the ratio).
+
+- **result** `v4_v1acc_gate_computed`
+    - result: G_V1 block as computed (tables.json G_V1, git_head 1d0f3d4, complete e1/e1b/e2/e2b true). Validity all pass: a E1 natives cube, arch, hollow_box clean; b native contexts 2 of 33; c manipulation check 264/264; d E2/E2b agreement 57 of 62 (pre-failure 44 of 44). Criteria: 1 pass (cube, arch, hollow_box all true); 2 fail (E2 110/124, E2b 47/62); 3 fail (yield 0.860, yaw p95 0.161 deg); 4 fail (cube, …
+    - finding: The stale flag comes from the 372 sweep rows (params hash 0f312821b7c8c394, run before the remedies, a pre-remedy diagnostic by design, v4_v1_acc_sweep); e1, e1b, e2, e2b and e4 rows are all e346d590acba5201, so the flag does not touch the gate inputs. Outcome ACC again: criterion 1 only. This entry is the computed block, not a gate decision; the gate entry follows the Codex review and the user's …
+
+- **result** `v4_v1acc_review`
+    - result: Codex review of the ACC round: CHANGES REQUESTED. (1) high: the margin pool (experiments/v4_vision.py about lines 433-439) keeps only relative xy and yaw, while look_done feeds the full fused d_h including z into the controller. At arch seed 1 step 0 the radial error was 0.088 mm but the held-height error +0.137 mm (about +0.186 mm by FK before contact); S3 seed 1 step 0 is similar. Held-height er…
+    - finding: The ACC numbers reproduce. Two open findings: the held-height (z) error is not tested by the margin pool, and the E2b validity rule does not require completeness. Neither changes the computed outcome (ACC).
+
+- **GATE** `v4_G_V1_acc` → **ACC — not passed; perception V1 closed by the user**
+    - result: ACC — not passed; perception V1 closed by the user
+    - status: G-V1 ACC round (merge commit 6967bbc, PARAMS_HASH e346d590acba5201, tables.json G_V1, git_head 1d0f3d4), criteria as recorded in v4_v1acc_gate_computed. VALIDITY all pass: (a) E1 natives clean on cube, arch, hollow_box; (b) 2 of 33 native contexts; (c) manipulation check 264/264; (d) E2/E2b agreement 57 of 62 (pre-failure 44 of 44). CRITERIA: (1) PASS: fk_oracle built all on cube, arch, hollow_box…
+
+- **decided** `v4_perception_stopped`
+    - outcome: The perception iteration stops after the ACC round; V2 and V3 are not started. The user will prepare a different training policy later. Open items carried: (1) held-height (z) error is not in the margin test (v4_v1acc_review); (2) the E2b validity rule does not require all planned steps scored (v4_v1acc_review); (3) look-0 rejections at arch step 7 and S3 step 10 (perception_v5, v4_v1_never_insert…
 
 ## pre-WP0 — Kinematic slice (pre-gate exploration)
 
@@ -504,6 +818,10 @@ Generated from `ledger.jsonl` by `scripts/worklog.py` — do not edit by hand.
 - **G5**: not_applicable — WP6 skipped on A3 (decision vision_decision)
 - **G6**: fail — 0/15 planned full-loop assemblies (RL-first inserter R1, scripted fallback); full system on S1-S3 x 5 seeds: 1/15; RL seats 54% of its attempts, the fallback 10…
 - **G7**: pass_with_recorded_exceptions — S5's A6 exception removed (20 seeds per cell, a6_s5_20seeds); remaining exception: G6 has one planned seed plus 4 extra on S1-S3
+- **v4_phase1_joint_model**: changes_requested (J-b); J-a pass, J-c pass — Phase 1 'Joint model' gate (plan v4 r5; phase commits a890b68, 4ad91a7, 0dd4f8b; base f227fd4), reviewed once by Codex (adversarial review of f227fd4..HEAD). Co…
+- **v4_phase2_gate**: pass_with_recorded_exceptions — Phase 2 'Unbraced build and image pipeline' gate, closed on the user's decision after the Codex review (v4_phase2_gate_review, CHANGES REQUESTED, 3 findings; th…
+- **v4_G_V1**: ACC — G-V1 (Phase 4 Perception V1 feasibility), computed by experiments/v4_vision.py tables on results/v4/vision/v1_r1 (tables.json G_V1). VALIDITY all pass: (a) E1 n…
+- **v4_G_V1_acc**: ACC — not passed; perception V1 closed by the user — G-V1 ACC round (merge commit 6967bbc, PARAMS_HASH e346d590acba5201, tables.json G_V1, git_head 1d0f3d4), criteria as recorded in v4_v1acc_gate_computed. VALIDIT…
 
 ## Open — needs a decision
 
