@@ -48,8 +48,8 @@ setpoint to fk_oracle's target; --shadow-vision runs V5 at every look in the gt 
 always records the scorer-only pre-weld screen (plan_v4_perception D6). The row gets a "vision" block.
     bash scripts/run.sh dual_arm_sim.py --shape cube --viewer null --test --num-frames 40000 --look --aim fk_vision
 
-Live-viewer aids (cell/liveview.py, VIEWING.md; off by default, the physics is unchanged): --show-cameras puts the top and wrist_B feeds
-(RGB, depth, and V5's result on each look) in a viewer image window, refreshed every --camera-every frames; --manual drives the two hands
+Live-viewer aids (cell/liveview.py, VIEWING.md; off by default, the physics is unchanged): --show-cameras puts the top, wrist_A and wrist_B feeds
+(RGB, depth, and V5's result on each look) in a viewer image window, refreshed every --camera-every frames, and a Workspace window with what top_detect reads off the top image (plate, bricks); --manual drives the two hands
 by hand from the side panel and the keyboard (no build queue); --pace holds the loop to 60 frames/s (implied by both).
     bash scripts/run.sh dual_arm_sim.py --shape cube --look --aim fk_vision --show-cameras
     bash scripts/run.sh dual_arm_sim.py --shape cube --manual --show-cameras
@@ -65,6 +65,7 @@ import json
 import math
 import os
 import sys
+import types
 from pathlib import Path
 
 import numpy as np
@@ -84,6 +85,7 @@ import blueprint as B  # noqa: E402
 import bracing  # noqa: E402
 import planner as P  # noqa: E402
 import stability as ST  # noqa: E402
+import top_detect as TD  # noqa: E402
 from cell import liveview as LV  # noqa: E402
 import vision as V  # noqa: E402
 from tasks.brace_bandit import EXE  # noqa: E402
@@ -580,6 +582,116 @@ class JointBreaker:
         print("  BREAK %s on %s: u %.3f, frame %d, step %s" % (bid, sid, r["u"], ex.frame, ex.b_step))
 
 
+def solve_park(model_ik):
+    """Joint angles that put the hand at PARK, pointing down."""
+    q = wp.array(np.array([HOME_Q + [0.01, 0.01]]), dtype=wp.float32)
+    solver = ik.IKSolver(
+        model=model_ik, n_problems=1, lambda_initial=0.1,
+        jacobian_mode=ik.IKJacobianType.ANALYTIC,
+        objectives=[ik.IKObjectivePosition(link_index=EE, link_offset=wp.vec3(0, 0, 0),
+                                           target_positions=wp.array([PARK], dtype=wp.vec3)),
+                    ik.IKObjectiveRotation(link_index=EE, link_offset_rotation=wp.quat_identity(),
+                                           target_rotations=wp.array([Q_DOWN], dtype=wp.vec4)),
+                    ik.IKObjectiveJointLimit(joint_limit_lower=model_ik.joint_limit_lower,
+                                             joint_limit_upper=model_ik.joint_limit_upper)])
+    for _ in range(30):
+        solver.step(q, q, iterations=24)
+    return q.numpy()[0].tolist()
+
+
+def build_cell(plan, exe, n0=0, substeps=16, legacy_brace=False):
+    """One cell as a world builder, without the ground plane: both arms parked, the baseplate, every brick (steps < n0 at their targets, the rest
+    waiting in the feeder with their final yaw) and the clutch pool (one weld per brick and support, enabled for steps < n0). Example.__init__ and
+    rl_batched.BatchedCells (which replicates it per world) both build the scene here.
+    Returns (scene, c): c.model_ik, park_q, n_arm_bodies, NIJ, plate_shapes, body / target / dims / feeder / welds keyed by brick id."""
+    bricks = {b["id"]: b for b in plan["bricks"]}
+    steps = plan["sequence"]
+    # --- arms ---------------------------------------------------------
+    arm = build_arm(substeps)
+    model_ik = arm.finalize()
+    # Start parked. HOME_Q reaches 0.41 m out, so two arms 0.9 m apart
+    # would begin with their hands interlocked.
+    park_q = solve_park(model_ik)
+    arm.joint_q[:9] = park_q
+    arm.joint_target_pos[:9] = park_q
+    scene = newton.ModelBuilder()
+    newton.solvers.SolverMuJoCo.register_custom_attributes(scene)
+    for pos, yaw in (ARM_A, ARM_B):
+        scene.add_builder(arm, xform=wp.transform(pos, wp.quat_from_axis_angle(wp.vec3(0, 0, 1), yaw)))
+    n_arm_bodies = arm.body_count
+    if exe["name"] != "E0":               # E1: A's arm joints only (E0 is build_arm's 400 / 40)
+        scene.joint_target_ke[:7], scene.joint_target_kd[:7] = [exe["arm_ke"]] * 7, [exe["arm_kd"]] * 7
+    if not legacy_brace:     # A's grip: 14.3 N per finger at the 1.5 mm brace squeeze (E0)
+        scene.joint_target_ke[7:9] = [exe["finger_ke"]] * 2
+        scene.joint_target_kd[7:9] = [2 * math.sqrt(exe["finger_ke"] * 0.1)] * 2
+
+    # --- baseplate: a studded slab, colliding only where the build stands --
+    ox, oy, _ = plan["voxel_origin"]
+    NI = max(b["grid_pos"][0] + P.footprint(b["type"], b["yaw_index"])[0] for b in bricks.values())
+    NJ = max(b["grid_pos"][1] + P.footprint(b["type"], b["yaw_index"])[1] for b in bricks.values())
+    cx, cy = ox + NI * P.PITCH / 2, oy + NJ * P.PITCH / 2
+    NIJ = (NI, NJ)
+    v, f = ex._make_brick_mesh(NI + 4, NJ + 4)
+    scene.add_shape_mesh(-1, mesh=newton.Mesh(v, f.flatten()), color=(0.45, 0.47, 0.45),
+                         xform=wp.transform((cx, cy, Z0 - ex.BRICK_HEIGHT), wp.quat_identity()),
+                         cfg=newton.ModelBuilder.ShapeConfig(has_shape_collision=False,
+                                                             has_particle_collision=False))
+    plate_shapes = [scene.add_shape_box(-1, hx=(NI + 4) * P.PITCH / 2, hy=(NJ + 4) * P.PITCH / 2, hz=Z0 / 2,
+                        xform=wp.transform((cx, cy, Z0 / 2), wp.quat_identity()), cfg=PROXY_CFG)]
+    stud_hh = 0.5 * ex.STUD_HEIGHT - ex.COLLIDER_INSET
+    for i in range(NI):
+        for j in range(NJ):
+            plate_shapes.append(scene.add_shape_cylinder(
+                -1, radius=ex.STUD_COLLIDER_RADIUS, half_height=stud_hh, cfg=PROXY_CFG,
+                xform=wp.transform((ox + (i + 0.5) * P.PITCH, oy + (j + 0.5) * P.PITCH,
+                                    Z0 + stud_hh), wp.quat_identity())))
+
+    # --- bricks, waiting in the placer's feeder with their final yaw ------
+    solimp = scene.custom_attributes["mujoco:geom_solimp"]
+    meshes, body, target, dims = {}, {}, {}, {}
+    slots = feeder_slots(len(steps))
+    for n, s in enumerate(steps):
+        b = bricks[s["brick_id"]]
+        nx, ny = P.footprint(b["type"], b["yaw_index"])
+        L, W = max(nx, ny), min(nx, ny)
+        yaw = math.pi / 2 if ny > nx else 0.0           # mesh x = long side
+        if (L, W) not in meshes:
+            mv, mf = ex._make_brick_mesh(L, W)
+            meshes[(L, W)] = ex._build_mesh_with_sdf(mv, mf, color=COLORS[0])
+        at = tuple(s["target_pose"][:3]) if n < n0 else (*slots[n], 0.0005)
+        xform = wp.transform(at, wp.quat_from_axis_angle(wp.vec3(0, 0, 1), yaw))
+        bd = scene.add_body(xform=xform, label=b["id"])
+        shape = scene.add_shape_mesh(bd, mesh=meshes[(L, W)], cfg=BRICK_CFG,
+                                     color=COLORS[n % len(COLORS)])
+        solimp.values = solimp.values or {}
+        solimp.values[shape] = (0.6, 0.95, 0.00075, 0.5, 2.5)
+        add_proxies(scene, bd, L, W, wp.transform_identity())
+        body[b["id"]] = bd
+        target[b["id"]] = (np.array(s["target_pose"][:3]), yaw, L == W)
+        dims[b["id"]] = (L * P.PITCH, W * P.PITCH)
+    feeder = {s["brick_id"]: np.array([*slots[n], 0.0]) for n, s in enumerate(steps)}
+
+    # --- clutch pool: one disabled weld per (brick, support) (§3.3) -------
+    welds = {}
+    for n, s in enumerate(steps):
+        bid = s["brick_id"]
+        p2, y2, _ = target[bid]
+        parents = [m[0] for m in s["mating_studs"]] or [None]   # None = baseplate
+        for sid in parents:
+            if sid is None:
+                rel = wp.transform(p2, qz(y2))
+            else:
+                p1, y1, _ = target[sid]
+                rel = wp.transform(rotate(qz(-y1), p2 - p1), qz(y2 - y1))
+            eq = scene.add_equality_constraint_weld(
+                body1=-1 if sid is None else body[sid], body2=body[bid],
+                relpose=rel, enabled=n < n0, label="clutch_%s_%s" % (sid or "plate", bid),
+                custom_attributes=WELD_ATTRS)
+            welds.setdefault(bid, []).append([eq, sid, rel, n < n0])
+    return scene, types.SimpleNamespace(model_ik=model_ik, park_q=park_q, n_arm_bodies=n_arm_bodies, NIJ=NIJ, plate_shapes=plate_shapes,
+                                        body=body, target=target, dims=dims, feeder=feeder, welds=welds)
+
+
 class Example:
     def __init__(self, viewer, args):
         self.viewer, self.args = viewer, args
@@ -606,7 +718,12 @@ class Example:
         self.realtime = (bool(getattr(args, "pace", False)) or self.show_cams or self.manual_on) and getattr(args, "viewer", None) != "null"
         if self.manual_on and (self.look or getattr(args, "test", False) or getattr(args, "start_step", None) is not None):
             raise SystemExit("--manual runs no build queue: it cannot be combined with --look, --test or --start-step")
-        self.rt_t, self.feed, self.look_feed, self.man_info = time.perf_counter(), None, None, {}
+        # rl_control (an Example arg, rl_env.py; no CLI flag): the hands follow ManualCtl targets that the env sets, from a nominal start, and the current step's brick is welded the moment it passes the snap gate
+        self.rl = bool(getattr(args, "rl_control", False))
+        self.direct = self.manual_on or self.rl      # the hands are driven from ManualCtl, not from a queue
+        if self.rl and (self.manual_on or self.look):
+            raise SystemExit("rl_control cannot be combined with --manual or --look")
+        self.rt_t, self.feed, self.look_feed, self.man_info, self.top_det, self.top_det_ms = time.perf_counter(), None, None, {}, None, 0.0
 
         self.plan, self.name = make_plan(args)
         self.failure = self.failed_at_step = self.built_at_failure = None   # end at the first failure (see fail())
@@ -628,89 +745,10 @@ class Example:
                 raise SystemExit("--brace-json needs --start-step: it overrides the brace of that step")
             self.sham_s = self.set_brace(steps[n0], json.loads(args.brace_json), exe)
 
-        # --- arms ---------------------------------------------------------
-        arm = build_arm(self.substeps)
-        self.model_ik = arm.finalize()
-        # Start parked. HOME_Q reaches 0.41 m out, so two arms 0.9 m apart
-        # would begin with their hands interlocked.
-        park_q = self.solve_park()
-        arm.joint_q[:9] = park_q
-        arm.joint_target_pos[:9] = park_q
-        scene = newton.ModelBuilder()
-        newton.solvers.SolverMuJoCo.register_custom_attributes(scene)
-        for pos, yaw in (ARM_A, ARM_B):
-            scene.add_builder(arm, xform=wp.transform(pos, wp.quat_from_axis_angle(wp.vec3(0, 0, 1), yaw)))
-        n_arm_bodies = arm.body_count
-        if exe["name"] != "E0":               # E1: A's arm joints only (E0 is build_arm's 400 / 40)
-            scene.joint_target_ke[:7], scene.joint_target_kd[:7] = [exe["arm_ke"]] * 7, [exe["arm_kd"]] * 7
-        if not getattr(args, "legacy_brace", False):     # A's grip: 14.3 N per finger at the 1.5 mm brace squeeze (E0)
-            scene.joint_target_ke[7:9] = [exe["finger_ke"]] * 2
-            scene.joint_target_kd[7:9] = [2 * math.sqrt(exe["finger_ke"] * 0.1)] * 2
-
-        # --- baseplate: a studded slab, colliding only where the build stands --
-        ox, oy, _ = self.plan["voxel_origin"]
-        NI = max(b["grid_pos"][0] + P.footprint(b["type"], b["yaw_index"])[0] for b in bricks.values())
-        NJ = max(b["grid_pos"][1] + P.footprint(b["type"], b["yaw_index"])[1] for b in bricks.values())
-        cx, cy = ox + NI * P.PITCH / 2, oy + NJ * P.PITCH / 2
-        self.NIJ = (NI, NJ)
-        v, f = ex._make_brick_mesh(NI + 4, NJ + 4)
-        scene.add_shape_mesh(-1, mesh=newton.Mesh(v, f.flatten()), color=(0.45, 0.47, 0.45),
-                             xform=wp.transform((cx, cy, Z0 - ex.BRICK_HEIGHT), wp.quat_identity()),
-                             cfg=newton.ModelBuilder.ShapeConfig(has_shape_collision=False,
-                                                                 has_particle_collision=False))
-        self.plate_shapes = [scene.add_shape_box(-1, hx=(NI + 4) * P.PITCH / 2, hy=(NJ + 4) * P.PITCH / 2, hz=Z0 / 2,
-                            xform=wp.transform((cx, cy, Z0 / 2), wp.quat_identity()), cfg=PROXY_CFG)]
-        stud_hh = 0.5 * ex.STUD_HEIGHT - ex.COLLIDER_INSET
-        for i in range(NI):
-            for j in range(NJ):
-                self.plate_shapes.append(scene.add_shape_cylinder(
-                    -1, radius=ex.STUD_COLLIDER_RADIUS, half_height=stud_hh, cfg=PROXY_CFG,
-                    xform=wp.transform((ox + (i + 0.5) * P.PITCH, oy + (j + 0.5) * P.PITCH,
-                                        Z0 + stud_hh), wp.quat_identity())))
-
-        # --- bricks, waiting in the placer's feeder with their final yaw ------
-        solimp = scene.custom_attributes["mujoco:geom_solimp"]
-        meshes, self.body, self.target, self.dims = {}, {}, {}, {}
-        slots = feeder_slots(len(steps))
-        for n, s in enumerate(steps):
-            b = bricks[s["brick_id"]]
-            nx, ny = P.footprint(b["type"], b["yaw_index"])
-            L, W = max(nx, ny), min(nx, ny)
-            yaw = math.pi / 2 if ny > nx else 0.0           # mesh x = long side
-            if (L, W) not in meshes:
-                mv, mf = ex._make_brick_mesh(L, W)
-                meshes[(L, W)] = ex._build_mesh_with_sdf(mv, mf, color=COLORS[0])
-            at = tuple(s["target_pose"][:3]) if n < n0 else (*slots[n], 0.0005)
-            xform = wp.transform(at, wp.quat_from_axis_angle(wp.vec3(0, 0, 1), yaw))
-            body = scene.add_body(xform=xform, label=b["id"])
-            shape = scene.add_shape_mesh(body, mesh=meshes[(L, W)], cfg=BRICK_CFG,
-                                         color=COLORS[n % len(COLORS)])
-            solimp.values = solimp.values or {}
-            solimp.values[shape] = (0.6, 0.95, 0.00075, 0.5, 2.5)
-            add_proxies(scene, body, L, W, wp.transform_identity())
-            self.body[b["id"]] = body
-            self.target[b["id"]] = (np.array(s["target_pose"][:3]), yaw, L == W)
-            self.dims[b["id"]] = (L * P.PITCH, W * P.PITCH)
-        self.feeder = {s["brick_id"]: np.array([*slots[n], 0.0]) for n, s in enumerate(steps)}
-
-        # --- clutch pool: one disabled weld per (brick, support) (§3.3) -------
-        self.welds = {}
-        for n, s in enumerate(steps):
-            bid = s["brick_id"]
-            p2, y2, _ = self.target[bid]
-            parents = [m[0] for m in s["mating_studs"]] or [None]   # None = baseplate
-            for sid in parents:
-                if sid is None:
-                    rel = wp.transform(p2, qz(y2))
-                else:
-                    p1, y1, _ = self.target[sid]
-                    rel = wp.transform(rotate(qz(-y1), p2 - p1), qz(y2 - y1))
-                eq = scene.add_equality_constraint_weld(
-                    body1=-1 if sid is None else self.body[sid], body2=self.body[bid],
-                    relpose=rel, enabled=n < n0, label="clutch_%s_%s" % (sid or "plate", bid),
-                    custom_attributes=WELD_ATTRS)
-                self.welds.setdefault(bid, []).append([eq, sid, rel, n < n0])
-
+        # --- the cell: arms, baseplate, bricks, clutch pool (build_cell) -------
+        scene, c = build_cell(self.plan, exe, n0, self.substeps, getattr(args, "legacy_brace", False))
+        self.model_ik, park_q, n_arm_bodies, self.NIJ, self.plate_shapes = c.model_ik, c.park_q, c.n_arm_bodies, c.NIJ, c.plate_shapes
+        self.body, self.target, self.dims, self.feeder, self.welds = c.body, c.target, c.dims, c.feeder, c.welds
         scene.add_ground_plane(cfg=newton.ModelBuilder.ShapeConfig(mu=0.75))
         self.model = scene.finalize()
         self.n_arm_bodies = n_arm_bodies
@@ -758,13 +796,13 @@ class Example:
         self.A.push("park", park(ARM_A), 0.0, 0.0, 1.5)
         self.B.push("park", park(ARM_B), 0.0, 0.01, 1.5)
         self.man = None
-        if self.manual_on:                    # --manual: no queue; the hands are driven from liveview.ManualCtl (step)
+        if self.direct:                       # --manual / rl_control: no queue; the hands are driven from liveview.ManualCtl (step)
             for a in (self.A, self.B):
                 a.moves.clear()
                 a.phase = "manual"
                 a.cmd = (a.cmd[0], a.base[1], a.cmd[2], a.cmd[3])      # hand yaw = base yaw: the parked hand (what the park move's yaw 0 becomes through step()'s wrap)
             self.man = LV.ManualCtl((ARM_A, ARM_B), [park(ARM_A), park(ARM_B)])
-        self.next_step, self.b_step = n0, None
+        self.next_step, self.b_step = n0, n0 if self.rl else None
         self.legacy = bool(getattr(args, "legacy_brace", False))
         # hand-off protocol events (plan_v4 r5-5): B lifted its brick / A closed on the structure / B retracted
         self.staged, self.braced, self.retracted, self.placed = set(), set(), set(), set()
@@ -798,6 +836,8 @@ class Example:
             self.viewer.register_ui_callback(self.gui_manual_window, position="free")
         if self.show_cams:
             LV.enlarge_image_window()
+            if hasattr(self.viewer, "register_ui_callback"):
+                self.viewer.register_ui_callback(self.gui_workspace_window, position="free")
         self.fixture_setup(steps, n0)
         self.capture()
         self.cams, self.fk_state, self.spheres = None, None, None    # cell.cameras.Cameras (--save-captures, V5 at the looks), rendered outside the captured graphs
@@ -817,20 +857,7 @@ class Example:
             self.plan["validation"]["bracing_strategy"], sum(len(w) for w in self.welds.values())))
 
     def solve_park(self):
-        """Joint angles that put the hand at PARK, pointing down."""
-        q = wp.array(np.array([HOME_Q + [0.01, 0.01]]), dtype=wp.float32)
-        solver = ik.IKSolver(
-            model=self.model_ik, n_problems=1, lambda_initial=0.1,
-            jacobian_mode=ik.IKJacobianType.ANALYTIC,
-            objectives=[ik.IKObjectivePosition(link_index=EE, link_offset=wp.vec3(0, 0, 0),
-                                               target_positions=wp.array([PARK], dtype=wp.vec3)),
-                        ik.IKObjectiveRotation(link_index=EE, link_offset_rotation=wp.quat_identity(),
-                                               target_rotations=wp.array([Q_DOWN], dtype=wp.vec4)),
-                        ik.IKObjectiveJointLimit(joint_limit_lower=self.model_ik.joint_limit_lower,
-                                                 joint_limit_upper=self.model_ik.joint_limit_upper)])
-        for _ in range(30):
-            solver.step(q, q, iterations=24)
-        return q.numpy()[0].tolist()
+        return solve_park(self.model_ik)
 
     # -- design-press fixture (plan_v4_rl_brace 2.2) --------------------------------------
     def fixture_setup(self, steps, n0):
@@ -1388,9 +1415,8 @@ class Example:
         g[shapes] = group
         self.model.shape_collision_group.assign(g)
 
-    def snap(self, s):
-        """§2.3.3 gate on the pressed brick; if it passes, engage its clutch welds."""
-        bid = s["brick_id"]
+    def gate(self, bid):
+        """§2.3.3 gate on a brick, read-only: (q, lateral mm, dz mm, dyaw deg, tilt deg, ok, screen)."""
         q = self.state_0.body_q.numpy()[self.body[bid]]
         tgt, yaw, square = self.target[bid]
         lateral = float(np.hypot(*(q[:2] - tgt[:2]))) * 1000
@@ -1402,6 +1428,13 @@ class Example:
               and dyaw < GATE["yaw_deg"] and tilt < GATE["yaw_deg"])
         screen = (lateral < SCREEN["lateral_mm"] and SCREEN["dz_mm"][0] <= dz <= SCREEN["dz_mm"][1]
                   and tilt < SCREEN["tilt_deg"] and dyaw < SCREEN["yaw_deg"])        # D6, scorer only: changes neither the gate nor the weld
+        return q, lateral, dz, dyaw, tilt, ok, screen
+
+    def snap(self, s):
+        """§2.3.3 gate on the pressed brick; if it passes, engage its clutch welds."""
+        bid = s["brick_id"]
+        q, lateral, dz, dyaw, tilt, ok, screen = self.gate(bid)
+        tgt, yaw, _ = self.target[bid]
         self.last_gate = {"brick": bid, "lateral_mm": round(lateral, 2), "dz_mm": round(dz, 2),
                           "yaw_deg": round(dyaw, 2), "tilt_deg": round(tilt, 2)}
         after = self.failure is not None      # only under --continue
@@ -1477,20 +1510,32 @@ class Example:
 
     # -- live viewer aids (cell/liveview.py; display only) --------------------------------
     def refresh_feeds(self):
-        """--show-cameras: a noise-free preview of both cameras of the current state (wrist_B from B's FK pose): the noise would cost 3x the render."""
-        top = self.cams.preview("top", state=self.state_0, stride=LV.SHOW_STRIDE)
-        wr = self.cams.preview("wrist_B", self.hand_fk(1), state=self.state_0, stride=LV.SHOW_STRIDE)
-        self.feed = [top["rgb"], wr["rgb"], LV.depth_rgb(top["depth"], 1), LV.depth_rgb(wr["depth"], 1)]
+        """--show-cameras: a noise-free preview of the cameras of the current state (the wrist cameras from their arm's FK pose): the noise would cost 3x the render.
+        The wrist tiles carry the top camera's top_detect read-out projected through each wrist camera's NOMINAL pose (LV.overlay_wrist): vision only, display only."""
+        top = self.cams.preview("top", state=self.state_0, stride=1)                # full size: top_detect reads it, the tile is every second pixel
+        t0 = time.perf_counter()
+        q = self.state_0.joint_q.numpy()
+        fk = [self.hand_fk(0), self.hand_fk(1)]
+        hands = [dict(name="AB"[k], pos=fk[k][:3], R=Rot.from_quat(fk[k][3:7]).as_matrix(), opening=q[9 * k + 7:9 * k + 9]) for k in range(2)]      # FK and the finger joints: proprioception
+        res = TD.remember(self.top_det, TD.detect(top["rgb"], top["depth"], self.cams.cams["top"]["rays_np"], *self.cams.poses("top")[2:]))      # nominal pose; display only
+        self.top_det = TD.track_held(res, self.top_det, hands)
+        self.top_det_ms = (time.perf_counter() - t0) * 1e3
+        wa = self.cams.preview("wrist_A", fk[0], state=self.state_0, stride=LV.SHOW_STRIDE)
+        wr = self.cams.preview("wrist_B", fk[1], state=self.state_0, stride=LV.SHOW_STRIDE)
+        # ponytail: the labels are drawn even where an arm occludes the brick; depth-test against the wrist depth image if it matters. A brick the top camera lost under an arm is kept (TD.remember) and drawn as hidden
+        wa_rgb = LV.overlay_wrist(wa["rgb"], "wrist_A", self.cams.poses("wrist_A", fk[0])[2:], self.top_det)
+        wr_rgb = LV.overlay_wrist(wr["rgb"], "wrist_B", self.cams.poses("wrist_B", fk[1])[2:], self.top_det)
+        self.feed = [LV.overlay_top(LV.tile(top["rgb"]), self.top_det), wa_rgb, wr_rgb, LV.depth_rgb(top["depth"]), LV.depth_rgb(wa["depth"], 1), LV.depth_rgb(wr["depth"], 1)]
         self.push_feeds()
 
     def push_feeds(self, blank=None):
-        """One log_image batch, a row of RGB over a row of depth: top, wrist_B, and (with V5 at the looks) the last look with V5's result."""
+        """One log_image batch, a row of RGB over a row of depth: top, wrist_A, wrist_B, and (with V5 at the looks) the last look with V5's result."""
         if blank is not None:
-            self.feed = [blank] * 4
+            self.feed = [blank] * 6
         look = [self.look_feed[0] if self.look_feed else np.zeros_like(self.feed[0])] if self.sees else []
         ldep = [self.look_feed[1] if self.look_feed else np.zeros_like(self.feed[0])] if self.sees else []
-        self.viewer.log_image("cameras: top | wrist_B%s (RGB over depth)" % (" | last look" if self.sees else ""),
-                              np.stack(self.feed[:2] + look + self.feed[2:] + ldep))
+        self.viewer.log_image("cameras: top | wrist_A | wrist_B%s (RGB over depth)" % (" | last look" if self.sees else ""),
+                              np.stack(self.feed[:3] + look + self.feed[3:] + ldep))
 
     def show_look(self, cap, rec, res, s):
         """The look just taken, for the panel: the wrist frame with V5's estimated target and held-brick footprints and its verdict."""
@@ -1501,6 +1546,13 @@ class Example:
         B_box = LV.box_corners(Bh[0], Bh[1], Bh[2], Bh[3], L, W) if np.isfinite(Bh).all() else None
         self.look_feed = (LV.overlay_look(LV.tile(cap["rgb"]), (cap["pos"], Rot.from_quat(cap["quat_xyzw"])), rec, T_box, B_box), LV.depth_rgb(cap["depth"]))
         self.push_feeds()
+
+    def rl_snap(self):
+        """rl_control, once per frame: the current step's brick is welded (snap) the moment it passes the gate; the env reads self.placed."""
+        s = self.plan["sequence"][self.b_step]
+        if s["step"] not in self.placed and self.gate(s["brick_id"])[5]:
+            self.snap(s)
+            self.placed.add(s["step"])
 
     def manual_step(self, body_q):
         """--manual: the held keys move the selected arm's target, then both arms' commands follow their targets (rate-limited, leashed)."""
@@ -1518,6 +1570,11 @@ class Example:
             m.nudge(m.sel, (r * (down(K.L) - down(K.J)), r * (down(K.I) - down(K.K)), r * (down(K.T) - down(K.G))),
                     math.radians(self.man_step_deg) * 10 * self.frame_dt * (down(K.Z) - down(K.X)),
                     grip=m.tgt[m.sel]["grip"] + 0.03 * self.frame_dt * (down(K.V) - down(K.C)))
+        self.man_follow(body_q)
+
+    def man_follow(self, body_q):
+        """Both arms' commands follow their ManualCtl targets (rate-limited, leashed)."""
+        m = self.man
         for k, arm in enumerate((self.A, self.B)):
             arm.cmd = m.advance(k, arm.cmd, body_q[EE + k * self.n_arm_bodies][:3], self.frame_dt)
 
@@ -1552,12 +1609,14 @@ class Example:
                                % (self.sim_time, self.b_step, self.B.phase, self.A.phase))
         if self.manual_on:
             self.manual_step(body_q)
+        elif self.rl:
+            self.man_follow(body_q)
         else:
             self.schedule()
         pos, rot, grip, cmd_w = [], [], [], []
         for arm, k in ((self.A, 0), (self.B, 1)):
             ee = body_q[EE + k * self.n_arm_bodies][:3]
-            if arm is self.B:
+            if arm is self.B and not self.direct:
                 self.aim_brick(ee, body_q)
             p, yaw, g, tilt = arm.update(self.frame_dt, ee)
             cmd_w.append(p)
@@ -1565,7 +1624,7 @@ class Example:
             pos.append(rotate(qz(-byaw), p - [bx, by, bz]))
             # a parallel gripper is 180-degree symmetric: pick the nearer wrist. A look step (--look) takes that choice once,
             # at its grasp (yaw_shift), so the wrist can turn 180 deg for the second look and delta-psi cannot flip it
-            yaw = (yaw if self.manual_on else yaw + self.yaw_shift if arm is self.B and self.yaw_shift is not None
+            yaw = (yaw if self.direct else yaw + self.yaw_shift if arm is self.B and self.yaw_shift is not None
                    else byaw + wrap(yaw - byaw, math.pi))     # --manual: the command is the hand's world yaw: no wrap, no wrist flip
             world = qmul(qrot(tilt), qmul(qz(yaw), Q_DOWN))
             rot.append(qmul(qz(-byaw), world))
@@ -1607,6 +1666,8 @@ class Example:
         if self.show_cams and self.frame % self.cam_every == 0:
             self.refresh_feeds()
         self.breaker.update()
+        if self.rl:
+            self.rl_snap()
         self.brace_readout()
         if self.monitor:
             self.monitor.step(self)
@@ -1700,6 +1761,38 @@ class Example:
                 ui.text("  aim: gt (ground-truth servo)")
             if v.get("failure"):
                 ui.text("  FAILED: %s" % v["failure"])
+
+    def gui_workspace_window(self, ui):
+        """--show-cameras: its own floating window (right side): what top_detect reads off the top camera, the plate (grid base) and the bricks."""
+        w = ui.get_io().display_size.x
+        ui.set_next_window_pos(ui.ImVec2(max(w - 580, 700), 10), ui.Cond_.once)
+        ui.set_next_window_size(ui.ImVec2(570, 430), ui.Cond_.once)
+        if ui.begin("Workspace (top camera)"):
+            det = self.top_det
+            if det is None:
+                ui.text("waiting for the first top frame")
+            else:
+                p = det["plate"]
+                if p is None:
+                    ui.text("plate: not found")
+                else:
+                    ui.text("plate (grid base): centre %.1f, %.1f mm   yaw %.1f deg" % (p["x"] * 1e3, p["y"] * 1e3, math.degrees(p["yaw"])))
+                    ui.text("  %d x %d studs, pitch %.0f mm, top z %.1f mm, %d cells occupied" % (*p["studs"], p["pitch"] * 1e3, p["top_z"] * 1e3, len(p["occupied"])))
+                    ui.text("  origin corner (cell 0, 0) %.1f, %.1f mm; i along the yaw, j to its left" % (p["origin"][0] * 1e3, p["origin"][1] * 1e3))
+                ui.text("%d bricks (%d held)   (detect %.0f ms)" % (len(det["bricks"]) + len(det["held"]), len(det["held"]), self.top_det_ms))
+                cols = ("id", "colour", "size", "x", "y", "z", "yaw", "layer", "on plate cell", "seen")
+                if ui.begin_table("bricks", len(cols), ui.TableFlags_.borders | ui.TableFlags_.row_bg | ui.TableFlags_.scroll_y):
+                    for c in cols:
+                        ui.table_setup_column(c)
+                    ui.table_headers_row()
+                    for b in sorted(det["bricks"] + list(det["held"].values()), key=lambda b: b["id"]):
+                        ui.table_next_row()
+                        for v in (b["id"], b["colour"], b["studs"], "%.1f" % (b["x"] * 1e3), "%.1f" % (b["y"] * 1e3), "%.1f" % (b["z_top"] * 1e3),
+                                  "%.1f" % math.degrees(b["yaw"]), b["layer"], "(%d, %d)" % b["cell"] if b["on_plate"] else "-" if b.get("held_by") else "table", "held by " + b["held_by"] if b.get("held_by") else "hidden" if b["hidden"] else "yes"):
+                            ui.table_next_column()
+                            ui.text(str(v))
+                    ui.end_table()
+        ui.end()
 
     def gui_manual_window(self, ui):
         """--manual: its own floating window (the side panel is full), top left beside the side panel."""
@@ -2086,7 +2179,7 @@ if __name__ == "__main__":
     parser.add_argument("--shadow-vision", action="store_true",
                         help="with --look: run V5 at every look in the gt and fk_oracle modes too; logged only, never aborts or changes control")
     parser.add_argument("--show-cameras", action="store_true",
-                        help="ViewerGL: an image window with the top and wrist_B feeds (RGB, depth; with --look --aim fk_vision/--shadow-vision the last "
+                        help="ViewerGL: an image window with the top, wrist_A and wrist_B feeds (RGB, depth; the top camera with top_detect's plate and brick outlines, and a Workspace window listing them; with --look --aim fk_vision/--shadow-vision the last "
                              "look with V5's result), refreshed every --camera-every frames; display only, the physics and V5's noise are unchanged")
     parser.add_argument("--camera-every", type=int, default=10, metavar="N", help="--show-cameras: refresh the feeds every N frames (default 10)")
     parser.add_argument("--manual", action="store_true",

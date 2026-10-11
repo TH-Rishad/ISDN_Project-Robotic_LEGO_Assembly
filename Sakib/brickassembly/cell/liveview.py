@@ -2,7 +2,9 @@
 camera frames drawn here use their own noise stream, so a run with the panels on is the same run.
 
     depth_rgb, tile, overlay_look      camera frames -> uint8 tiles for ViewerBase.log_image; the V5 result drawn on the wrist look
-    clamp_target, ManualCtl            the manual-control targets: workspace clamp, rate limit and a leash on the measured hand
+    overlay_top                        top_detect's plate and bricks drawn on the top tile
+    overlay_wrist                      the same read-out projected into a wrist tile, with each brick's label
+    clamp_target, follow, ManualCtl    the manual-control targets: workspace clamp, rate limit and a leash on the measured hand (ManualCtlBatch: n worlds at once, rl_batched.py)
 """
 
 import math
@@ -67,6 +69,80 @@ def overlay_look(rgb, cam_pose, rec, T_box, B_box):
     return np.asarray(im)
 
 
+HELD = (0, 255, 0)        # outline of a brick in a gripper (top_detect.track_held)
+
+
+def overlay_top(rgb, det, stride=SHOW_STRIDE):
+    """The top tile with top_detect's read-out on it: the plate outline (cyan), each brick's top-face outline (yellow; magenta if it is on the plate; gray if hidden, i.e. remembered; green if a gripper holds it)
+    and its id. `det` is detect()'s result in the pixels of the image it ran on; the tile is that image at 1/`stride`."""
+    from PIL import Image, ImageDraw, ImageFont
+    im = Image.fromarray(rgb)
+    dr = ImageDraw.Draw(im)
+    f = ImageFont.load_default(size=14)
+    if det and det["plate"]:
+        pts = [(x / stride, y / stride) for x, y in det["plate"]["outline"]]
+        dr.line(pts + pts[:1], fill=(0, 255, 255), width=1)
+    for b in (det["bricks"] + list(det.get("held", {}).values()) if det else []):
+        pts = [(x / stride, y / stride) for x, y in b["outline"]]
+        dr.line(pts + pts[:1], fill=HELD if b.get("held_by") else (200, 200, 200) if b["hidden"] else (255, 0, 255) if b["on_plate"] else (255, 255, 0), width=1)
+        dr.text((b["px"] / stride + 4, b["py"] / stride - 16), str(b["id"]), fill=(0, 255, 0), font=f)
+    return np.asarray(im)
+
+
+def overlay_wrist(rgb, cam, cam_pose, det, stride=SHOW_STRIDE):
+    """A wrist tile with the TOP camera's read-out `det` (top_detect.detect) projected through this wrist camera's pose `cam_pose` = (pos, R)
+    (the nominal one: display only, nothing from ground truth): the plate outline (cyan) and each brick's top-face outline (yellow; magenta on
+    the plate; gray and "(hidden)" when remembered, TD.remember; green and "(held by B)" in a gripper, TD.track_held) with a two-line label on black, "#id colour size" and "x, y mm  yaw deg" (+ " L<layer> (i,j)" on the plate). Labels are moved off each other (a leader line to a far one). A shape with a corner
+    behind the camera or wholly outside the image is skipped. The tile is the camera's frame at 1/`stride`; None `det`: unchanged."""
+    if not det:
+        return rgb
+    from PIL import Image, ImageDraw, ImageFont
+    from cell.cameras import CAMS, project
+    pos, R = cam_pose
+    im = Image.fromarray(rgb)
+    dr = ImageDraw.Draw(im)
+    f = ImageFont.load_default(size=15)
+    w, h = CAMS[cam]["w"] / stride, CAMS[cam]["h"] / stride
+    boxes = []                                                       # the label boxes drawn so far
+
+    def pts(corners):
+        if (R.inv().apply(corners - pos)[:, 2] >= 0).any():          # a corner behind the camera: project() clamps it and would not say
+            return None
+        px, py, _ = project(cam, pos, R, corners)
+        px, py = px / stride, py / stride
+        if px.max() < 0 or px.min() > w or py.max() < 0 or py.min() > h:
+            return None
+        return list(zip(px, py))
+
+    if det["plate"]:
+        q = pts(np.c_[det["plate"]["corners"][:, :2], np.full(4, det["plate"]["top_z"])])
+        if q:
+            dr.line(q + q[:1], fill=(0, 255, 255), width=2)
+    for b in det["bricks"] + list(det.get("held", {}).values()):
+        q = pts(box_corners(b["x"], b["y"], b["z_top"], b["yaw"], b["L"], b["W"]))
+        if not q:
+            continue
+        dr.line(q + q[:1], fill=HELD if b.get("held_by") else (200, 200, 200) if b["hidden"] else (255, 0, 255) if b["on_plate"] else (255, 255, 0), width=2)
+        txt = ("#%d %s %s" + (" (held by %s)" % b["held_by"] if b.get("held_by") else " (hidden)" if b["hidden"] else "") + "\n%.0f, %.0f mm  yaw %d deg") % (b["id"], b["colour"], b["studs"], 1e3 * b["x"], 1e3 * b["y"], round(math.degrees(b["yaw"])))
+        if b["on_plate"]:
+            txt += " L%d (%d,%d)" % (b["layer"], *b["cell"])
+        ox, oy = min(q, key=lambda p: p[1])                           # above the outline's top edge, kept in the tile
+        x0, y0, x1, y1 = dr.multiline_textbbox((0, 0), txt, font=f)
+        tx, ty0 = min(max(ox, 0), w - x1), min(max(oy - y1 - 2, 0), h - y1)
+        for d in (y1 + 2, -(y1 + 2)):                                 # clear of the labels already drawn: down, else up, a label height at a time
+            ty = ty0
+            while any(tx < bx1 and tx + x1 > bx0 and ty < by1 and ty + y1 > by0 for bx0, by0, bx1, by1 in boxes) and 0 <= ty + d <= h - y1:
+                ty += d
+            if not any(tx < bx1 and tx + x1 > bx0 and ty < by1 and ty + y1 > by0 for bx0, by0, bx1, by1 in boxes):
+                break
+        boxes.append((tx, ty, tx + x1, ty + y1))
+        if abs(ty - ty0) > y1:                                        # far from its brick: a leader to the outline's top point
+            dr.line([(tx + x1 / 2, ty + y1 / 2), (ox, oy)], fill=(255, 255, 255), width=1)
+        dr.rectangle(dr.multiline_textbbox((tx, ty), txt, font=f), fill=(0, 0, 0))
+        dr.multiline_text((tx, ty), txt, fill=(255, 255, 255), font=f)
+    return np.asarray(im)
+
+
 # --- manual control ---------------------------------------------------------------------------------------------
 Z_MIN, Z_MAX = 0.012, 0.55    # hand TCP height (m): fingertips are 8.9 mm below it, the plate top is 3.2 mm
 REACH = 0.76                  # TCP to the shoulder (base + 0.333 up): the farthest feeder slot, with the hand down, is 0.73 m
@@ -81,25 +157,39 @@ GRIP_OPEN, GRIP_SHUT = 0.03, 0.0         # finger target (m per finger); 0.04 is
 
 def clamp_target(base, p, yaw):
     """The nearest allowed hand target (p, yaw) for the arm at `base` (world); p in the world, yaw relative to the arm's base frame (the gripper is
-    180-degree symmetric, so for the hand this is also the world yaw mod pi)."""
-    b, p = np.asarray(base, float), np.array(p, float)
-    p[2] = np.clip(p[2], Z_MIN, Z_MAX)
-    p[0] = max(p[0], -CROSS) if b[0] > 0 else min(p[0], CROSS)
+    180-degree symmetric, so for the hand this is also the world yaw mod pi). Batched: base (..., 3), p (..., 3), yaw (...) clamp every row at once."""
+    b, p, yaw = np.asarray(base, float), np.array(p, float), np.asarray(yaw, float)
+    p[..., 2] = np.clip(p[..., 2], Z_MIN, Z_MAX)
+    p[..., 0] = np.where(b[..., 0] > 0, np.maximum(p[..., 0], -CROSS), np.minimum(p[..., 0], CROSS))
     s = b + [0, 0, SHOULDER_Z]
-    n = np.linalg.norm(p - s)
-    if n > REACH:
-        p = s + (p - s) * REACH / n
-    h = p[:2] - b[:2]
-    if np.linalg.norm(h) < R_MIN:
-        p[:2] = b[:2] + (h / np.linalg.norm(h) if np.linalg.norm(h) > 1e-9 else [-np.sign(b[0]), 0.0]) * R_MIN
-    return p, float(np.clip(yaw, -YAW_MAX, YAW_MAX))
+    d = p - s
+    n = np.linalg.norm(d, axis=-1, keepdims=True)
+    p = np.where(n > REACH, s + d * REACH / np.maximum(n, 1e-12), p)
+    h = p[..., :2] - b[..., :2]
+    hn = np.linalg.norm(h, axis=-1, keepdims=True)
+    away = np.where(hn > 1e-9, h / np.maximum(hn, 1e-12), np.stack([-np.sign(b[..., 0]), np.zeros_like(b[..., 0])], -1))
+    p[..., :2] = np.where(hn < R_MIN, b[..., :2] + away * R_MIN, p[..., :2])
+    yaw = np.clip(yaw, -YAW_MAX, YAW_MAX)
+    return p, float(yaw) if yaw.ndim == 0 else yaw
 
 
 def toward(cur, tgt, step):
-    """`cur` moved toward `tgt` by at most `step` (vectors by their norm, scalars by their size)."""
-    d = np.asarray(tgt, float) - cur
-    n = np.linalg.norm(d)
-    return np.asarray(tgt, float) if n <= step else cur + d * step / n
+    """`cur` moved toward `tgt` by at most `step` (vectors by their norm over the last axis, a leading batch axis allowed; scalars by their size)."""
+    cur, d = np.asarray(cur, float), np.asarray(tgt, float) - cur
+    n = np.linalg.norm(d, axis=-1, keepdims=True) if d.ndim else np.abs(d)
+    return np.where(n <= step, np.asarray(tgt, float), cur + d * step / np.maximum(n, 1e-12))
+
+
+def follow(cmd_p, cmd_yaw, cmd_g, tgt_p, tgt_yaw, tgt_g, ee, dt):
+    """One frame of a hand's command (position, yaw, finger target): slewed toward its target at V_MAX / W_MAX / G_MAX, then kept within LEASH of the
+    measured hand `ee`. tgt_yaw is the hand's world yaw. Batched over leading axes (positions (..., 3), the rest (...))."""
+    p = toward(cmd_p, tgt_p, V_MAX * dt)
+    lag = p - ee
+    n = np.linalg.norm(lag, axis=-1, keepdims=True)
+    p = np.where(n > LEASH, ee + lag * LEASH / np.maximum(n, 1e-12), p)
+    yaw = toward(np.asarray(cmd_yaw, float)[..., None], np.asarray(tgt_yaw, float)[..., None], W_MAX * dt)[..., 0]
+    g = toward(np.asarray(cmd_g, float)[..., None], np.asarray(tgt_g, float)[..., None], G_MAX * dt)[..., 0]
+    return p, yaw, g
 
 
 class ManualCtl:
@@ -126,10 +216,31 @@ class ManualCtl:
         """The new Arm.cmd (pos, yaw, grip, tilt) of arm k: `cmd` slewed toward the target, then kept within LEASH of `ee` (its measured hand)."""
         p, yaw, g, tilt = cmd
         t = self.tgt[k]
-        p = toward(p, t["p"], V_MAX * dt)
-        lag = p - ee
-        if np.linalg.norm(lag) > LEASH:
-            p = ee + lag * LEASH / np.linalg.norm(lag)
-        yaw = float(toward(np.array(yaw), self.yaws[k] + t["yaw"], W_MAX * dt))        # the command is the hand's world yaw
-        g = float(toward(np.array(g), t["grip"], G_MAX * dt))
-        return p, yaw, g, tilt
+        p, yaw, g = follow(p, yaw, g, t["p"], self.yaws[k] + t["yaw"], t["grip"], ee, dt)        # the command is the hand's world yaw
+        return p, float(yaw), float(g), tilt
+
+
+class ManualCtlBatch:
+    """ManualCtl for `n` worlds at once (rl_batched.py): the same targets and the same clamp / slew / leash (clamp_target, follow), as arrays over
+    (world, arm): tgt_p (n, 2, 3), tgt_yaw (n, 2), tgt_grip (n, 2). Starts every world parked."""
+
+    def __init__(self, n, bases, parks):
+        self.n, self.bases = n, np.array([b[0] for b in bases], float)       # (2, 3) world bases of A, B
+        self.yaws = np.array([b[1] for b in bases], float)
+        self.parks = np.array(parks, float)
+        self.reset(np.ones(n, bool))
+
+    def reset(self, mask):
+        """Park the worlds where `mask` (n,) is true; the others keep their targets."""
+        if not hasattr(self, "tgt_p"):
+            self.tgt_p, self.tgt_yaw, self.tgt_grip = np.zeros((self.n, 2, 3)), np.zeros((self.n, 2)), np.zeros((self.n, 2))
+        self.tgt_p[mask], self.tgt_yaw[mask], self.tgt_grip[mask] = self.parks, 0.0, 0.01
+
+    def nudge(self, d, dyaw, grip):
+        """All arms of all worlds: d (n, 2, 3), dyaw (n, 2), grip (n, 2) (the absolute finger target)."""
+        self.tgt_p, self.tgt_yaw = clamp_target(self.bases, self.tgt_p + d, self.tgt_yaw + dyaw)
+        self.tgt_grip = np.clip(grip, 0.0, 0.04)
+
+    def advance(self, cmd_p, cmd_yaw, cmd_g, ee, dt):
+        """The new command (pos (n, 2, 3), world yaw (n, 2), grip (n, 2)) from the old one and the measured hands `ee` (n, 2, 3)."""
+        return follow(cmd_p, cmd_yaw, cmd_g, self.tgt_p, self.yaws + self.tgt_yaw, self.tgt_grip, ee, dt)
