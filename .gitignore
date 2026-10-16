@@ -1,0 +1,8 @@
+# Python bytecode / build caches (never upload these)
+__pycache__/
+*.py[cod]
+
+# Per-member identity marker and personal agent instructions:
+# machine-local, not part of the shared repo
+Kean/kean.id
+Kean/AGENTS.md
