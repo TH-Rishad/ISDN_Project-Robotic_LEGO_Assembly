@@ -2112,6 +2112,20 @@ def make_plan(args):
     return plan, name
 
 
+def _kean_viz(example):
+    ident = Path(__file__).resolve().parents[2] / "Kean" / "kean.id"
+    if not ident.is_file():
+        return
+    try:
+        kean = str(ident.parent)
+        if kean not in sys.path:
+            sys.path.insert(0, kean)
+        import viz_cameras
+        viz_cameras.attach(example)
+    except Exception as e:
+        print("[kean] visualization not started: %s" % e)
+
+
 if __name__ == "__main__":
     parser = newton.examples.create_parser()
     src = parser.add_mutually_exclusive_group()
@@ -2212,6 +2226,7 @@ if __name__ == "__main__":
         example.recorder = Recorder(example)
     if args.record_inserts:
         example.inserts = []
+    _kean_viz(example)
     err = None
     try:
         newton.examples.run(example, args)
