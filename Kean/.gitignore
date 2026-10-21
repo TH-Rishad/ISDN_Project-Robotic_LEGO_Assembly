@@ -1,0 +1,44 @@
+# Personal ignores for Kean's workspace
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+env/
+venv/
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary / build. Result logs under results/checks stay; they are the run record.
+*.tmp
+*.log
+!results/checks/**/*.log
+*.bak
+build/
+dist/
+
+# Recorder dumps and unused collision-model copies. JSON summaries stay.
+*.npz
+results/p3/fr3.yml
+results/p3/fr3_plan.yml
+
+# Personal notes & scratch
+notes/
+scratch/
+*.md.bak
+todo-personal.md
+
+# Personal agent / task files (do not push)
+AGENTS.md
+task.md

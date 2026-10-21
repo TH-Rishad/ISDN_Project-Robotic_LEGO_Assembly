@@ -1,0 +1,196 @@
+{
+ "placements": 3,
+ "runs": [
+  {
+   "shape": "cube",
+   "seed": 0,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "placed": 3,
+   "total": 8,
+   "failure": "gate_miss",
+   "frames": 4741,
+   "braced_placements": 0,
+   "events": [
+    {
+     "class": "neighbour_rub",
+     "a": "plate#-1",
+     "b": "brick:b_000#28",
+     "phase": {
+      "A": "park",
+      "B": "insert"
+     },
+     "start_frame": 1310,
+     "max_pen_mm": -0.063,
+     "peak_force_n": 0.24,
+     "end_frame": 1310,
+     "step": 0,
+     "braced": false,
+     "duration_frames": 1,
+     "contact_frames": 1,
+     "fragments": 1
+    },
+    {
+     "class": "neighbour_rub",
+     "a": "brick:b_000#28",
+     "b": "brick:b_001#29",
+     "phase": {
+      "A": "park",
+      "B": "insert"
+     },
+     "start_frame": 2416,
+     "max_pen_mm": -0.138,
+     "peak_force_n": 0.36,
+     "end_frame": 2439,
+     "step": 1,
+     "braced": false,
+     "duration_frames": 24,
+     "contact_frames": 11,
+     "fragments": 4
+    },
+    {
+     "class": "unintended",
+     "a": "B_finger#27",
+     "b": "brick:b_000#28",
+     "phase": {
+      "A": "park",
+      "B": "insert"
+     },
+     "start_frame": 2422,
+     "max_pen_mm": -0.088,
+     "peak_force_n": 4.13,
+     "end_frame": 2447,
+     "step": 1,
+     "braced": false,
+     "duration_frames": 26,
+     "contact_frames": 11,
+     "fragments": 5
+    },
+    {
+     "class": "unintended",
+     "a": "B_finger#26",
+     "b": "brick:b_000#28",
+     "phase": {
+      "A": "park",
+      "B": "insert"
+     },
+     "start_frame": 2422,
+     "max_pen_mm": -0.339,
+     "peak_force_n": 23.33,
+     "end_frame": 2448,
+     "step": 1,
+     "braced": false,
+     "duration_frames": 27,
+     "contact_frames": 15,
+     "fragments": 3
+    },
+    {
+     "class": "neighbour_rub",
+     "a": "plate#-1",
+     "b": "brick:b_001#29",
+     "phase": {
+      "A": "park",
+      "B": "insert"
+     },
+     "start_frame": 2431,
+     "max_pen_mm": -0.393,
+     "peak_force_n": 1.7,
+     "end_frame": 2440,
+     "step": 1,
+     "braced": false,
+     "duration_frames": 10,
+     "contact_frames": 10,
+     "fragments": 1
+    },
+    {
+     "class": "neighbour_rub",
+     "a": "brick:b_001#29",
+     "b": "brick:b_002#30",
+     "phase": {
+      "A": "park",
+      "B": "insert"
+     },
+     "start_frame": 3429,
+     "max_pen_mm": -0.235,
+     "peak_force_n": 0.93,
+     "end_frame": 3436,
+     "step": 2,
+     "braced": false,
+     "duration_frames": 8,
+     "contact_frames": 8,
+     "fragments": 1
+    },
+    {
+     "class": "neighbour_rub",
+     "a": "brick:b_000#28",
+     "b": "brick:b_002#30",
+     "phase": {
+      "A": "park",
+      "B": "insert"
+     },
+     "start_frame": 3429,
+     "max_pen_mm": -0.204,
+     "peak_force_n": 0.94,
+     "end_frame": 3436,
+     "step": 2,
+     "braced": false,
+     "duration_frames": 8,
+     "contact_frames": 8,
+     "fragments": 1
+    },
+    {
+     "class": "unintended",
+     "a": "B_finger#26",
+     "b": "brick:b_001#29",
+     "phase": {
+      "A": "park",
+      "B": "insert"
+     },
+     "start_frame": 4716,
+     "max_pen_mm": -0.455,
+     "peak_force_n": 75.94,
+     "end_frame": 4741,
+     "step": 3,
+     "braced": false,
+     "duration_frames": 26,
+     "contact_frames": 26,
+     "fragments": 1
+    },
+    {
+     "class": "unintended",
+     "a": "plate#-1",
+     "b": "brick:b_003#31",
+     "phase": {
+      "A": "park",
+      "B": "insert"
+     },
+     "start_frame": 4719,
+     "max_pen_mm": -1.681,
+     "peak_force_n": 3.67,
+     "end_frame": 4741,
+     "step": 3,
+     "braced": false,
+     "duration_frames": 23,
+     "contact_frames": 21,
+     "fragments": 3
+    }
+   ]
+  }
+ ],
+ "plan_failures": 1,
+ "captures": 0,
+ "min_clearance_m": null,
+ "arm_arm_braced": 0,
+ "arm_arm_unbraced": 0,
+ "unintended": 4,
+ "displaced": 0,
+ "penetration": 0,
+ "neighbour_rub": 5,
+ "ok": false,
+ "reasons": [
+  "unintended",
+  "clearance",
+  "plan_failures",
+  "completion:cube:0"
+ ]
+}
