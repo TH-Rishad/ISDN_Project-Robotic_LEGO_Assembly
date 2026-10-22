@@ -1,0 +1,38 @@
+{
+ "best": "ckpt_0000000.pt",
+ "results": [
+  {
+   "ckpt": "ckpt_0000000.pt",
+   "seated": 37,
+   "episodes": 72,
+   "joint_break": 20
+  },
+  {
+   "ckpt": "ckpt_0100352.pt",
+   "seated": 27,
+   "episodes": 72,
+   "joint_break": 28
+  },
+  {
+   "ckpt": "ckpt_0200704.pt",
+   "seated": 29,
+   "episodes": 72,
+   "joint_break": 22
+  },
+  {
+   "ckpt": "ckpt_0300160.pt",
+   "seated": 32,
+   "episodes": 72,
+   "joint_break": 22
+  }
+ ],
+ "levels": [
+  0,
+  2
+ ],
+ "braces": [
+  "none",
+  "wriggle"
+ ],
+ "per_class": 3
+}

@@ -1,0 +1,11 @@
+{
+ "mode": "residual",
+ "sensing": "cheap",
+ "per_class": 60,
+ "samples": 1500000,
+ "workers": 7,
+ "horizon": 128,
+ "seed": 0,
+ "bc_episodes": 300,
+ "init_std": 0.15
+}

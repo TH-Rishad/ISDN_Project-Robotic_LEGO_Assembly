@@ -1,0 +1,11 @@
+{
+ "mode": "e2e",
+ "sensing": "cheap",
+ "per_class": 60,
+ "samples": 0,
+ "workers": 7,
+ "horizon": 128,
+ "seed": 0,
+ "bc_episodes": 300,
+ "init_std": 0.25
+}

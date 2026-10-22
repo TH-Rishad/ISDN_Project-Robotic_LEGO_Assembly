@@ -1,0 +1,152 @@
+{
+ "FREE/0": {
+  "n": 50,
+  "rate": 0.0,
+  "unlocked": true
+ },
+ "FREE/1": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "FREE/2": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "FREE/3": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "FREE/4": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "FLUSH/0": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "FLUSH/1": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "FLUSH/2": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "FLUSH/3": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "FLUSH/4": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "CORNER/0": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "CORNER/1": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "CORNER/2": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "CORNER/3": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "CORNER/4": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "SLOT/0": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "SLOT/1": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "SLOT/2": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "SLOT/3": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "SLOT/4": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "POCKET/0": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "POCKET/1": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "POCKET/2": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "POCKET/3": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "POCKET/4": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "ENCLOSED/0": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "ENCLOSED/1": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "ENCLOSED/2": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "ENCLOSED/3": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ },
+ "ENCLOSED/4": {
+  "n": 0,
+  "rate": null,
+  "unlocked": false
+ }
+}

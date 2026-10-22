@@ -1,0 +1,17 @@
+{
+ "mode": "residual",
+ "sensing": "cheap",
+ "per_class": 60,
+ "res_scale": 0.3,
+ "res_release": false,
+ "samples": 300000,
+ "workers": 7,
+ "horizon": 128,
+ "seed": 0,
+ "bc_episodes": 300,
+ "init_std": 0.15,
+ "res_l2": 0.1,
+ "critic_warmup": 20000,
+ "unlock_gate": 0.4,
+ "ckpt_every": 100000
+}

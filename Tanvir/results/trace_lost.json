@@ -1,0 +1,322 @@
+{
+ "controller": "scripted",
+ "outcomes": {
+  "lost_brick": 9,
+  "success": 22,
+  "timeout": 19
+ },
+ "lost": [
+  {
+   "context": "pyramid_b_002_exec",
+   "class": "CORNER",
+   "level": 0,
+   "seed": 0,
+   "release_step": 26,
+   "end_step": 190,
+   "at_release": {
+    "hand_err_mm": 0.41002888812923005,
+    "brick_err_mm": 0.17805249531868608,
+    "brick_dz_mm": 1.4423279503611268,
+    "brick_tilt_deg": 2.623255515601781,
+    "step": 26,
+    "post": null,
+    "tips": false,
+    "touch": []
+   },
+   "at_end": {
+    "hand_err_mm": 3.8608310078094,
+    "brick_err_mm": 0.10099213361397695,
+    "brick_dz_mm": 0.2540421034242829,
+    "brick_tilt_deg": 2.3800426129259398,
+    "step": 190,
+    "post": "press",
+    "tips": true,
+    "touch": [
+     "hand",
+     "world"
+    ]
+   },
+   "max_brick_err_mm": 0.36314427356926676,
+   "max_hand_err_mm": 3.8608310078094
+  },
+  {
+   "context": "pyramid_b_003_last",
+   "class": "POCKET",
+   "level": 3,
+   "seed": 0,
+   "release_step": 76,
+   "end_step": 77,
+   "at_release": {
+    "hand_err_mm": 2.51274652859524,
+    "brick_err_mm": 1.6152074524774915,
+    "brick_dz_mm": 1.4816153608485882,
+    "brick_tilt_deg": 5.347386217790816,
+    "step": 76,
+    "post": null,
+    "tips": false,
+    "touch": [
+     "world"
+    ]
+   },
+   "at_end": {
+    "hand_err_mm": 3.3931239092392818,
+    "brick_err_mm": 1.5794633410957772,
+    "brick_dz_mm": 1.0597885274992125,
+    "brick_tilt_deg": 2.8277476862356585,
+    "step": 77,
+    "post": "rise",
+    "tips": false,
+    "touch": [
+     "world"
+    ]
+   },
+   "max_brick_err_mm": 1.6152074524774915,
+   "max_hand_err_mm": 3.3931239092392818
+  },
+  {
+   "context": "pyramid_b_003_last",
+   "class": "POCKET",
+   "level": 4,
+   "seed": 0,
+   "release_step": 193,
+   "end_step": 194,
+   "at_release": {
+    "hand_err_mm": 2.0257795391911553,
+    "brick_err_mm": 2.0039784095270616,
+    "brick_dz_mm": 1.8021230706878757,
+    "brick_tilt_deg": 0.11768823745018589,
+    "step": 193,
+    "post": null,
+    "tips": false,
+    "touch": [
+     "world"
+    ]
+   },
+   "at_end": {
+    "hand_err_mm": 3.0205303833625203,
+    "brick_err_mm": 2.003980055510603,
+    "brick_dz_mm": 1.7999750847358655,
+    "brick_tilt_deg": 5.853177225625916e-06,
+    "step": 194,
+    "post": "rise",
+    "tips": false,
+    "touch": [
+     "world"
+    ]
+   },
+   "max_brick_err_mm": 2.003980055510603,
+   "max_hand_err_mm": 3.0205303833625203
+  },
+  {
+   "context": "pyramid_b_004_exec",
+   "class": "CORNER",
+   "level": 3,
+   "seed": 0,
+   "release_step": 27,
+   "end_step": 90,
+   "at_release": {
+    "hand_err_mm": 2.5803143202138954,
+    "brick_err_mm": 2.5654473087985212,
+    "brick_dz_mm": 1.7994356325346126,
+    "brick_tilt_deg": 0.6836483828469597,
+    "step": 27,
+    "post": null,
+    "tips": false,
+    "touch": [
+     "world"
+    ]
+   },
+   "at_end": {
+    "hand_err_mm": 3.027254967197429,
+    "brick_err_mm": 2.0230931133483865,
+    "brick_dz_mm": 1.2965472651971675,
+    "brick_tilt_deg": 14.484830393208668,
+    "step": 90,
+    "post": "press",
+    "tips": true,
+    "touch": [
+     "hand",
+     "world"
+    ]
+   },
+   "max_brick_err_mm": 2.5654473087985212,
+   "max_hand_err_mm": 3.027254967197429
+  },
+  {
+   "context": "pyramid_b_009_exec",
+   "class": "CORNER",
+   "level": 0,
+   "seed": 0,
+   "release_step": 26,
+   "end_step": 128,
+   "at_release": {
+    "hand_err_mm": 0.6237127994122873,
+    "brick_err_mm": 0.22806080234840093,
+    "brick_dz_mm": 1.3922102761287427,
+    "brick_tilt_deg": 3.3797089446394977,
+    "step": 26,
+    "post": null,
+    "tips": false,
+    "touch": []
+   },
+   "at_end": {
+    "hand_err_mm": 3.177522869442323,
+    "brick_err_mm": 0.10388593554336369,
+    "brick_dz_mm": 0.19020614231196262,
+    "brick_tilt_deg": 3.3427262808263127,
+    "step": 128,
+    "post": "press",
+    "tips": true,
+    "touch": [
+     "b_001",
+     "b_003",
+     "hand"
+    ]
+   },
+   "max_brick_err_mm": 0.45845063831592026,
+   "max_hand_err_mm": 3.177522869442323
+  },
+  {
+   "context": "fam_CORNER_1_2",
+   "class": "CORNER",
+   "level": 0,
+   "seed": 0,
+   "release_step": 27,
+   "end_step": 96,
+   "at_release": {
+    "hand_err_mm": 0.2808463410014554,
+    "brick_err_mm": 0.06664117885252413,
+    "brick_dz_mm": 1.0943488386522937,
+    "brick_tilt_deg": 0.5036273723340274,
+    "step": 27,
+    "post": null,
+    "tips": false,
+    "touch": []
+   },
+   "at_end": {
+    "hand_err_mm": 3.102698051156492,
+    "brick_err_mm": 0.11160626231716864,
+    "brick_dz_mm": -0.0493424791669448,
+    "brick_tilt_deg": 0.7557242863187748,
+    "step": 96,
+    "post": "press",
+    "tips": true,
+    "touch": [
+     "L001",
+     "hand"
+    ]
+   },
+   "max_brick_err_mm": 0.1957144680900915,
+   "max_hand_err_mm": 3.102698051156492
+  },
+  {
+   "context": "fam_CORNER_1_2",
+   "class": "CORNER",
+   "level": 3,
+   "seed": 0,
+   "release_step": 77,
+   "end_step": 78,
+   "at_release": {
+    "hand_err_mm": 2.491426804459215,
+    "brick_err_mm": 1.7394359434168178,
+    "brick_dz_mm": 1.275726464940707,
+    "brick_tilt_deg": 5.00193736149478,
+    "step": 77,
+    "post": null,
+    "tips": false,
+    "touch": [
+     "L001"
+    ]
+   },
+   "at_end": {
+    "hand_err_mm": 3.6673795759643095,
+    "brick_err_mm": 1.7337440395616661,
+    "brick_dz_mm": 1.2260152638512607,
+    "brick_tilt_deg": 4.852582864076025,
+    "step": 78,
+    "post": "rise",
+    "tips": false,
+    "touch": [
+     "L001"
+    ]
+   },
+   "max_brick_err_mm": 1.7394359434168178,
+   "max_hand_err_mm": 3.6673795759643095
+  },
+  {
+   "context": "fam_POCKET_0_1",
+   "class": "POCKET",
+   "level": 0,
+   "seed": 0,
+   "release_step": 27,
+   "end_step": 161,
+   "at_release": {
+    "hand_err_mm": 0.09037708113434038,
+    "brick_err_mm": 0.7360559155223729,
+    "brick_dz_mm": 6.283325033920196,
+    "brick_tilt_deg": 8.093617697284602,
+    "step": 27,
+    "post": null,
+    "tips": false,
+    "touch": [
+     "nb2"
+    ]
+   },
+   "at_end": {
+    "hand_err_mm": 3.0485369462091043,
+    "brick_err_mm": 0.7708662560286009,
+    "brick_dz_mm": 5.835926584069524,
+    "brick_tilt_deg": 10.839269575234646,
+    "step": 161,
+    "post": "press",
+    "tips": true,
+    "touch": [
+     "hand",
+     "nb0",
+     "nb1",
+     "nb2",
+     "world"
+    ]
+   },
+   "max_brick_err_mm": 1.218290554761671,
+   "max_hand_err_mm": 3.0485369462091043
+  },
+  {
+   "context": "fam_POCKET_0_1",
+   "class": "POCKET",
+   "level": 3,
+   "seed": 0,
+   "release_step": 50,
+   "end_step": 107,
+   "at_release": {
+    "hand_err_mm": 2.2317208084173212,
+    "brick_err_mm": 2.5771538735062367,
+    "brick_dz_mm": 8.340716597697417,
+    "brick_tilt_deg": 4.785973362102428,
+    "step": 50,
+    "post": null,
+    "tips": false,
+    "touch": [
+     "nb0",
+     "nb1"
+    ]
+   },
+   "at_end": {
+    "hand_err_mm": 3.2638602127929053,
+    "brick_err_mm": 2.5032516519087027,
+    "brick_dz_mm": 6.415630578948503,
+    "brick_tilt_deg": 10.74816620859491,
+    "step": 107,
+    "post": "press",
+    "tips": true,
+    "touch": [
+     "hand",
+     "nb0",
+     "world"
+    ]
+   },
+   "max_brick_err_mm": 2.8047826560179803,
+   "max_hand_err_mm": 3.2638602127929053
+  }
+ ]
+}
