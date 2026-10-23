@@ -1,0 +1,84 @@
+test_measured_joints_fingers_and_other_arm_collision (test_clearance.ClearanceTest.test_measured_joints_fingers_and_other_arm_collision) ... ok
+test_boxes_clear_a_sphere_false_positive (test_contact_check.ContactCheckTest.test_boxes_clear_a_sphere_false_positive) ... ok
+test_declared_graze_event_is_not_a_miss (test_contact_check.ContactCheckTest.test_declared_graze_event_is_not_a_miss) ... ok
+test_non_graze_event_the_check_misses_fails (test_contact_check.ContactCheckTest.test_non_graze_event_the_check_misses_fails) ... ok
+test_arm_arm_is_split_and_rub_is_not_counted (test_gate.GateTest.test_arm_arm_is_split_and_rub_is_not_counted) ... ok
+test_brace_all_rewrites_only_feasible_steps (test_gate.GateTest.test_brace_all_rewrites_only_feasible_steps) ... ok
+test_clean_gate_passes_and_a_collision_fails (test_gate.GateTest.test_clean_gate_passes_and_a_collision_fails) ... ok
+test_held_brick_is_left_out_of_the_world (test_gate.GateTest.test_held_brick_is_left_out_of_the_world) ... ok
+test_job_list_is_the_m05_grid (test_gate.GateTest.test_job_list_is_the_m05_grid) ... ok
+test_blocked_grasp_is_not_silently_accepted (test_grasp_clearance.GraspClearanceTest.test_blocked_grasp_is_not_silently_accepted) ... ok
+test_checks_both_directions (test_grasp_clearance.GraspClearanceTest.test_checks_both_directions) ... ok
+test_clear_grasp_stays_centred (test_grasp_clearance.GraspClearanceTest.test_clear_grasp_stays_centred) ... ok
+test_shift_clears_neighbour_with_margin (test_grasp_clearance.GraspClearanceTest.test_shift_clears_neighbour_with_margin) ... ok
+test_press_cannot_exceed_the_stud_budget (test_insert_cell.InsertCellTest.test_press_cannot_exceed_the_stud_budget) ... ok
+test_refuses_to_start_before_pre_insert (test_insert_cell.InsertCellTest.test_refuses_to_start_before_pre_insert) ... ok
+test_actor_obs_is_frames_and_proprio_only (test_insertion.InsertionTest.test_actor_obs_is_frames_and_proprio_only) ... ok
+test_one_update_on_cpu (test_insertion.InsertionTest.test_one_update_on_cpu) ... ok
+test_press_is_capped_at_insertion_budget (test_insertion.InsertionTest.test_press_is_capped_at_insertion_budget) ... ok
+test_residual_cannot_exceed_unit_box (test_insertion.InsertionTest.test_residual_cannot_exceed_unit_box) ... ok
+test_shared_observation_filters_task_and_detection_state (test_insertion.InsertionTest.test_shared_observation_filters_task_and_detection_state) ... ok
+test_sparse_reward (test_insertion.InsertionTest.test_sparse_reward) ... ok
+test_shared_optimizer_settings_are_default (test_iter_budget.DefaultBudgetTest.test_shared_optimizer_settings_are_default) ... ok
+test_floor_and_idempotent (test_iter_budget.IterBudgetTest.test_floor_and_idempotent) ... ok
+test_latency_gate_is_150 (test_iter_budget.IterBudgetTest.test_latency_gate_is_150) ... ok
+test_leaves_ik_and_graph_search (test_iter_budget.IterBudgetTest.test_leaves_ik_and_graph_search) ... ok
+test_num_iters_stays_a_multiple_of_inner_iters (test_iter_budget.IterBudgetTest.test_num_iters_stays_a_multiple_of_inner_iters) ... ok
+test_scale_one_is_a_noop (test_iter_budget.IterBudgetTest.test_scale_one_is_a_noop) ... ok
+test_scales_iter_fields_only (test_iter_budget.IterBudgetTest.test_scales_iter_fields_only) ... ok
+test_conflicting_cached_package_and_pythonpath (test_m05_import.RunnerImportTest.test_conflicting_cached_package_and_pythonpath) ... ok
+test_freeze_round_trip (test_memory.MemoryTest.test_freeze_round_trip) ... ok
+test_grip_adjust_updates_only_that_brick (test_memory.MemoryTest.test_grip_adjust_updates_only_that_brick) ... ok
+test_held_brick_is_not_overwritten (test_memory.MemoryTest.test_held_brick_is_not_overwritten) ... ok
+test_init_is_one_shot (test_memory.MemoryTest.test_init_is_one_shot) ... ok
+test_lift_freezes_once (test_memory.MemoryTest.test_lift_freezes_once) ... ok
+test_relative_matches_compose (test_memory.MemoryTest.test_relative_matches_compose) ... ok
+test_scan_refused_until_a_reason (test_memory.MemoryTest.test_scan_refused_until_a_reason) ... ok
+test_a_flipped_seed_is_not_the_same_start (test_motion.MotionTest.test_a_flipped_seed_is_not_the_same_start) ... ok
+test_cartesian_only_when_inside_30_mm (test_motion.MotionTest.test_cartesian_only_when_inside_30_mm) ... ok
+test_last_30_mm_is_straight (test_motion.MotionTest.test_last_30_mm_is_straight) ... ok
+test_pre_insert_is_25_mm (test_motion.MotionTest.test_pre_insert_is_25_mm) ... ok
+test_refuses_before_warmup_and_after_capture (test_motion.MotionTest.test_refuses_before_warmup_and_after_capture) ... ok
+test_shared_motion_coexists_with_kean (test_motion.MotionTest.test_shared_motion_coexists_with_kean) ... ok
+test_short_move_is_all_cartesian (test_motion.MotionTest.test_short_move_is_all_cartesian) ... ok
+test_zone_and_thread (test_motion.MotionTest.test_zone_and_thread) ... ok
+test_p3_default_does_not_modify_the_shared_probe (test_shared.SharedTest.test_p3_default_does_not_modify_the_shared_probe) ... ok
+test_p3_model_generation_stays_with_sakib (test_shared.SharedTest.test_p3_model_generation_stays_with_sakib) ... ok
+test_planner_closes_when_work_raises (test_shared.SharedTest.test_planner_closes_when_work_raises) ... ok
+test_probe_import_uses_shared_overlay_and_cleans_failed_cache (test_shared.SharedTest.test_probe_import_uses_shared_overlay_and_cleans_failed_cache) ... ok
+test_probe_keeps_shared_models_and_redirects_only_reports (test_shared.SharedTest.test_probe_keeps_shared_models_and_redirects_only_reports) ... ok
+test_shared_force_constants (test_shared.SharedTest.test_shared_force_constants) ... ok
+test_already_inside_limits_is_not_repaired (test_sphere_fit.SphereFitTest.test_already_inside_limits_is_not_repaired) ... ok
+test_cover_radius_stays_inside_both_limits (test_sphere_fit.SphereFitTest.test_cover_radius_stays_inside_both_limits) ... ok
+test_drops_only_spheres_outside_the_protrusion_limit (test_sphere_fit.SphereFitTest.test_drops_only_spheres_outside_the_protrusion_limit) ... ok
+test_fat_finger_needs_repair (test_sphere_fit.SphereFitTest.test_fat_finger_needs_repair) ... ok
+test_hand_vertex_miss_needs_repair (test_sphere_fit.SphereFitTest.test_hand_vertex_miss_needs_repair) ... ok
+test_inward_sphere_covers_the_point (test_sphere_fit.SphereFitTest.test_inward_sphere_covers_the_point) ... ok
+test_shrink_keeps_a_legal_sphere_and_pulls_a_fat_one_in (test_sphere_fit.SphereFitTest.test_shrink_keeps_a_legal_sphere_and_pulls_a_fat_one_in) ... ok
+test_b_waits_for_a (test_support.SupportTest.test_b_waits_for_a) ... ok
+test_consumes_brace_pose (test_support.SupportTest.test_consumes_brace_pose) ... ok
+test_grip_adjust_rescans_then_freezes (test_support.SupportTest.test_grip_adjust_rescans_then_freezes) ... ok
+test_one_arm_moves_in_the_zone (test_support.SupportTest.test_one_arm_moves_in_the_zone) ... ok
+test_rejects_missing_brace (test_support.SupportTest.test_rejects_missing_brace) ... ok
+test_all_launchers_use_only_shared_venv (test_test_runner.InterpreterTest.test_all_launchers_use_only_shared_venv) ... ok
+test_dry_run_isolated_output_and_invalid_job (test_test_runner.TestRunnerTest.test_dry_run_isolated_output_and_invalid_job) ... ok
+test_failed_command_keeps_output_and_exit_status (test_test_runner.TestRunnerTest.test_failed_command_keeps_output_and_exit_status) ... test: /home/mlieq/ISDN_Project-Robotic_LEGO_Assembly/Sakib/.venv/bin/python -c print('diagnostic'); raise SystemExit(7)
+diagnostic
+ok
+test_bias_and_ik_seed_at_handoff (test_tick.TickTest.test_bias_and_ik_seed_at_handoff) ... ok
+test_capture_after_warmup_fails_the_run (test_tick.TickTest.test_capture_after_warmup_fails_the_run) ... ok
+test_cartesian_tail_keeps_shared_arrival_and_wait_semantics (test_tick.TickTest.test_cartesian_tail_keeps_shared_arrival_and_wait_semantics) ... ok
+test_contact_retract_stays_cartesian (test_tick.TickTest.test_contact_retract_stays_cartesian) ... ok
+test_other_arm_holds_the_zone (test_tick.TickTest.test_other_arm_holds_the_zone) ... ok
+test_plan_does_not_block_and_then_plays (test_tick.TickTest.test_plan_does_not_block_and_then_plays) ... ok
+test_planner_uses_cell_wrist_convention (test_tick.TickTest.test_planner_uses_cell_wrist_convention) ... ok
+test_request_yaw_matches_cell_at_and_around_boundaries (test_tick.TickTest.test_request_yaw_matches_cell_at_and_around_boundaries) ... ok
+test_short_and_contact_are_not_planned (test_tick.TickTest.test_short_and_contact_are_not_planned) ... ok
+test_velocity_cleared_on_cartesian_handoff (test_tick.TickTest.test_velocity_cleared_on_cartesian_handoff) ... ok
+test_waiting_holds_measured_joints_and_updates_ee (test_tick.TickTest.test_waiting_holds_measured_joints_and_updates_ee) ... plan fallback B transport: no path
+ok
+
+----------------------------------------------------------------------
+Ran 76 tests in 5.190s
+
+OK

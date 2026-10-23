@@ -2,7 +2,15 @@
 __pycache__/
 *.py[cod]
 
+# IDE
+.idea/
+
 # Per-member identity marker and personal agent instructions:
 # machine-local, not part of the shared repo
 Kean/kean.id
 Kean/AGENTS.md
+
+# Kean run artifacts. JSON evidence stays; recorder dumps and unused model copies do not.
+Kean/results/**/*.npz
+Kean/results/p3/fr3.yml
+Kean/results/p3/fr3_plan.yml

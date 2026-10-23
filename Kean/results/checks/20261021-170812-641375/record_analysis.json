@@ -1,0 +1,49 @@
+{
+  "frames": 4729,
+  "command_jumps_over_0_5_rad": [
+    {
+      "frame": 325,
+      "step": 0,
+      "phase": "to feeder",
+      "max_command_jump_rad": 2.843531608581543
+    },
+    {
+      "frame": 827,
+      "step": 0,
+      "phase": "transport",
+      "max_command_jump_rad": 2.280367612838745
+    },
+    {
+      "frame": 1146,
+      "step": 0,
+      "phase": "pre-insert",
+      "max_command_jump_rad": 2.8166675567626953
+    },
+    {
+      "frame": 3713,
+      "step": 3,
+      "phase": "to feeder",
+      "max_command_jump_rad": 2.996886730194092
+    },
+    {
+      "frame": 4244,
+      "step": 3,
+      "phase": "transport",
+      "max_command_jump_rad": 2.1856870651245117
+    },
+    {
+      "frame": 4454,
+      "step": 3,
+      "phase": "pre-insert",
+      "max_command_jump_rad": 1.4748659133911133
+    },
+    {
+      "frame": 4501,
+      "step": 3,
+      "phase": "pre-insert",
+      "max_command_jump_rad": 1.4865117073059082
+    }
+  ],
+  "finding": "90-degree nominal yaw maps to 270 degrees in the shared B controller; the previous Kean adapter mapped it to 90 degrees. Transport jump at frame 4244 precedes the step-3 pre-insert failure.",
+  "limitation": "Recording has no per-plan handoff marker or planner collision diagnostic; corrected GPU build still requires rerun."
+}

@@ -1,0 +1,142 @@
+{
+ "placements": 1,
+ "runs": [
+  {
+   "shape": "cube",
+   "seed": 0,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "placed": 1,
+   "total": 8,
+   "failure": "gate_miss",
+   "frames": 2862,
+   "braced_placements": 0,
+   "events": [
+    {
+     "class": "unintended",
+     "a": "plate#-1",
+     "b": "B_finger#27",
+     "phase": {
+      "A": "park",
+      "B": "transport"
+     },
+     "start_frame": 973,
+     "max_pen_mm": -1.351,
+     "peak_force_n": 3824.6,
+     "end_frame": 973,
+     "step": 0,
+     "braced": false,
+     "duration_frames": 1,
+     "contact_frames": 1,
+     "fragments": 1
+    },
+    {
+     "class": "neighbour_rub",
+     "a": "plate#-1",
+     "b": "brick:b_000#28",
+     "phase": {
+      "A": "park",
+      "B": "insert"
+     },
+     "start_frame": 1558,
+     "max_pen_mm": -0.5,
+     "peak_force_n": 4.86,
+     "end_frame": 1575,
+     "step": 0,
+     "braced": false,
+     "duration_frames": 18,
+     "contact_frames": 18,
+     "fragments": 1
+    },
+    {
+     "class": "unintended",
+     "a": "plate#-1",
+     "b": "brick:b_001#29",
+     "phase": {
+      "A": "park",
+      "B": "pre-insert"
+     },
+     "start_frame": 2706,
+     "max_pen_mm": -3.539,
+     "peak_force_n": 0.11,
+     "end_frame": 2707,
+     "step": 1,
+     "braced": false,
+     "duration_frames": 2,
+     "contact_frames": 2,
+     "fragments": 1
+    },
+    {
+     "class": "unintended",
+     "a": "B_finger#27",
+     "b": "brick:b_000#28",
+     "phase": {
+      "A": "park",
+      "B": "pre-insert"
+     },
+     "start_frame": 2709,
+     "max_pen_mm": -0.84,
+     "peak_force_n": 187.87,
+     "end_frame": 2709,
+     "step": 1,
+     "braced": false,
+     "duration_frames": 1,
+     "contact_frames": 1,
+     "fragments": 1
+    },
+    {
+     "class": "unintended",
+     "a": "ground#-1",
+     "b": "brick:b_001#29",
+     "phase": {
+      "A": "park",
+      "B": "pre-insert"
+     },
+     "start_frame": 2715,
+     "max_pen_mm": -3.029,
+     "peak_force_n": 0.06,
+     "end_frame": 2736,
+     "step": 1,
+     "braced": false,
+     "duration_frames": 22,
+     "contact_frames": 17,
+     "fragments": 4
+    },
+    {
+     "class": "unintended",
+     "a": "B_finger#27",
+     "b": "brick:b_000#28",
+     "phase": {
+      "A": "park",
+      "B": "insert"
+     },
+     "start_frame": 2840,
+     "max_pen_mm": -0.82,
+     "peak_force_n": 73.38,
+     "end_frame": 2862,
+     "step": 1,
+     "braced": false,
+     "duration_frames": 23,
+     "contact_frames": 23,
+     "fragments": 1
+    }
+   ]
+  }
+ ],
+ "plan_failures": 1,
+ "captures": 0,
+ "min_clearance_m": null,
+ "arm_arm_braced": 0,
+ "arm_arm_unbraced": 0,
+ "unintended": 5,
+ "displaced": 0,
+ "penetration": 0,
+ "neighbour_rub": 1,
+ "ok": false,
+ "reasons": [
+  "unintended",
+  "clearance",
+  "plan_failures",
+  "completion:cube:0"
+ ]
+}

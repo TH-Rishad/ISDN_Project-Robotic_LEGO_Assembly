@@ -1,0 +1,192 @@
+{
+ "jobs": [
+  {
+   "shape": "cube",
+   "kind": "shape",
+   "seed": 0,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 8
+  },
+  {
+   "shape": "cube",
+   "kind": "shape",
+   "seed": 1,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 8
+  },
+  {
+   "shape": "cube",
+   "kind": "shape",
+   "seed": 2,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 8
+  },
+  {
+   "shape": "cube",
+   "kind": "shape",
+   "seed": 3,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 8
+  },
+  {
+   "shape": "cube",
+   "kind": "shape",
+   "seed": 4,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 8
+  },
+  {
+   "shape": "arch",
+   "kind": "shape",
+   "seed": 0,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 11
+  },
+  {
+   "shape": "arch",
+   "kind": "shape",
+   "seed": 1,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 11
+  },
+  {
+   "shape": "arch",
+   "kind": "shape",
+   "seed": 2,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 11
+  },
+  {
+   "shape": "arch",
+   "kind": "shape",
+   "seed": 3,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 11
+  },
+  {
+   "shape": "arch",
+   "kind": "shape",
+   "seed": 4,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 11
+  },
+  {
+   "shape": "hollow_box",
+   "kind": "shape",
+   "seed": 0,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 12
+  },
+  {
+   "shape": "hollow_box",
+   "kind": "shape",
+   "seed": 1,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 12
+  },
+  {
+   "shape": "hollow_box",
+   "kind": "shape",
+   "seed": 2,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 12
+  },
+  {
+   "shape": "hollow_box",
+   "kind": "shape",
+   "seed": 3,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 12
+  },
+  {
+   "shape": "hollow_box",
+   "kind": "shape",
+   "seed": 4,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 12
+  },
+  {
+   "shape": "S3",
+   "kind": "structure",
+   "seed": 0,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 16
+  },
+  {
+   "shape": "S3",
+   "kind": "structure",
+   "seed": 1,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 16
+  },
+  {
+   "shape": "S3",
+   "kind": "structure",
+   "seed": 2,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 16
+  },
+  {
+   "shape": "S3",
+   "kind": "structure",
+   "seed": 3,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 16
+  },
+  {
+   "shape": "S3",
+   "kind": "structure",
+   "seed": 4,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 16
+  },
+  {
+   "shape": "S3",
+   "kind": "structure",
+   "seed": 0,
+   "strategy": "brace_all",
+   "stress": true,
+   "bricks": 16
+  },
+  {
+   "shape": "S3",
+   "kind": "structure",
+   "seed": 1,
+   "strategy": "brace_all",
+   "stress": true,
+   "bricks": 16
+  },
+  {
+   "shape": "S3",
+   "kind": "structure",
+   "seed": 2,
+   "strategy": "brace_all",
+   "stress": true,
+   "bricks": 16
+  }
+ ],
+ "job_count": 23,
+ "placements": 235,
+ "stress_jobs": 3,
+ "note": "235 placements: cube, arch, hollow_box, S3 x 5 seeds. Arm-arm is split by braced placement. S3 brace-all x 3 is the zone stress."
+}

@@ -1,0 +1,5 @@
+Python: /home/mlieq/ISDN_Project-Robotic_LEGO_Assembly/Sakib/.venv/bin/python
+GPU: NVIDIA L20 torch CUDA: 12.8
+Model: /home/mlieq/ISDN_Project-Robotic_LEGO_Assembly/Sakib/brickassembly/motion/fr3.yml
+Model: /home/mlieq/ISDN_Project-Robotic_LEGO_Assembly/Sakib/brickassembly/motion/fr3_plan.yml
+Shared motion imports/models passed.
