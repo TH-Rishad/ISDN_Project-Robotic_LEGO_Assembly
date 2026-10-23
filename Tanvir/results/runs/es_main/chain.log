@@ -1,0 +1,9 @@
+[2026-10-23 05:38:45 CST] stage 1: ES search, max-hours 1.65
+[2026-10-23 07:23:07 CST] stage 1 done (exit 0)
+[2026-10-23 07:23:07 CST] stage 2: select
+[2026-10-23 07:38:14 CST] stage 2 done (exit 0)
+[2026-10-23 07:38:14 CST] stage 3: held-out evaluation of best.json
+[2026-10-23 07:55:45 CST] stage 3 done (exit 0)
+[2026-10-23 07:55:45 CST] stage 4: held-out evaluation of theta = 0 (scripted with the pad shift)
+[2026-10-23 08:13:05 CST] stage 4 done (exit 0)
+[2026-10-23 08:13:05 CST] chain finished

@@ -1,0 +1,22 @@
+720 episodes on 7 workers
+  50/720  45s
+  100/720  128s
+  150/720  185s
+  200/720  226s
+  250/720  317s
+  300/720  360s
+  350/720  442s
+  400/720  486s
+  450/720  564s
+  500/720  614s
+  550/720  660s
+  600/720  751s
+  650/720  794s
+  700/720  878s
+select: zero.json 67/120
+select: mean_gen011.json 50/120
+select: mean_gen012.json 53/120
+select: mean_gen013.json 52/120
+select: mean_gen014.json 50/120
+select: avg_last.json 50/120
+{"ckpt": "zero.json", "seated": 67, "episodes": 120, "joint_break": 25, "timeout": 14, "by_level": {"0": 45, "2": 22}, "by_brace": {"none": 36, "wriggle": 31}}

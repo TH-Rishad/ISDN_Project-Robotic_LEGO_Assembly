@@ -1,0 +1,152 @@
+{
+ "FREE/0": {
+  "n": 50,
+  "rate": 0.88,
+  "unlocked": true
+ },
+ "FREE/1": {
+  "n": 50,
+  "rate": 0.78,
+  "unlocked": true
+ },
+ "FREE/2": {
+  "n": 41,
+  "rate": 0.7560975609756098,
+  "unlocked": true
+ },
+ "FREE/3": {
+  "n": 2,
+  "rate": 0.5,
+  "unlocked": true
+ },
+ "FREE/4": {
+  "n": 3,
+  "rate": 0.0,
+  "unlocked": false
+ },
+ "FLUSH/0": {
+  "n": 50,
+  "rate": 0.36,
+  "unlocked": true
+ },
+ "FLUSH/1": {
+  "n": 43,
+  "rate": 0.4186046511627907,
+  "unlocked": true
+ },
+ "FLUSH/2": {
+  "n": 2,
+  "rate": 1.0,
+  "unlocked": true
+ },
+ "FLUSH/3": {
+  "n": 3,
+  "rate": 0.0,
+  "unlocked": false
+ },
+ "FLUSH/4": {
+  "n": 1,
+  "rate": 0.0,
+  "unlocked": false
+ },
+ "CORNER/0": {
+  "n": 1,
+  "rate": 0.0,
+  "unlocked": false
+ },
+ "CORNER/1": {
+  "n": 3,
+  "rate": 0.3333333333333333,
+  "unlocked": false
+ },
+ "CORNER/2": {
+  "n": 4,
+  "rate": 0.0,
+  "unlocked": false
+ },
+ "CORNER/3": {
+  "n": 3,
+  "rate": 0.0,
+  "unlocked": false
+ },
+ "CORNER/4": {
+  "n": 5,
+  "rate": 0.0,
+  "unlocked": false
+ },
+ "SLOT/0": {
+  "n": 3,
+  "rate": 0.0,
+  "unlocked": false
+ },
+ "SLOT/1": {
+  "n": 5,
+  "rate": 0.4,
+  "unlocked": false
+ },
+ "SLOT/2": {
+  "n": 5,
+  "rate": 0.0,
+  "unlocked": false
+ },
+ "SLOT/3": {
+  "n": 5,
+  "rate": 0.0,
+  "unlocked": false
+ },
+ "SLOT/4": {
+  "n": 2,
+  "rate": 0.0,
+  "unlocked": false
+ },
+ "POCKET/0": {
+  "n": 4,
+  "rate": 0.75,
+  "unlocked": false
+ },
+ "POCKET/1": {
+  "n": 3,
+  "rate": 0.3333333333333333,
+  "unlocked": false
+ },
+ "POCKET/2": {
+  "n": 6,
+  "rate": 0.16666666666666666,
+  "unlocked": false
+ },
+ "POCKET/3": {
+  "n": 3,
+  "rate": 0.0,
+  "unlocked": false
+ },
+ "POCKET/4": {
+  "n": 3,
+  "rate": 0.3333333333333333,
+  "unlocked": false
+ },
+ "ENCLOSED/0": {
+  "n": 6,
+  "rate": 0.5,
+  "unlocked": false
+ },
+ "ENCLOSED/1": {
+  "n": 1,
+  "rate": 0.0,
+  "unlocked": false
+ },
+ "ENCLOSED/2": {
+  "n": 3,
+  "rate": 0.3333333333333333,
+  "unlocked": false
+ },
+ "ENCLOSED/3": {
+  "n": 4,
+  "rate": 0.0,
+  "unlocked": false
+ },
+ "ENCLOSED/4": {
+  "n": 3,
+  "rate": 0.3333333333333333,
+  "unlocked": false
+ }
+}

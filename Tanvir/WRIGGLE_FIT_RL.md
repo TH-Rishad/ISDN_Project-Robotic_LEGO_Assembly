@@ -1,6 +1,6 @@
 # Wriggle-Fit RL: the fitting arm's tight-socket skill in the dual-arm LEGO cell
 
-Author: Tanvir · 2026-10-21 · Status: design proposal (not yet built beyond the two probe scripts)
+Author: Tanvir · 2026-10-21 · Status (2026-10-23): twin, scripted baseline, PPO runs (residual and skill-level), pad-shift fix and ES search built and run. No learned policy beat the scripted wriggle; the pad shift (§6.10) is the one measured gain. Held-out repo, no brace, aim 1–2 mm: 26/68 (target ≥ 85 %). See §6.9–§6.11 and `report/Wriggle_Fit_Design_Proposal.md`
 
 **Goal.** In the dual-arm cell, arm A braces the structure and arm B fits bricks. This design is for **arm B's fitting skill at crucial layouts**: *wriggling* a brick into a tight socket, such as a gap in the middle of a layer with bricks around it. It should succeed from a coarse aim (1–4 mm off) using only cheap, built-in sensing: no wrist force/torque (F/T) sensor and no fine vision. The aim is to get crucial, load-bearing layers seated without the neighbours being levered off, while arm A braces whatever is at risk.
 
@@ -513,6 +513,118 @@ The env now has an option `shaping=k`. It adds `γΦ(s') − Φ(s)` to the rewar
 
 1. a longer shaped run (≥ 1–2 M samples; about 3–6 h locally, or the cluster);
 2. a larger validation set (for example 3 seeds, or `per_class` 5) to separate checkpoints.
+
+### 6.9 Skill-level RL with PPO (`skill_main`: no improvement)
+
+**Why change the formulation.** Three residual-PPO runs (§6.4-§6.8) never beat checkpoint 0 on validation. The suspected cause is the learning signal: a 20 Hz residual over about 200 steps, a sparse ±1 reward and about 10 finished episodes per update. The skill-level run makes fewer, larger decisions and gets about 400 finished episodes per update (measured in the smoke run, below).
+
+**Formulation** (`skill_env.py`, `train_skill.py`, `eval_skill.py`; all of `SocketInsertionEnv` is reused unchanged, including contexts, DR, brace conditions, cheap sensing, terminations and the §3.5 reward).
+
+- *Approach is not a decision.* ScriptedBase align and descend run until first contact (the scripted phase flips to search or press).
+- *Macro step.* From first contact, one decision = K = 10 env ticks (0.5 s, exactly one period of the 2 Hz rock). The policy outputs θ ∈ [-1, 1]^10. `SkillController` replaces `env.base` in the env's `"scripted"` mode, so the unchanged `env.step` asks it for the 9-D action every tick and then does the impedance control, sensing, reward and terminations. An episode has about 2–17 macro steps (200 ticks in all, of which about 45 are approach).
+- *θ = 0 is the scripted controller.* Same spiral, rock, 8 N search press, seating-press ramp, release rule and post-release press. Checked: θ = 0 gives the same reason, step count and peak force as `ScriptedWriggle` on the same seed (test), and the 72-episode validation score of checkpoint 0 equals the scripted one (37/72, below).
+
+| θ | channel | range (θ = -1 … 0 … +1) |
+|---|---|---|
+| 0, 1 | centre nudge x, y | ±0.6 mm per macro step, accumulated on the spiral centre; the centre is kept within 4 mm of the believed target; world frame (= socket frame, the believed yaw is under 2°) |
+| 2, 3 | static tilt roll, pitch | ±3° about the believed pose, search phase only; commanded tilt (static + rock) capped at 5.5° |
+| 4 | yaw offset | ±1.5°, search and press phases |
+| 5 | rock amplitude | 0 … 1.5° … 3° at 2 Hz (roll; pitch 0.7×) |
+| 6 | rock yaw mix | yaw rock = 0.5 · θ6 · roll rock (0 at θ = 0: the scripted rock only tilts) |
+| 7 | press force | search press 2 … 8 … 24 N; seating press 0.4 … 1 … 1.2 × the scripted force, at most 0.9 of the budget (also used on the stud tops after a release) |
+| 8 | lateral stiffness scale | 0.15 … 1 … 1 (θ > 0 is the same as 0) |
+| 9 | spiral radius | 0 … 2 mm … 3 mm |
+
+**Differences from the first sketch.** Ten channels, not eight: a spiral-radius channel (the scripted base searches in a 2 mm spiral, and without it θ = 0 could not match the base; it also lets the policy switch the lateral search off in a tight slot) and a separate rock-yaw channel (so that θ = 0 stays the pure-tilt scripted rock). The stiffness channel has no stiffer-than-scripted half. The nudge only acts in the search phase (the scripted press phase is laterally free). Release stays the scripted rule.
+
+**Macro observation** (97 numbers, actor): depth progress and its change over the window; the cheap wrench estimate (mean, min, max over the window, hand frame); impedance tracking error (mean, last); hand linear and angular velocity (mean); hand xy, roll, pitch and yaw against the believed pose; controller phase (search, press, released); accumulated centre offset; tips closed; elapsed time and time in phase; the previous θ; the 32 context and 9 brace features. The critic adds the env's 28 privileged numbers (true offset, clutch state, contact count, neighbour utilisation, DR parameters, true wrench).
+
+**Reward.** The sum of the env rewards over the K ticks, plus the potential-based depth shaping of §6.8 at the macro level: k · (γ_macro Φ(s') − Φ(s)), with k = 0.5, γ_macro = 0.97 (also the PPO discount) and Φ = 0 at termination (a test checks that the discounted shaping telescopes to −Φ(s₀)).
+
+**PPO** (`train_skill.py`): Sakib's `ActorCritic` (2 × 256), zero-initialised mean (θ = 0 at the start), initial std 0.4 in pre-tanh space (θ = tanh(u)), exploration std clamped to [0.15, 0.6], entropy coefficient 0.001, lr 3e-4, gradient clip 1, 5 epochs × 4 minibatches with an early stop at approximate KL 0.05, GAE λ = 0.95. 7 workers × 3 envs, 50 macro steps per env per update = 1050 macro steps per update. The critic trains alone for the first 5,000 macro steps. Curriculum: the success-band buckets of `train_wriggle.Buckets`, unlock gate 0.4. One addition: 10 % of episodes are drawn uniformly over all 30 buckets (including locked ones; §3.6 lists this 10 % but `train_wriggle` did not implement it), so the policy sees SLOT, POCKET and ENCLOSED sockets and the locked buckets get success statistics. A checkpoint is written every 15 minutes of wall time, plus checkpoint 0 (θ = 0) and the last.
+
+**Selection and evaluation** (`eval_skill.py`). Every checkpoint is run deterministically (θ = tanh(mean)) on the family validation split: 5 contexts per class, levels 0 and 2, braces none and wriggle, 1 seed = 120 episodes; `ScriptedWriggle` is run on the same 120 episodes and the same seeds, and recorded in `select.json`. The selected checkpoint (ties go to the earlier one) and checkpoint 0 are then run on the `scripted_cheap_v2` protocol (repo + family test + probe, levels 0 / 2 / 4, braces none + wriggle, 2 seeds), writing `results/eval/skill_main.{md,jsonl}` and `skill_main_ckpt0.{md,jsonl}` in the same table format. `run_skill_chain.sh` runs train, select and both evaluations unattended; the run is `skill_main` (`results/runs/skill_main/`).
+
+**Measured so far (smoke run `skill_smoke`, 3 updates, 3,150 macro steps).**
+
+| quantity | value |
+|---|---|
+| training throughput, 7 workers × 3 envs | about 7 macro steps/s (about 150 s per 1,050-step update, about 195 env ticks/s including approach ticks and env rebuilds) |
+| finished episodes per update | 206–413 (the old residual runs: about 10) |
+| validation, 72 episodes (3 per class, levels 0 and 2, braces none + wriggle) | scripted 37; checkpoint 0 (θ = 0) 37; smoke checkpoint after 3 updates 34 |
+
+Three updates say nothing about learning; the smoke run only checked the plumbing and the speed.
+
+**Launch and outcome.** `run_skill_chain.sh` started the run `skill_main` at 03:38 CST on 2026-10-23 (7 workers × 3 envs, ~140 s per update). The supervisor stopped it after 46 logged updates (48,300 macro steps; checkpoints kept, last `ckpt_00045150.pt`). Training log (`results/runs/skill_main/train.jsonl`):
+
+| update | 1 | 6 | 16 | 26 | 36 | 46 |
+|---|---|---|---|---|---|---|
+| success, last 200 training episodes | 0.80 | 0.47 | 0.38 | 0.42 | 0.38 | 0.45 |
+| buckets unlocked | 3 | 8 | 11 | 12 | 12 | 12 |
+| exploration std (mean) | 0.400 | 0.399 | 0.397 | 0.395 | 0.394 | 0.393 |
+| largest |mean θ| over a batch | 0.02 | 0.02 | 0.02 | 0.09 | 0.06 | 0.09 |
+
+Diagnostic on the 72-episode validation set (`results/eval/diag_ckpt45k.md`): `ckpt_00045150` seated **28/72**, checkpoint 0 and the scripted controller **37/72**. The policy barely moved (std 0.400 to 0.393, mean θ within ±0.1) and the training success did not rise. This is the same outcome as the three residual runs: PPO does not find an improvement at this budget (about 50k macro steps, 12 buckets unlocked). One class stands out in the diagnostic: FLUSH seated 0/12 (FREE 10/12), and the scripted baseline is poor on FLUSH too (`scripted_cheap_v2`: 8/28 at level 0). §6.10 traces that. §6.11 replaces PPO by a paired evolution-strategy search.
+
+**Environment note.** On this machine `python` on the PATH is `lego_env`, a venv with no packages. The numbers above and the chain use `~/.venv/bin/python` (3.11; numpy, torch, mujoco, scipy). `pytest` is not installed in either; the tests were run with a small stand-in runner (same test functions).
+
+### 6.10 FLUSH sockets: the finger pads overhang onto the neighbour (pad shift)
+
+Full trace and tables: `results/flush_trace.md` (`flush_trace.py`, `flush_padshift.py`).
+
+- **Finding.** On FLUSH sockets the scripted descent stops 5–7.5 mm above the seat with a finger pad resting on the flush neighbour's studs. The pads are 17.5 mm wide and centred on the brick; a 1-wide brick is 7.8 mm and a 2-wide one 15.8 mm, so the pads overhang by 4.85 mm and 0.85 mm per side, over the neighbour. The audit's "free pinch axis" looks at the brick's end cells only. The scripted controller then keeps spiralling and pressing with the pad on the neighbour (timeouts, 70 N presses, neighbour joint breaks). The controller is not at fault, and no termination, budget, gate or joint strength is involved.
+- **Fix.** `SocketInsertionEnv(pad_shift=True)` (default off, so older numbers stand): when exactly one face perpendicular to the pinch axis touches a neighbour, the pads sit off-centre along that face, away from the neighbour, with their edge 0.2 mm inside the brick's face. This is a grasp-point choice from the plan. `skill_env.WriggleSkillEnv`, `eval_skill.py --pad-shift` and the ES run use it.
+- **Before / after** (scripted, no brace, one seed):
+
+| sockets | pad centred | pad shifted |
+|---|---|---|
+| FLUSH family, 6 train + 6 validation contexts × levels 0, 2 | 9/24 | **16/24** |
+| `pyramid_b_006_exec` (3 seeds × levels 0, 2) | 0/6 | **6/6** |
+| `pyramid_b_008_exec` | 0/6 | **5/6** |
+| CORNER, SLOT (24 episodes each) | 10/24, 7/24 | 10/24, 7/24 (the shift does not apply) |
+
+Seven FLUSH family episodes changed, all to seated; none got worse. Tests: `tests/test_skill.py`. Everything before this section (including `scripted_cheap_v2` and `skill_main`) used centred pads.
+
+### 6.11 Paired evolution-strategy search (`es_main`)
+
+`es_skill.py`; chain `run_es_chain.sh`; run directory `results/runs/es_main/`.
+
+- **Policy.** θ = clip(b[socket class] + W·z, −1, 1): b is 6 × 10 (per-class bias), W is 10 × 8, 140 parameters, initialised to 0 (θ = 0 exactly, i.e. the scripted controller; test). z is 8 features of the macro observation the actor already sees: depth progress, its change over the window, mean cheap-wrench z, mean lateral wrench magnitude, impedance tracking-error magnitude, elapsed time, released flag, brace active. No privileged information.
+- **Search.** OpenAI-ES with mirrored sampling (8 pairs per generation, σ = 0.2 on b and 0.1 on W), centred-rank fitness, Adam (lr 0.05) on the mean. Fitness = mean episode return (+1 seated, −1 for a break, force violation, arm contact or lost brick, the utilisation penalty and 0.002 per tick; no shaping).
+- **Common random numbers.** All candidates of a generation run on the same batch: 24 episodes, one per (socket class, aim-error level in {0, 1, 2, 3}), the brace alternating none / ideal over the grid, a random train-split context of the class, one env seed per episode; a fresh batch each generation (test). The current mean is scored on every batch and θ = 0 on every third, so improvement is a paired difference on the same episodes. Per generation: 8 pairs + mean (+ θ = 0) = 18–19 candidates × 24 episodes. Pad shift on.
+- **Throughput** (7 workers): the first generation of the real run, 432 episodes, took 479 s (about 1.1 s per episode), so a 99-minute search gives about 12 generations. This is a small budget for 140 parameters.
+- **Selection.** The last 4 saved means, their average and θ = 0 are run on the validation split (5 contexts per class, levels 0 and 2, braces none + wriggle, 120 episodes, the same seeds for all); ties go to θ = 0, then to the earlier mean.
+- **Held-out evaluation.** The selected policy and θ = 0 (both with the pad shift) are run on the `scripted_cheap_v2` protocol: repo + family test + probe, levels 0 2 4, braces none + wriggle, 2 seeds → `results/eval/es_main.{md,jsonl}` and `es_main_zero.{md,jsonl}`. θ = 0 with the pad shift is the paired baseline; `scripted_cheap_v2` (centred pads) remains the historical one.
+- **Results** (13 generations; `train.jsonl`, `select.json`, `results/eval/es_main*.md`).
+
+Paired fitness difference of the current mean against θ = 0 on the same 24-episode batch (only generations where θ = 0 was scored):
+
+| generation | 1 | 4 | 7 | 10 | 13 |
+|---|---|---|---|---|---|
+| mean − θ = 0 | 0.000 | +0.049 | −0.018 | −0.12 | −0.27 |
+
+Validation (120 episodes, same seeds), `select.json`:
+
+| candidate | θ = 0 | gen 11 | gen 12 | gen 13 | gen 14 mean | average of last four |
+|---|---|---|---|---|---|---|
+| seated / 120 | **67** | 50 | 53 | 52 | 50 | 50 |
+| joint breaks | 25 | 27 | 29 | 27 | 29 | 28 |
+
+**θ = 0 was selected**, so `es_main.md` equals `es_main_zero.md` (the pad-shifted scripted baseline). The ES search found no improvement over the scripted wriggle at this budget (13 generations × 24 episodes, 140 parameters).
+
+Held-out evaluation, seated / episodes by aim error (≤ 0.5, 1–2, 3–4 mm), two seeds, counted from the `.jsonl` files:
+
+| contexts, brace | centred pads (`scripted_cheap_v2`) | pad shift (`es_main_zero`) |
+|---|---|---|
+| repo, none | 33/68, 22/68, 9/68 | 38/68, 26/68, 8/68 |
+| repo, wriggle (ideal) brace | 31/68, 22/68, 9/68 | 36/68, 26/68, 8/68 |
+| family test, none | 32/60, 23/60, 3/60 | 30/60, 25/60, 2/60 |
+
+Joint breaks over the 204 repo, brace-none episodes: 87 with centred pads, 82 with the pad shift. By class (all braces, 780 episodes): FLUSH 18/84 → 40/84, SLOT 140/360 → 136/360, CORNER 19/120 → 21/120, POCKET 23/96 → 20/96.
+
+**Verdict.** No learned policy (five PPO runs, one ES run) beat the scripted wriggle. The measured gain came from the grasp diagnosis (§6.10). The 85 % target at 2 mm is far off (26/68 = 38 %), and joint breaks stay the dominant failure (82 of 204 repo, brace-none episodes).
+
+**Recommended next steps.** (a) Trace the SLOT joint-break episodes as FLUSH was traced (SLOT is 360 of the 780 held-out episodes) before more learning. (b) ES or PPO with much larger batches (≥ 200 episodes per generation) or on the HPC cluster (5–20 M steps, §3.6). (c) Question the 3–4 mm levels: the calibrated aim error is 0.8 mm (1σ), so 4 mm is a 5σ case. (d) Port to Newton only after (a).
 
 ## 7. Risks and checks
 

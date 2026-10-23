@@ -159,7 +159,8 @@ class ScriptedWriggle(ScriptedBase):
 
 class SocketInsertionEnv(InsertionEnv):
     def __init__(self, mode="e2e", sensing="cheap", reward="sparse", dr=True, seed=0, fingers=True,
-                 contexts=None, sampler=None, u_soft=0.6, res_scale=1.0, res_release=True, shaping=0.0):
+                 contexts=None, sampler=None, u_soft=0.6, res_scale=1.0, res_release=True, shaping=0.0,
+                 pad_shift=False):
         """mode: "e2e" (policy only), "residual" (policy added to ScriptedWriggle) or "scripted"
         (ScriptedWriggle only; the action is ignored). sampler(rng) -> (context, level, brace)
         is used by reset() when no context is given; contexts is the default pool for it.
@@ -173,6 +174,7 @@ class SocketInsertionEnv(InsertionEnv):
         self.sampler = sampler or self._default_sampler
         self.res_scale, self.res_release = res_scale, res_release
         self.shaping = shaping
+        self.pad_shift = pad_shift    # WRIGGLE_FIT_RL.md §6.10: grasp the brick off-centre, away from a flush neighbour
 
     def _default_sampler(self, rng):
         pool = self.contexts or [SF.family(int(rng.integers(1 << 30)), SF.CLASSES[rng.integers(6)])]
@@ -262,8 +264,9 @@ class SocketInsertionEnv(InsertionEnv):
             h.explicitinertial = True               # the pads below must not set the hand's mass
             if self.fingers:
                 half = (Lx if axis == "x" else Ly) / 2 + PAD_GAP + PAD_T / 2
+                sh = self._pad_offset(ctx, axis, Ly if axis == "x" else Lx)
                 for s, name in ((1, "padp"), (-1, "padn")):
-                    pos = [s * half, 0, TIP_Z + PAD_H / 2] if axis == "x" else [0, s * half, TIP_Z + PAD_H / 2]
+                    pos = [s * half, sh, TIP_Z + PAD_H / 2] if axis == "x" else [sh, s * half, TIP_Z + PAD_H / 2]
                     size = [PAD_T / 2, FINGER_W / 2, PAD_H / 2] if axis == "x" else [FINGER_W / 2, PAD_T / 2, PAD_H / 2]
                     g = h.add_geom(name="hand/" + name, type=mujoco.mjtGeom.mjGEOM_BOX, size=size, pos=pos)
                     g.contype, g.conaffinity = Bk.HAND_TYPE, Bk.HAND_AFFINITY
@@ -370,6 +373,19 @@ class SocketInsertionEnv(InsertionEnv):
         self.hist.append(self._step_features())
         self.phi = self.shaping * self.depth_progress()
         return self._obs()
+
+    def _pad_offset(self, ctx, axis, width):
+        """Along-the-face offset of the two finger pads (hand frame, perpendicular to the pinch axis). The pads
+        are FINGER_W = 17.5 mm wide, wider than a 1-wide brick (7.8 mm) or a 2-wide one (15.8 mm), so a pad
+        centred on the brick overhangs it, and over a flush neighbour that overhang lands on the neighbour's
+        studs and stops the descent (§6.10). With pad_shift, when exactly one of the two faces perpendicular
+        to the pinch axis touches a neighbour, the pads sit off-centre, their edge 0.2 mm inside that face."""
+        if not self.pad_shift:
+            return 0.0
+        side = [f for f in ctx["faces"] if f[1] != axis]
+        if len(side) != 1 or FINGER_W <= width:
+            return 0.0
+        return (1.0 if side[0][0] == "-" else -1.0) * (FINGER_W / 2 - width / 2 + 0.0002)
 
     # --- sensing ------------------------------------------------------------------------
     def ft_world(self):

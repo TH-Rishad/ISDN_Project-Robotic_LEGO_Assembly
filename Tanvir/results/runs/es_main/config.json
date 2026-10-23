@@ -1,0 +1,19 @@
+{
+ "name": "es_main",
+ "max_hours": 1.65,
+ "pairs": 8,
+ "sigma_b": 0.2,
+ "sigma_w": 0.1,
+ "lr": 0.05,
+ "seed": 0,
+ "zero_every": 3,
+ "pad_shift": true,
+ "episodes_per_candidate": 24,
+ "n_params": 140,
+ "levels": [
+  0,
+  1,
+  2,
+  3
+ ]
+}

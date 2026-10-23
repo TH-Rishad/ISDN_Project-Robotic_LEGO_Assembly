@@ -1,0 +1,30 @@
+{
+ "skill": true,
+ "sensing": "cheap",
+ "per_class": 60,
+ "shaping": 0.5,
+ "gamma": 0.97,
+ "uniform_frac": 0.1,
+ "macro_steps": 3000,
+ "workers": 7,
+ "per_worker": 3,
+ "horizon": 50,
+ "seed": 0,
+ "init_std": 0.4,
+ "lr": 0.0003,
+ "ent_coef": 0.001,
+ "lam": 0.95,
+ "critic_warmup": 1000,
+ "unlock_gate": 0.4,
+ "ckpt_every": 0,
+ "ckpt_minutes": 0.0,
+ "max_hours": null,
+ "std_range": [
+  0.15,
+  0.6
+ ],
+ "target_kl": 0.03,
+ "k_ticks": 10,
+ "macro_dim": 97,
+ "theta_dim": 10
+}

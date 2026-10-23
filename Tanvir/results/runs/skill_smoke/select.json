@@ -1,0 +1,62 @@
+{
+ "best": "ckpt_00000000.pt",
+ "scripted": {
+  "ckpt": "scripted",
+  "seated": 37,
+  "episodes": 72,
+  "joint_break": 20,
+  "timeout": 10,
+  "by_level": {
+   "0": 24,
+   "2": 13
+  },
+  "by_brace": {
+   "none": 19,
+   "wriggle": 18
+  }
+ },
+ "results": [
+  {
+   "ckpt": "ckpt_00000000.pt",
+   "seated": 37,
+   "episodes": 72,
+   "joint_break": 20,
+   "timeout": 10,
+   "by_level": {
+    "0": 24,
+    "2": 13
+   },
+   "by_brace": {
+    "none": 19,
+    "wriggle": 18
+   }
+  },
+  {
+   "ckpt": "ckpt_00003150.pt",
+   "seated": 34,
+   "episodes": 72,
+   "joint_break": 19,
+   "timeout": 12,
+   "by_level": {
+    "0": 23,
+    "2": 11
+   },
+   "by_brace": {
+    "none": 17,
+    "wriggle": 17
+   }
+  }
+ ],
+ "levels": [
+  0,
+  2
+ ],
+ "braces": [
+  "none",
+  "wriggle"
+ ],
+ "per_class": 3,
+ "seeds": 1,
+ "episodes_each": 72,
+ "wall_s": 306
+}
