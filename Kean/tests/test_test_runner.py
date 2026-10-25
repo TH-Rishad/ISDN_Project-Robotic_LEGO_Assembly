@@ -39,7 +39,7 @@ class InterpreterTest(unittest.TestCase):
             root = Path(tmp).resolve()
             scripts = root / "Kean/scripts"
             scripts.mkdir(parents=True)
-            for name in ("run.sh", "m05.sh", "p3.sh", "test_m05.sh"):
+            for name in ("run.sh", "m05.sh", "p3.sh", "test_m05.sh", "accept.sh"):
                 shutil.copy2(ROOT / "Kean/scripts" / name, scripts / name)
             shared_launcher = root / "Sakib/brickassembly/scripts/run.sh"
             shared_launcher.parent.mkdir(parents=True)
@@ -49,7 +49,7 @@ class InterpreterTest(unittest.TestCase):
             venv.write_text('#!/bin/sh\necho shared-venv\nprintf "%s\\n" "$@"\n')
             venv.chmod(0o755)
             env = dict(os.environ, P3_PY="/wrong/python", ROBOFAB_PY="/wrong/python")
-            for name in ("m05.sh", "p3.sh", "test_m05.sh"):
+            for name in ("m05.sh", "p3.sh", "test_m05.sh", "accept.sh"):
                 result = subprocess.run(["sh", str(scripts / name), "--help"], env=env,
                                         capture_output=True, text=True)
                 self.assertEqual(result.returncode, 0, result.stderr)

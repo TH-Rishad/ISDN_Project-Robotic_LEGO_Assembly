@@ -181,3 +181,43 @@ Gate summary: ok, no reasons. 0 plan failures, 0 captures, 0 arm-arm, 0 unintend
 Compared with synced run `20261021-171655-549530`: also 8/8, but 8 unintended B-finger contacts on steps 1/3/5/7, `min_clearance_m` null, gate failed. The offset is still opt-in. Arch, hollow_box, and S3 are not in this sync.
 
 `20261021-185956-521081` is only a unit exit 1 from an incomplete tree sync. It did not reach a job.
+
+---
+
+## Instructor acceptance (2026-10-25)
+
+Course instructions, all required. Existing motion and insertion-RL work stays in scope and does not replace any item.
+
+1. Take the target structure as direct input. Converting an image into a target structure is not required.
+2. Automatically generate the assembly sequence and determine where temporary support is needed.
+3. Use both robotic arms to autonomously assemble two different structures, each containing at least eight LEGO bricks and at least one section requiring temporary support.
+
+The required pair is the arch (11 bricks, one generated support) and S3 (16 bricks, two generated supports). Cube job 0 does not meet item 3. Generate with `planner.build_plan` and `bracing.assign`; do not use strategy `none` and do not require an image. Arm A must hold each generated support before Arm B inserts. Both builds are still unrun.
+
+Tight steps reuse Tanvir, not a new inserter: `tight_fit_audit.py`, `socket_family.py`, `socket_env.ScriptedWriggle` (`pad_shift` on a flush neighbour), and `wriggle_brace.choose` for the sideways neighbour. `SkillController` with θ = 0 is that same script. Do not copy those modules into `Kean/` and do not start another PPO or ES run until the scripted skill is called from the cell.
+
+## Workspace inventory (2026-10-25)
+
+- Sakib has the Newton cell, planner, vertical-press brace, vision, RL env, `robofab_sim/`, BrickSim, and docs. Finished: unbraced cube 8/8, arch 11/11, hollow_box 12/12, and the sequence/support generators. Perception V1 closed. G-V1 not passed. v3.1 frozen.
+- Kean has the planned-motion adapter, M0.5 scripts, camera bridge, and unwired memory/support/insertion prototypes. Finished: cube job 0 with grasp offset, 8/8, gate passed, 0 braces. Arch and S3 not run.
+- Tanvir has the tight-fit audit, socket family, scripted wriggle, pad shift, sideways brace, and failed learned search. Finished as a twin skill. Not in the cell. Held-out 1–2 mm, no brace: 26/68.
+- Richard has only `.gitkeep`.
+
+Not finished, and the next job: both arms assemble the arch and S3 from a structure id, with generated support held, reusing Sakib and Tanvir. Do not rebuild the finished pieces.
+
+## Acceptance runner (2026-10-25)
+
+The mark is the arch and S3, generated, with Arm A holding each support. Tanvir stays a fallback if the cell insert misses. No new inserter, no training, no extension of `insertion/`.
+
+`acceptance.py` takes the structure id, calls `planner.sequence` and `planner.build_plan` (`weakest_joint`, `grasp_lp`), and records the order and every `requires_brace` pose. It refuses strategy `none`. `scripts/accept.py --live` deletes a cached plan so the cell calls `build_plan`, then requires every generated support in `brace_by_step` to be executed. The cell's existing `queue_brace` is the hold. The cell's existing insert is the insert.
+
+CPU preview, cell frame: arch 11 bricks, one generated support on the crown. S3 16 bricks, `single_arm_fails`, three generated supports. The default-origin plan file has two; the cell recenters the origin and this generator emits three. The live run uses the cell's own `build_plan`, including its grip, and holds whatever that call marks. No image input. The dual-arm runs are not executed on this machine.
+
+```sh
+python3 Kean/scripts/accept.py --dry-run
+bash Kean/scripts/accept.sh --live
+```
+
+## Scope cut (2026-10-25)
+
+The instructor's three requirements are a full mark. Omitted from the master plan, and no longer required: image-to-structure, perception, G-V1, insertion RL, the camera actor, place-bandit, brace-bandit, memory scan, grip adjustment, the 235-placement M0.5 gate, cube and hollow_box regression, P3 ledger close, G3, G4, and a learned wriggle. Call Tanvir's scripted skill only if the cell insert misses a step on the arch or S3. Do not train.

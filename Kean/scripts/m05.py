@@ -75,7 +75,7 @@ def _stress_plan(plan_path, shape):
     return plan_path
 
 
-def run_job(job, out_dir, max_frames, record=False, grasp_offset=False):
+def run_job(job, out_dir, max_frames, record=False, grasp_offset=False, fresh_plan=False):
     from Kean.shared import add_cell_path
     add_cell_path()
     try:
@@ -84,6 +84,8 @@ def run_job(job, out_dir, max_frames, record=False, grasp_offset=False):
     except ImportError as exc:
         raise SystemExit("m05: Newton cell is not importable (%s). Run this on HPC." % exc)
     plan = out_dir / "plans" / ("%s_%s.json" % (job["shape"], job["strategy"]))
+    if fresh_plan and not job["stress"] and plan.exists():
+        plan.unlink()
     if job["stress"]:
         _stress_plan(plan, job["shape"])
     if not getattr(D.build_arm, "_kean_ff", False):
@@ -160,6 +162,12 @@ def run_job(job, out_dir, max_frames, record=False, grasp_offset=False):
         "braced_placements": len(braced_steps),
         "events": events,
         "grasp_offsets": grasp_offsets,
+        "required_supports": [s["step"] for s in example.plan["sequence"] if s.get("requires_brace")],
+        "supports": [
+            {"step": n, "executed": bool(info.get("executed")),
+             "pose": (example.plan["sequence"][n].get("brace") or {}).get("brace_pose")}
+            for n, info in sorted(getattr(example, "brace_by_step", {}).items())
+        ],
     }
     return row, tick.report()
 

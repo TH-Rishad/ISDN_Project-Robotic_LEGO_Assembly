@@ -1,103 +1,91 @@
-# Kean — motion, support, and insertion RL
+# Kean — two braced dual-arm builds
 
-**Execution setup.** Local development is CPU-only macOS. GPU work (cuRobo, Newton, RL training) runs on HPC4. Keep new files and edits under `Kean/` by default and avoid editing shared folders. Reading outside `Kean/`, including `Sakib/`, is allowed without additional permission.
+**Execution setup.** Local development is CPU-only macOS. GPU work runs on HPC4. Keep new files and edits under `Kean/` by default and avoid editing shared folders. Reading outside `Kean/`, including `Sakib/`, is allowed without additional permission.
 
-**Ownership.** Sakib owns environment provisioning, shared simulation, sensing, grasp/brace execution, and collision models. Kean owns planned-motion integration and camera/proprioception insertion RL. Kean scripts must consume the supplied environment, not install or repair it.
+**Ownership.** Sakib owns environment provisioning, the cell, the sequence and support generators, grasp/brace execution, and collision models. Tanvir owns the tight-fit skill. Kean runs the generators and finishes the two builds. Kean scripts must consume the supplied environment, not install or repair it.
+
+**Full mark.** The three instructor requirements below are sufficient. Master-plan items that they do not need are omitted.
 
 **Reuse first.** Inspect existing code and documentation before implementing. Reuse shared controllers, utilities, and interfaces; add adapters or missing behavior under `Kean/` rather than duplicating existing implementations. If a shared-file edit is necessary, follow the authorization guidance in `Kean/AGENTS.md`.
 
 **v3.1 is frozen.** Do not re-run G3 or G4, and do not port the twin PPO onto the Newton weld. **v4 is the cell.** Sakib owns the environment. This file is the job.
 
+**Finished, do not redo.** Sakib: unbraced cube 8/8, arch 11/11, hollow_box 12/12, plus `planner.build_plan` and `bracing.assign`. Kean: cube job 0, grasp offset, 8/8, motion gate passed, 0 braces. Tanvir: `ScriptedWriggle` plus pad shift; learned search did not beat it. Richard: empty. Not finished: arch and S3 finished in the cell, with every generated support held by Arm A.
+
+---
+
+## Instructor acceptance (full mark)
+
+These three are the mark. Do not drop or weaken any of them. Do not add master-plan work as a further requirement.
+
+1. Take the target structure as direct input. Converting an image into a target structure is not required.
+2. Automatically generate the assembly sequence and determine where temporary support is needed.
+3. Use both robotic arms to autonomously assemble two different structures, each containing at least eight LEGO bricks and at least one section requiring temporary support.
+
+Direct input is a structure id or an equivalent brick list already in memory (`--structure`, or a named sample such as `--shape` that does not read an image). Do not require `--front`, `--side`, `--top`, or any silhouette-to-structure step. Image conversion may exist in the shared repo; it is not part of this job and must not block acceptance.
+
+Sequence and support are generated, not supplied by hand. Call `planner.sequence` and `planner.build_plan` with `bracing.assign` (`weakest_joint` or `nearest`). Do not use `--strategy none` for the acceptance runs. The plan must record, per step, the order, `requires_brace`, and the support pose when a brace is required. Do not hand-author the brick order or which steps are supported.
+
+The two structures are the arch and S3. The arch has 11 bricks and, under `weakest_joint` / `grasp_lp`, `brace_required_count` 1 (the crown). S3 has 16 bricks and `brace_required_count` 2 under the same generators (`single_arm_fails` is true). Both must be assembled autonomously: Arm A reaches each generated support pose and holds before Arm B inserts on that step; Arm B picks, transports, and inserts every brick; the build completes. A run that skips a required support, or that only places an unbraced cube or hollow box, does not count.
+
+Autonomous means no manual stepping and no hand-labeled brace list. Ground-truth structure input is allowed. A learned inserter is not required.
+
+---
+
+## Omitted from the master plan
+
+Not required for the mark. Do not build them, do not train them, and do not block the two builds on them.
+
+- Image-to-structure, perception V1/V2/V3, G-V1, and vision-only acting.
+- Insertion RL, residual PPO, the camera actor, reward shaping, the place-bandit, and the brace-bandit.
+- The memory scan, grip adjustment, and a live tracker for a grasped brick.
+- The M0.5 235-placement gate, cube and hollow_box regression, brace-all stress, and a P3 ledger close.
+- G3, G4, and any port of the v3.1 twin PPO onto the Newton weld.
+- A learned policy that beats `ScriptedWriggle`. Five PPO runs and one evolution-strategy run already failed.
+
+If the cell's scripted insert cannot seat a step on the arch or S3, call Tanvir's `ScriptedWriggle` and, for a sideways neighbour, `wriggle_brace.choose`. That is reuse, not a new work package. Do not copy those modules and do not train.
+
 ---
 
 ## Contract
 
-Sakib supplies the cell, the sequence, and the support pose. Kean takes a brick pose and an insertion target.
+Sakib supplies the cell and the generators (`planner.py`, `bracing.py`, `stability.py`, `queue_place`, `queue_brace`). Kean runs those generators on a structure id and executes the sequence and support poses. Tanvir is a fallback for a missed insert, not a required run. Do not treat a pre-written pose list as a substitute for generation. Do not copy Tanvir's modules into `Kean/`.
 
-Arm A supports. It moves to the support pose and holds before Arm B transports. It also holds the brick when Arm B must adjust its grip. Arm B does the pick, the transport, and the insert. Only one arm moves inside the build zone.
+Arm A supports. It moves to the generated support pose and holds before Arm B inserts that step. Arm B does the pick, the transport, and the insert. Only one arm moves inside the build zone. Grip adjustment is not required.
 
-Motion ends at the pre-insert pose: above the target socket, +25 mm in z. Insertion RL starts there, brick already grasped. It does not learn pick, transport, or grip adjustment.
-
----
-
-## What to develop
-
-1. **Memory.** Scan brick poses at initialization and after each completed step. On grasp, freeze the brick in the gripper frame and infer it from forward kinematics. Do not track a held brick. Rescan only while a grip is being adjusted, then freeze the new frame.
-2. **Support.** Move Arm A to the support pose on a collision-free path, then hold. When a grip adjustment is required, Arm A holds the brick, Arm B regrasps, the scan runs, and Arm A returns to its hold. Consume the support pose from `bracing.py`. Do not rebuild `tasks/brace_bandit.py`.
-3. **Motion.** Collision-free path for either arm from the stored pose to the handoff pose. Arm B moves only after Arm A has settled. The last 30 mm of grasp, insert, and support are straight Cartesian segments, not planned paths.
-4. **Insertion RL.** Residual PPO on the scripted insert. Sparse snap reward. The policy sees camera frames and both arms' proprioception only.
-
-```
-Kean/
-├── memory/
-│   ├── store.py
-│   └── scan.py
-├── support/
-│   ├── hold.py
-│   ├── sequence.py
-│   └── grip_adjust.py
-├── motion/
-│   ├── plan_curobo.py
-│   ├── contact_segment.py
-│   └── curobo_server.py
-├── insertion/
-│   ├── obs.py
-│   ├── env.py
-│   └── train.py
-├── tests/
-├── scripts/
-│   └── p3.sh
-└── results/
-    ├── p3/
-    ├── m05/
-    └── insertion/
-```
-
-`curobo_server.py` is written only if in-process cuRobo fails. `fr3.yml` stays in `Sakib/brickassembly/motion/`.
+Use the cell's existing insert. Call Tanvir only when that insert misses a step on the arch or S3. Do not start insertion RL.
 
 ---
 
-## Observation
+## What to do
 
-The actor gets frames from `top`, `wrist_A`, and `wrist_B`, plus both arms' joint positions, joint velocities, and finger openings, and the hand poses from forward kinematics.
+1. **Generate.** From a structure id, run `planner.build_plan` with `bracing.assign`. Record the order and every `requires_brace` pose.
+2. **Support.** Move Arm A to each generated support pose and hold it before Arm B inserts. Do not rebuild `bracing.py` or `tasks/brace_bandit.py`.
+3. **Assemble.** Both arms finish the arch and S3. Reuse the cell's motion and insert. A planned path is allowed only where waypoint motion collides or misses. Do not close P3 or the 235-placement gate first.
 
-Brick position and orientation are a memory, not a live input. A held brick's frame is the frozen grasp composed with the hand's forward kinematics.
-
-Not actor inputs: the true socket error, clutch state, weld utilization, a camera embedding, and a wrist force-torque history. The cell has no wrist force-torque sensor. Those signals are reward and critic only.
-
-This is not the master-plan 183-D observation and not the frozen twin's 121-D observation.
-
----
-
-## Reward and action
-
-Action is a residual on the scripted insert: an end-effector increment at 20 Hz, plus a press channel. Cap the press at the stud budget. Do not invent force limits. Use 8.9 N insertion and 11.3 N break per stud.
-
-Reward weights, chosen: +1 on snap, −1 on a joint break, a force above n·11.3 N, or a drop, and 0 otherwise. This is the frozen twin's scale. The spec's +50 / −10 is not used.
-
-A grip adjustment is a support move. It is not an insertion action.
+`memory/`, `insertion/`, and the camera actor already exist as prototypes. They are omitted. Do not extend them. `curobo_server.py` is written only if in-process cuRobo is required and fails. `fr3.yml` stays in `Sakib/brickassembly/motion/`.
 
 ---
 
 ## Do not build
 
-- Sakib's cell, clutch, sequence, or perception stack.
-- The brace selector (`tasks/brace_bandit.py`). Execute the pose it emits.
-- The v4 place-bandit. It is a draft and is not adopted.
-- A live tracker for a brick that is already grasped.
+- A second cell, clutch, sequence generator, or perception stack.
+- An image-to-structure converter.
+- A new brace selector. Execute `bracing.assign`. Call `wriggle_brace.choose` only if a tight step on the arch or S3 breaks a neighbour.
+- A second tight-fit stack, pad shift, or PPO/ES trainer.
+- The place-bandit, the memory scan, and a live tracker for a grasped brick.
 
 ---
 
-## Inherited constraints
+## Constraints that still apply
 
-- Current cell motion is waypoint IK in `dual_arm_sim.py`. Planned motion is the new work. P3 (`scripts/12_curobo_probe.py`) has no ledger pass. Close it on HPC before trusting `plan_curobo.py`.
-- M0.5 is the motion gate: cube, arch, hollow_box, S3, zero arm–arm events. Report braced and unbraced separately.
-- G3 and G4 failed on joint breaks and on press, not on transport. More press is not progress.
-- Plans must not block the sim tick. Warm up every CUDA graph before the loop. A capture during the loop fails the run.
+- More press is not progress. Use 8.9 N insertion and 11.3 N break per stud. Do not invent force limits.
+- On the arch and S3, Arm A must actually hold each generated support. Zero arm–arm events on those steps.
+- If a plan is used, it must not block the sim tick. Warm up every CUDA graph before the loop. A capture during the loop fails the run.
 
 ## Read
 
-1. `Sakib/Docs/plan_v4.md` §2.3, §2.4, P3, WP2
-2. `Sakib/brickassembly/rl_env.py` for what a policy may read
-3. `Sakib/brickassembly/dual_arm_sim.py` `queue_place` and `queue_brace`
-4. `Sakib/Docs/master_report.md` §WP5 and §7.7 M8 only as the frozen record, not as this MDP
+1. `Sakib/brickassembly/dual_arm_sim.py` `queue_place` and `queue_brace`
+2. `Sakib/brickassembly/planner.py` `build_plan` and `bracing.py` `assign`
+3. `Tanvir/socket_env.py` `ScriptedWriggle` only if the cell insert misses a step
+4. `Sakib/Docs/master_report.md` is the frozen record, not this job
