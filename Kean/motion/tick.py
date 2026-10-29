@@ -15,7 +15,7 @@ def resolve_wrap(module):
     return fn if callable(fn) else angle_wrap
 
 
-FREE = frozenset({"to feeder", "transport", "to brace", "park", "abort", "approach", "pre-insert"})
+FREE = frozenset({"to feeder", "transport", "park", "abort", "pre-insert", "clearance"})
 # Retract starts at the insertion contact pose; keep this escape Cartesian.
 STATIC = frozenset({"park", "hold", "stage", "settle"})
 TAIL_SPEED = 0.020
@@ -50,11 +50,15 @@ class Slot:
         self.i = 0
         self.tail = None
         self.goal = None
-        self.move_id = None
+        self.move = None
+        self.request = None
+        self.other_q = None
 
 
 class Tick:
-    def __init__(self, planner, zone=None, fps=60, world=None, clearance=None, q_of=None, *, wrap_angle, resample_trajectory):
+    def __init__(self, planner, zone=None, fps=60, world=None, clearance=None, q_of=None, *, wrap_angle, resample_trajectory, strict=False, carried=None):
+        self.strict = strict
+        self.carried = carried
         self.resample_trajectory = resample_trajectory
         self.wrap_angle = wrap_angle
         self.planner = planner
@@ -67,6 +71,7 @@ class Tick:
         self.example = None
         self.plans = 0
         self.plan_failures = []
+        self.workarounds = []
         self.captures = 0
         self.segments = []
         self.min_gap = None
@@ -133,11 +138,15 @@ class Tick:
         boxes, other_q = (None, None) if self.world is None else self.world(self.example, slot.name)
         request = Request(
             slot.name, self.q_of(self.example, arm), ee, goal, np.array([0.0, 0.0, 0.0, 1.0]),
-            zone_clear=True, yaw=planner_yaw(self.example, arm, move["yaw"], self.wrap_angle), boxes=boxes, other_q=other_q)
+            zone_clear=True, yaw=planner_yaw(self.example, arm, move["yaw"], self.wrap_angle), boxes=boxes, other_q=other_q, full_path=self.strict,
+            alternate_goals=[np.asarray(p, float) + arm.bias for p in move.get("alternate_goals", [])],
+            grip=float(move["grip"]), carried=None if self.carried is None else self.carried(self.example, slot.name))
+        slot.other_q = None if other_q is None else np.asarray(other_q[:7], float).copy()
         slot.future = self.planner.submit(request)
         slot.mode = "waiting"
         slot.goal = goal
-        slot.move_id = id(move)
+        slot.move = move
+        slot.request = request
         slot.q = request.q[:7].copy()
         slot.v = np.zeros(7)
         self.plans += 1
@@ -168,10 +177,14 @@ class Tick:
         slot.q = None
         slot.v = None
         slot.goal = None
-        slot.move_id = id(arm.cur)
+        slot.move = arm.cur
 
     def _service(self, arm, orig, dt, ee):
         slot = self.slots[arm]
+        if self.strict and slot.other_q is not None:
+            other = self.other(arm)
+            if np.max(np.abs(self.q_of(self.example, other)[:7] - slot.other_q)) > 0.02:
+                return self._stop(arm, "motion_obstacle_moved")
         if slot.mode == "waiting":
             if not slot.future.done():
                 return self._hold(arm)
@@ -181,19 +194,33 @@ class Tick:
                 self.captures += 1
                 raise
             except Exception as exc:
-                self.plan_failures.append({"arm": slot.name, "phase": getattr(arm, "phase", None), "error": str(exc)})
+                self.plan_failures.append({"arm": slot.name, "phase": getattr(arm, "phase", None), "error": str(exc),
+                                           "step": getattr(self.example, "b_step", None),
+                                           "request": slot.request.snapshot()})
+                if self.strict:
+                    print("planner error %s %s: %s" % (slot.name, arm.phase, exc), flush=True)
+                    return self._stop(arm, "motion_plan_failed")
                 print("plan fallback %s %s: %s" % (slot.name, getattr(arm, "phase", ""), exc), flush=True)
                 slot.mode = "idle"
                 slot.q = None
                 slot.v = None
-                slot.move_id = id(arm.cur) if arm.cur is not None else None
+                slot.move = arm.cur
                 return orig(dt, ee)
             if result.get("joint_pos") is None:
+                if self.strict:
+                    return self._stop(arm, "motion_plan_empty")
                 slot.mode = "idle"
                 slot.q = None
                 slot.v = None
-                slot.move_id = id(arm.cur) if arm.cur is not None else None
+                slot.move = arm.cur
                 return orig(dt, ee)
+            if self.strict and result.get("goal") is not None:
+                slot.goal = np.asarray(result["goal"], float)
+                arm.cur["pos"] = slot.goal - arm.bias
+            if result.get("proposal_mode") == "full-sphere-filter":
+                self.workarounds.append({"step": getattr(self.example, "b_step", None),
+                                         "arm": slot.name, "phase": arm.phase,
+                                         "method": "full-sphere-filter"})
             pos = np.asarray(result["joint_pos"], float)
             vel = result.get("joint_vel")
             if vel is None:
@@ -214,18 +241,45 @@ class Tick:
                 gap = float(self.clearance(self.example, slot.name, slot.q))
                 self.min_gap = gap if self.min_gap is None else min(self.min_gap, gap)
             return self._hold(arm)
+        if self.strict:
+            # Stay at the planned endpoint until measured joints have arrived.
+            # Do not hand the endpoint back to unconstrained Cartesian IK.
+            slot.i += 1
+            if np.max(np.abs(self.q_of(self.example, arm)[:7] - slot.q[:7])) > 0.02:
+                if slot.i > len(slot.play_q) + 2 * self.fps:
+                    return self._stop(arm, "motion_tracking_failed")
+                return self._hold(arm)
+            move = arm.cur
+            arm.cmd = (np.asarray(slot.goal, float) - arm.bias, move["yaw"], move["grip"], move["tilt"])
+            arm.cur = None
+            slot.mode = "idle"
+            slot.q = slot.v = None
+            if move["then"]:
+                move["then"]()
+            return self._hold(arm)
         self._release(arm, slot, ee)
         return orig(dt, ee)
+
+    def _stop(self, arm, reason):
+        slot = self.slots[arm]
+        slot.mode = "stopped"
+        slot.q = self.q_of(self.example, arm)[:7].copy()
+        slot.v = np.zeros(7)
+        self.example.fail(reason)
+        print("motion stop %s %s: %s" % (slot.name, arm.phase, reason), flush=True)
+        return self._hold(arm)
 
     def _update(self, arm, orig, dt, ee):
         arm.ee = np.asarray(ee, float).copy()
         slot = self.slots[arm]
+        if slot.mode == "stopped":
+            return self._hold(arm)
         if slot.mode in ("waiting", "playing"):
             self._seed_ik(arm)
             return self._service(arm, orig, dt, ee)
         pending = arm.cur if arm.cur is not None else (arm.moves[0] if arm.moves else None)
-        if pending is not None and id(pending) != slot.move_id and needs_plan(pending, ee):
-            if self._blocked(arm, pending["pos"], ee):
+        if pending is not None and pending is not slot.move and (needs_plan(pending, ee) or (self.strict and pending.get("phase") in FREE and not pending.get("contact") and pending.get("rel") is None)):
+            if (self.strict and self.other(arm) is not None and self._moving(self.other(arm))) or self._blocked(arm, pending["pos"], ee):
                 return self._hold(arm)
             if arm.cur is None:
                 orig(0.0, ee)
@@ -251,11 +305,39 @@ class Tick:
                     self._velocity_owned.add(arm)
                 else:
                     self._velocity_owned.discard(arm)
+        if self.strict and self.clearance is not None:
+            # Guard even the shared Cartesian contact/escape phases against
+            # arm-arm collisions. Intended finger-brick contacts are unaffected.
+            measured = self.example.state_0.joint_q.numpy()[:18]
+            n = max(1, int(np.ceil(np.max(np.abs(tgt[:18] - measured)) / 0.02)))
+            for t in np.linspace(0., 1., n + 1):
+                q = measured + t * (tgt[:18] - measured)
+                a = self.clearance.spheres("A", q[:9])
+                b = self.clearance.spheres("B", q[9:18])
+                gap = self.clearance.probe.clearance_spheres(a, b)
+                if not np.isfinite(gap) or gap < 0.001:
+                    self.example.fail("arm_clearance")
+                    detail = {"error": "arm clearance %.2f mm" % (gap * 1000),
+                              "step": getattr(self.example, "b_step", None),
+                              "phases": {a.name: a.phase for a in self.slots},
+                              "modes": {a.name: s.mode for a, s in self.slots.items()},
+                              "measured_q": measured.tolist(), "target_q": tgt[:18].tolist(),
+                              "fraction": float(t)}
+                    self.plan_failures.append(detail)
+                    print("motion guard: %s" % detail, flush=True)
+                    tgt[:18] = measured
+                    if self._vel_assign is not None:
+                        vel = self.example.control.joint_target_vel.numpy()
+                        vel[:18] = 0
+                    break
         if vel is not None:
             self._vel_assign(vel)
 
     def report(self):
         return {
+            "strict": self.strict,
+            "workarounds": self.workarounds,
+            "failures": self.plan_failures,
             "plans": self.plans,
             "plan_failures": len(self.plan_failures),
             "captures": self.captures,

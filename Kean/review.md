@@ -1,5 +1,11 @@
 # Reuse audit — 2026-10-21
 
+> Updated 2026-10-29: instructor acceptance now passes on HPC — arch 11/11 and S3
+> 16/16 with every generated support held by Arm A, the arch crown seated by the
+> scripted wriggle (`motion/wriggle.py`). The omitted prototypes listed below
+> (`insertion/`, `memory/`, `support/hold.py` + `grip_adjust.py`, `viz_cameras.py`)
+> were removed, not kept. The body of this audit is the 2026-10-21 record.
+
 This review supersedes the earlier cleanup notes. It covers all Kean source areas, scripts, tests and existing evidence, compared with Sakib's current launcher, cell controller, P3 probe, perception, observation encoder, camera/contact/record interfaces, motion skills and PPO code. No cluster run, environment installation or shared-source edit was made.
 
 ## Workspaces and finished work (2026-10-25)

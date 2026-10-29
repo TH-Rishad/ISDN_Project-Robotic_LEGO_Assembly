@@ -89,12 +89,12 @@ def preview():
     }
 
 
-def preview_ok(payload):
+def preview_ok(payload, expected_shapes=("arch", "S3")):
     reasons = []
     if payload.get("image_input") or payload.get("strategy") == "none":
         reasons.append("input")
     got = {row["structure"] for row in payload.get("structures") or []}
-    if got != {"arch", "S3"}:
+    if got != set(expected_shapes):
         reasons.append("structures")
     for row in payload.get("structures") or []:
         if row["strategy"] == "none" or row["bricks"] < 8:
@@ -120,13 +120,17 @@ def supports_held(example):
     return out
 
 
-def judge(runs):
+def judge(runs, expected_shapes=("arch", "S3")):
     reasons = []
-    if {r["shape"] for r in runs} != {"arch", "S3"}:
+    if {r["shape"] for r in runs} != set(expected_shapes):
         reasons.append("structures")
     for run in runs:
         if run.get("failure") or int(run.get("placed") or 0) != int(run.get("total") or -1):
             reasons.append("incomplete:%s" % run["shape"])
+        if run.get("done") is False:
+            reasons.append("unfinished_motion:%s" % run["shape"])
+        if any(e.get("class") == "arm_arm" for e in run.get("events", [])):
+            reasons.append("arm_collision:%s" % run["shape"])
         required = run.get("required_supports") or []
         if not required:
             reasons.append("no_support:%s" % run["shape"])

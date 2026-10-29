@@ -19,7 +19,7 @@ The two structures are the arch (11 bricks, `brace_required_count` 1 under `weak
 | Workspace | Has | Finished | Not finished |
 | --- | --- | --- | --- |
 | `Sakib/` | `brickassembly/` (cell, planner, bracing, stability, vision, RL env, plans, ledger), `robofab_sim/`, `BrickSim/`, `Docs/`, `setup_env.sh` | Unbraced cube 8/8, arch 11/11, hollow_box 12/12. Sequence and vertical-press support generators. Perception V1 closed. v3.1 frozen. | G-V1. Live default is `--strategy none`, so braced acceptance builds are not the current path. |
-| `Kean/` | `motion/` planned-path adapter, M0.5 scripts, `viz_cameras.py`, `memory/` and `support/` prototypes, `insertion/` smoke fixture, `acceptance.py` | Cube job 0 with opt-in grasp offset: 8/8, gate passed, 0 braces (`results/checks/20261021-191332-980676`). CPU preview generates arch and S3. | Cell runs of arch and S3, with Arm A holding each generated support. |
+| `Kean/` | `motion/` planned-path adapter and the acceptance runner (`acceptance.py`, `scripts/accept.sh`) | arch 11/11 and S3 16/16 in the cell, with Arm A holding each generated support and the scripted wriggle seating the arch crown. | — |
 | `Tanvir/` | `tight_fit_audit.py`, `socket_family.py`, `socket_env.py`, `wriggle_brace.py`, `skill_env.py`, trainers, `report/` | `ScriptedWriggle` is the best policy. Pad shift is the measured gain. Five PPO runs and one ES run did not beat scripted. Proposal written. | Not in the Newton cell. Held-out, no brace, 1–2 mm: 26/68. |
 | `Richard/` | `.gitkeep` | Nothing | Everything |
 
@@ -45,6 +45,63 @@ python3 -m unittest discover -s Kean/tests -v
 python3 Kean/scripts/m05.py --dry-run
 ```
 
+Routine `test_m05.sh` checks focus on brace search and motion recovery. Use
+`bash Kean/scripts/test_m05.sh --cpu-only --full-tests` when a full historical
+regression run is needed. After a passing run, repeat only checks affected by
+subsequent changes.
+
+## Motion recovery (2026-10-28)
+
+Planning now runs synchronously on the simulation thread. The simulation pauses
+while a query runs, avoiding concurrent access to the shared probe's cached GPU
+kinematics buffers. This trades responsiveness for a simpler execution model.
+
+If planning with the other arm's enclosing cuboids fails, strict motion can
+propose a path without those cuboids. Every proposed path must still pass the
+full-arm sphere checks against the measured other arm, fingers, carried brick
+and world before playback. cuRobo retains its self-collision and world checks.
+This is a bounded fallback for overly conservative cuboids, not an unchecked
+Cartesian move. Sampled validation is not a continuous-collision guarantee.
+Accepted fallbacks appear in `motion_report.workarounds`.
+If a fallback trajectory fails the other-arm clearance check, the planner adds
+the offending sphere as a local obstacle and retries, with up to eight added
+obstacles. This supplies collision feedback while preserving the 1 mm threshold.
+
+Replay the saved arch planning failure and S3 command-guard snapshot first on
+HPC, without reconstructing the preceding placements:
+
+```sh
+bash Kean/scripts/run.sh Kean/scripts/replay_motion.py Kean/results/acceptance/summary.json
+```
+
+The guard replay prints three independently recomputed minimum clearances.
+A passing replay only establishes feasibility for the recorded state. Check
+the complete physical builds separately, preserving the previous summary:
+
+```sh
+bash Kean/scripts/accept.sh --live --out Kean/results/acceptance_serialized
+```
+
+These workarounds have CPU regression coverage; GPU feasibility and complete
+physical acceptance still require the HPC run. Generated supports and final
+acceptance requirements remain in force.
+
+Strict acceptance also searches up to eight generated brace configurations per
+required support. It tests the original pose, alternative lean angles and
+generated support locations with no worse predicted utilisation or increased
+grip force. At the end of A's open-finger guard approach, it checks B's complete
+staged-to-hover and hover-to-pre-insert paths against A's measured joints, with
+both open and closed fingers. Only then may A close. On rejection A retracts
+and parks before trying the next configuration; exhaustion fails the build.
+Actual B execution is planned again against the measured closed brace.
+Candidate poses, rejection reasons and acceptance are saved in each run's
+`brace_search` field in the summary. This search needs the live cell and cannot
+be exercised by replaying the old fixed-brace request alone:
+
+```sh
+bash Kean/scripts/accept.sh --live --out Kean/results/acceptance_brace_search
+```
+
 ## Shared interfaces and Kean's additions
 
 | Concern | Reused implementation | Kean's remaining responsibility |
@@ -56,19 +113,38 @@ python3 Kean/scripts/m05.py --dry-run
 | Collision models and brick geometry | P3 `PROFILES`, `TABLE`, `brick_box` | Dynamic scene inputs and geometry-query adapters |
 | Clearance | P3 sphere/FK/gap routines | Measured-joint/finger-opening adapter and reporting |
 | Contact events and recordings | `ContactMonitor`, `Recorder`, `Example.finish` | Job labels and M0.5 acceptance summary |
-| Tight insert, only if the cell misses | `Tanvir/socket_env.py` `ScriptedWriggle`, `pad_shift`, `wriggle_brace.choose` | Call. Do not copy, retrain, or require for the mark unless a step fails |
-| Insertion RL, perception, memory | Existing prototypes | Omitted. Do not extend |
+| Tight insert, only if the cell misses | `Tanvir/socket_env.py` `ScriptedWriggle` (replayed in `motion/wriggle.py`) | Call. Do not copy, retrain, or require for the mark unless a step fails |
+| Insertion RL, perception, memory | Omitted (removed) | Not part of acceptance |
 
 Import local modules as `Kean.*`; the top-level `motion` package belongs to Sakib. `shared.py` loads the existing P3 script once and redirects only report output to Kean. Model paths stay exactly as supplied by Sakib. Old `Kean/results/p3/fr3*.yml` copies are retained as historical artifacts and are no longer selected by the runtime. The shared vendor loader runs as Sakib defines it; Kean does not inject Conda packages or override that loader.
 
 ## Experiments and prototypes
 
-Default M0.5 uses shared grasp execution and optimizer iterations. `P3_ITER_SCALE` explicitly opts into Kean's iteration-budget experiment; its default is now 1.0. The pickup-offset search stays opt-in (`m05.py --experimental-grasp-offset`). The recorded launcher passes that flag. Cube job 0 in `results/checks/20261021-191332-980676` placed 8/8, had no unintended contacts, and passed the motion gate; planned-playback clearance was 0.046 m. That cube has no temporary-support section, so it does not meet instructor acceptance. The same cube without the offset, `results/checks/20261021-171655-549530`, had 8 unintended finger contacts and no measured clearance. Arch and S3, with generated support actually executed by both arms, are still not run. Hollow_box is extra regression only. Contact acceptance thresholds are unchanged.
+Default M0.5 uses shared grasp execution and optimizer iterations. `P3_ITER_SCALE` explicitly opts into Kean's iteration-budget experiment; its default is now 1.0. The pickup-offset search stays opt-in (`m05.py --experimental-grasp-offset`). Cube job 0 in `results/checks/20261021-191332-980676` placed 8/8, had no unintended contacts, and passed the motion gate; planned-playback clearance was 0.046 m. That cube has no temporary-support section, so it does not meet instructor acceptance. Hollow_box is extra regression only. Contact acceptance thresholds are unchanged.
 
 `p3.sh` runs the shared probe without automatic sphere repair, contact rescoring or summary-source rewriting. Historical extensions require explicit `--kean-extensions`. Collision-model generation (`--step 2` / `--all`) is delegated to Sakib and rejected by this wrapper. P3 report files continue to be written under Kean.
 
-`memory/`, `support/hold.py`, Handoff and GripAdjust are isolated prototypes, not a second live perception/support stack. M0.5's no-op Store bookkeeping has been removed. Future live memory should adapt Sakib's `top_detect.remember`, `track_held` and sensing interfaces while enforcing the task's scan schedule; the local full-pose prototypes are retained for review, not claimed as integrated.
+The insertion-RL, memory-scan, grip-adjustment and camera-bridge prototypes were removed (2026-10-29) — they were not part of the acceptance path. Tight steps call `motion/wriggle.py`, which replays Tanvir's `ScriptedWriggle` search phases on the cell's waypoint queue.
 
-`KinematicInsert` is a CPU fixture with synthetic observations. `scripts/insert.py` is only a network/update smoke experiment. It is not a Newton inserter, not evidence of a trained policy, and not a substitute for `Tanvir/socket_env.py`. A live cell adapter can supply `observe()` using the shared encoded observation; `from_shared` discards all fields except cameras and proprioception. Tight steps call `ScriptedWriggle` instead of growing this fixture into another twin. The frozen MuJoCo twin's 121-D environment is not substituted for this task.
+See [review.md](review.md) for the audit and validation limits.
 
-See [review.md](review.md) for the audit, remaining shared-interface needs and validation limits. Sync the complete source tree after these interface changes.
+## Final acceptance
+
+Both structures assemble in the cell with every generated support held by Arm A:
+
+- `--shape arch` places 11/11; the crown (`b_010`) seats with the scripted
+  wriggle (lateral < 0.15 mm, dz < 0.8 mm, tilt < 2.1 deg).
+- `--shape S3` places 16/16 with its three required supports.
+
+The strict acceptance path searches up to eight brace configurations per
+required support (including the opposite pier) before closing, and replays
+Tanvir's `ScriptedWriggle` search phases for precision sockets. Run the
+combined acceptance with:
+
+```bash
+bash Kean/scripts/accept.sh --live
+```
+
+A single-structure summary records `scope=<shape>` and `full_acceptance=false`;
+it does not certify the combined goal. Omit `--shape` for the final combined
+acceptance.

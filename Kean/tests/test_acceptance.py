@@ -33,6 +33,14 @@ class AcceptanceTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             generate("S3", "structure", "none")
 
+    def test_single_structure_scope_still_requires_support(self):
+        arch = dict(shape='arch', placed=11, total=11, done=True,
+                    required_supports=[10], supports=[dict(step=10, executed=True)])
+        self.assertEqual(judge([arch], expected_shapes=['arch']), [])
+        self.assertIn('structures', judge([arch]))
+        arch['supports'][0]['executed'] = False
+        self.assertIn('unheld:arch:10', judge([arch], expected_shapes=['arch']))
+
     def test_judge_requires_each_generated_support_held(self):
         arch = {
             "shape": "arch", "placed": 11, "total": 11, "failure": None,

@@ -4,7 +4,7 @@ import math
 
 import numpy as np
 
-PICK = frozenset({"park", "to feeder", "descend", "settle", "grasp"})
+PICK = frozenset({"park", "to feeder", "descend", "settle", "grasp", "release", "retract", "clearance"})
 
 
 def yaw_of(q):

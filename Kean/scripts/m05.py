@@ -75,7 +75,7 @@ def _stress_plan(plan_path, shape):
     return plan_path
 
 
-def run_job(job, out_dir, max_frames, record=False, grasp_offset=False, fresh_plan=False):
+def run_job(job, out_dir, max_frames, record=False, grasp_offset=False, fresh_plan=False, planned_motion=True, strict_motion=False):
     from Kean.shared import add_cell_path
     add_cell_path()
     try:
@@ -88,7 +88,7 @@ def run_job(job, out_dir, max_frames, record=False, grasp_offset=False, fresh_pl
         plan.unlink()
     if job["stress"]:
         _stress_plan(plan, job["shape"])
-    if not getattr(D.build_arm, "_kean_ff", False):
+    if planned_motion and not getattr(D.build_arm, "_kean_ff", False):
         orig = D.build_arm
 
         def build_arm_ff(*a, **k):
@@ -104,7 +104,15 @@ def run_job(job, out_dir, max_frames, record=False, grasp_offset=False, fresh_pl
         name = "%s_%s_s%d" % (job["shape"], job["strategy"], job["seed"])
         cell_args.record_all = str(out_dir / (name + ".npz"))
         cell_args.p0_out = str(out_dir / "cell_rows.jsonl")
+    if strict_motion:
+        print("motion: serialized planning; full paths, carried-brick checks, full-sphere fallback, stop on failure", flush=True)
     example = D.Example(viewer, cell_args)
+    if not planned_motion or strict_motion:
+        from Kean.motion.brace_hold import install as install_brace_hold
+        install_brace_hold(example)
+    if strict_motion:
+        from Kean.motion.coordinated import install as install_coordination
+        install_coordination(example)
     if record:
         from cell.record import Recorder
         example.recorder = Recorder(example)
@@ -115,40 +123,70 @@ def run_job(job, out_dir, max_frames, record=False, grasp_offset=False, fresh_pl
     from Kean.motion.tick import Tick
     from Kean.motion.world import plate_box, zone_of
     error = None
+    tick = None
+    grasp_offsets = []
     try:
-        with Planner(CuroboBackend()) as planner:
-            planner.warmup()
-            grasp_offsets = []
-            if grasp_offset:
-                from Kean.motion.grasp_clearance import install as install_grasp_clearance
-                grasp_offsets = install_grasp_clearance(example, planner.backend.probe, D)
-            origin = example.plan["voxel_origin"]
-            ni, nj = example.NIJ
-            pitch = float(example.plan["grid_pitch"][0])
-        
-            def world(ex, arm_name):
-                from Kean.motion.world import brick_boxes, held_brick
-                body_q = ex.state_0.body_q.numpy()
-                step = None if ex.b_step is None else ex.plan["sequence"][ex.b_step]
-                skip = held_brick(arm_name, ex.B.phase if arm_name == "B" else ex.A.phase, None if step is None else step["brick_id"])
-                boxes = [planner.backend.probe.TABLE, plate_box(origin, ni, nj, pitch, 0.0032)]
-                boxes.extend(brick_boxes(body_q, ex.body, ex.dims, skip, box_of=planner.backend.probe.brick_box))
-                other = 0 if arm_name == "B" else 1
-                return boxes, ex.state_0.joint_q.numpy()[9 * other:9 * other + 7]
-        
-            from Kean.motion.clearance import Clearance
-            clearance = Clearance(planner.backend.probe, world)
+        from Kean.motion.gate import stamp
+        braced_steps = {s["step"] for s in example.plan["sequence"] if s.get("requires_brace")}
 
-            from Kean.motion.tick import resolve_wrap
-            tick = Tick(planner, zone=zone_of(origin, ni, nj, pitch), world=world, clearance=clearance, wrap_angle=resolve_wrap(D), resample_trajectory=planner.backend.probe.resample).attach(example)
-            from Kean.motion.gate import stamp
-            braced_steps = {s["step"] for s in example.plan["sequence"] if s.get("requires_brace")}
+        def pump():
             frames = 0
-            while not example.done and example.failure is None and frames < max_frames:
+            while (not example.done or (strict_motion and not (example.A.idle() and example.B.idle()))) and example.failure is None and frames < max_frames:
                 example.step()
                 frames += 1
                 step = -1 if example.b_step is None else example.b_step
                 stamp(list(example.monitor.raw) + list(example.monitor._active.values()), step, step in braced_steps)
+
+        if not planned_motion:
+            pump()
+        else:
+            with Planner(CuroboBackend()) as planner:
+                planner.warmup()
+                if grasp_offset:
+                    from Kean.motion.grasp_clearance import install as install_grasp_clearance
+                    grasp_offsets = install_grasp_clearance(example, planner.backend.probe, D)
+                origin = example.plan["voxel_origin"]
+                ni, nj = example.NIJ
+                pitch = float(example.plan["grid_pitch"][0])
+
+                def world(ex, arm_name):
+                    from Kean.motion.world import brick_boxes, held_brick
+                    body_q = ex.state_0.body_q.numpy()
+                    step = None if ex.b_step is None else ex.plan["sequence"][ex.b_step]
+                    skip = held_brick(arm_name, ex.B.phase if arm_name == "B" else ex.A.phase, None if step is None else step["brick_id"])
+                    boxes = [planner.backend.probe.TABLE, plate_box(origin, ni, nj, pitch, 0.0032)]
+                    boxes.extend(brick_boxes(body_q, ex.body, ex.dims, skip, box_of=planner.backend.probe.brick_box))
+                    other = 0 if arm_name == "B" else 1
+                    return boxes, ex.state_0.joint_q.numpy()[9 * other:9 * other + (9 if strict_motion else 7)]
+
+                def carried(ex, arm_name):
+                    if arm_name != "B" or ex.B.phase not in {"stage", "transport", "pre-insert"}:
+                        return None
+                    import numpy as np
+                    from scipy.spatial.transform import Rotation
+                    bid = ex.plan["sequence"][ex.b_step]["brick_id"]
+                    poses = ex.state_0.body_q.numpy()
+                    tcp = poses[D.EE + ex.n_arm_bodies]
+                    brick = poses[ex.body[bid]]
+                    rt = Rotation.from_quat(tcp[3:7]).as_matrix()
+                    rb = Rotation.from_quat(brick[3:7]).as_matrix()
+                    height = float(D.P.BRICK_H + planner.backend.probe.STUD_H)
+                    center = rt.T @ (brick[:3] + rb @ np.array([0., 0., height / 2]) - tcp[:3])
+                    quat = Rotation.from_matrix(rt.T @ rb).as_quat()
+                    length, width = ex.dims[bid]
+                    return dict(dims=[float(length), float(width), height], center=center.tolist(),
+                                quat_wxyz=quat[[3, 0, 1, 2]].tolist())
+
+                from Kean.motion.clearance import Clearance
+                clearance = Clearance(planner.backend.probe, world)
+                from Kean.motion.tick import resolve_wrap
+                tick = Tick(planner, zone=zone_of(origin, ni, nj, pitch), world=world, clearance=clearance, wrap_angle=resolve_wrap(D), resample_trajectory=planner.backend.probe.resample, strict=strict_motion, carried=carried if strict_motion else None).attach(example)
+                if strict_motion:
+                    from Kean.motion.brace_search import install as install_brace_search
+                    install_brace_search(example, planner, world, carried, D)
+                    from Kean.motion.wriggle import install as install_wriggle
+                    install_wriggle(example, D)
+                pump()
     except BaseException as exc:
         error = "%s: %s" % (type(exc).__name__, exc)
         raise
@@ -162,6 +200,15 @@ def run_job(job, out_dir, max_frames, record=False, grasp_offset=False, fresh_pl
         "braced_placements": len(braced_steps),
         "events": events,
         "grasp_offsets": grasp_offsets,
+        "brace_search": getattr(example, "brace_search_report", []),
+        "motion": "coordinated" if strict_motion else "planned" if planned_motion else "cell",
+        "motion_report": {} if tick is None else tick.report(),
+        "done": bool(example.done and example.A.idle() and example.B.idle()),
+        "breaks": [
+            {"step": b.get("step"), "pair": b.get("pair"), "u": b.get("u"),
+             "A": b.get("A_phase"), "B": b.get("B_phase")}
+            for b in getattr(getattr(example, "breaker", None), "breaks", [])
+        ],
         "required_supports": [s["step"] for s in example.plan["sequence"] if s.get("requires_brace")],
         "supports": [
             {"step": n, "executed": bool(info.get("executed")),
@@ -169,7 +216,7 @@ def run_job(job, out_dir, max_frames, record=False, grasp_offset=False, fresh_pl
             for n, info in sorted(getattr(example, "brace_by_step", {}).items())
         ],
     }
-    return row, tick.report()
+    return row, {} if tick is None else tick.report()
 
 
 

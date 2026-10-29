@@ -91,6 +91,32 @@ class MotionTest(unittest.TestCase):
             self.assertTrue(hasattr(vendor, "add_overlay"))
         self.assertIs(importlib.import_module("Kean.motion"), kean_motion)
 
+    def test_submit_is_completed_on_calling_thread_and_preserves_errors(self):
+        import threading
+        from unittest.mock import Mock
+        caller = threading.get_ident()
+        backend = Backend()
+        original = backend.plan
+        seen = []
+        def plan(request, handoff):
+            seen.append(threading.get_ident())
+            return original(request, handoff)
+        backend.plan = plan
+        request = Request('B', np.zeros(7), np.zeros(3), [.2, 0, .2], [0, 0, 0, 1])
+        with Planner(backend) as planner:
+            planner.warmup()
+            future = planner.submit(request)
+            self.assertTrue(future.done())
+            self.assertEqual(seen, [caller])
+            self.assertIsNotNone(future.result()['joint_pos'])
+            backend.plan = Mock(side_effect=PlannerUnavailable('blocked'))
+            failure = planner.submit(request)
+            self.assertTrue(failure.done())
+            with self.assertRaisesRegex(PlannerUnavailable, 'blocked'):
+                failure.result()
+        with self.assertRaisesRegex(RuntimeError, 'closed'):
+            planner.submit(request)
+
     def test_zone_and_thread(self):
         planner = Planner(Backend())
         planner.warmup()

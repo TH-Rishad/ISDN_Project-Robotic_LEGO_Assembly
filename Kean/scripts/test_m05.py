@@ -44,6 +44,8 @@ def metadata():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cpu-only", action="store_true")
+    parser.add_argument("--full-tests", action="store_true",
+                        help="run all historical CPU regressions instead of focused motion checks")
     parser.add_argument("--max-frames", type=int, default=60000)
     args = parser.parse_args()
     if args.max_frames <= 0:
@@ -53,9 +55,13 @@ def main():
     out.mkdir(parents=True)
     print("Evidence:", out, flush=True)
     meta = metadata()
-    meta.update(cpu_only=args.cpu_only, max_frames=args.max_frames, job=0)
+    meta.update(cpu_only=args.cpu_only, max_frames=args.max_frames, job=0, full_tests=args.full_tests)
     (out / "environment.json").write_text(json.dumps(meta, indent=2) + "\n")
-    stages = [("unit", [sys.executable, "-m", "unittest", "discover", "-s", "Kean/tests", "-v"]),
+    unit = ([sys.executable, "-m", "unittest", "discover", "-s", "Kean/tests", "-v"]
+            if args.full_tests else
+            [sys.executable, "-m", "unittest", "Kean.tests.test_brace_search",
+             "Kean.tests.test_motion_workarounds", "-q"])
+    stages = [("unit", unit),
               ("manifest", [sys.executable, "Kean/scripts/m05.py", "--dry-run", "--out", str(out)])]
     if not args.cpu_only:
         stages += [("gpu", [sys.executable, "Kean/scripts/check_env.py", "--gpu"]),

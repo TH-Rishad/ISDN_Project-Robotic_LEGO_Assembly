@@ -221,3 +221,346 @@ bash Kean/scripts/accept.sh --live
 ## Scope cut (2026-10-25)
 
 The instructor's three requirements are a full mark. Omitted from the master plan, and no longer required: image-to-structure, perception, G-V1, insertion RL, the camera actor, place-bandit, brace-bandit, memory scan, grip adjustment, the 235-placement M0.5 gate, cube and hollow_box regression, P3 ledger close, G3, G4, and a learned wriggle. Call Tanvir's scripted skill only if the cell insert misses a step on the arch or S3. Do not train.
+
+## First live acceptance run (HPC, 2026-10-27)
+
+Ran `bash Kean/scripts/accept.sh --live` on gpu19 (first Newton+cuRobo on that node).
+
+- arch: generated 11 bricks, 1 support (crown, step 10). Reached step 9, B transport plan failed ("cuRobo plan failed"), BREAK on b_000 (u=1.13) at step 10. incomplete.
+- S3: generated 16 bricks, 3 supports (steps 11,13,14). Guard stop at step 11 (A brace-guard contact), placed the braced b_010. Later B transport fallback at step 13, BREAKs on b_000/b_002 (u>1.8). incomplete, plus unheld:S3:14 (never reached step 14).
+- Final: ok=False, reasons: incomplete:arch, incomplete:S3, unheld:S3:14
+- Artifacts: results/acceptance/{summary.json,cell_rows.jsonl,episodes.jsonl,plans/*.json}
+
+Root: Tick planned B transport for braced steps while A holds brace pose (in zone); cuRobo returned no plan (or start gap), fallback direct produced high-u contacts/breaks. Native cell paths for B during brace coordination were not exercised for these structures before.
+
+## Second live run (HPC, 2026-10-27)
+
+Skipping B's planner on braced steps did not finish either build. arch still broke `b_000` at step 10 (u 1.16) with no plan-fallback line. S3 placed through step 12, then `plan fallback A to brace` / `approach` (`Start or End state in collision`) and broke at step 13. Those goals sit on the bricks; a failed plan then drives a straight line through the build.
+
+Acceptance now runs the cell's own arm motion (`planned_motion=False`). cuRobo stays on the cube path. Brace travel and approach are no longer free-space plans. The row records `breaks` with A/B phase.
+
+```sh
+bash Kean/scripts/accept.sh --live
+```
+
+## Third live failure: brace hold correction (2026-10-27)
+
+The native-motion run also failed: arch step 10 (u=1.1212), S3 step 13
+(u=2.2108/1.6886), both with A=hold and B=transport. The recorded arch
+contacts include A finger/base-brick force 35.74 N and hand/crown contact.
+This does not establish B transport planning as the cause.
+
+Added a Kean-only IK adapter for native acceptance: latch A's measured seven
+arm joints on entry to hold, retain them until open, and leave finger targets
+and B's IK unchanged. The shared TCP rebase retains a planned orientation;
+continuing IK during hold can therefore move the gripping arm. Disable only
+the captured IK call so the adapter executes each frame; physics capture and
+joint-break thresholds remain unchanged. No shared simulator files modified.
+
+CPU regression covers measured-joint latching, resistance to drift, release,
+next-hold relatching, and isolation of B and fingers. GPU physical acceptance
+is pending; rerun `bash Kean/scripts/accept.sh --live` on the cluster. This is
+a targeted hold correction, not evidence that the complete builds now pass.
+
+## Collision-aware acceptance (2026-10-27)
+
+The supplied recordings confirm fixed A joint commands but arm-arm collisions:
+arch first contact frame 6557, break 6589 (792 N peak); S3 step 13 contact
+8899, break 8902 (209 N). S3 also collides during A's park after step 11.
+
+Acceptance now enables strict planned motion. Free-space paths reach their
+endpoints without the former unplanned 30 mm tail. Failed/invalid plans stop
+with a recorded reason instead of Cartesian fallback. The backend retries up
+to three queries, includes the actual carried brick in its attachment slot,
+and checks densely sampled paths against full arm spheres, measured other-arm
+fingers, world boxes and a conservative enclosing sphere for the carried brick.
+This sampled check is not a continuous collision guarantee. A per-command
+arm-arm check also covers shared contact/escape phases. B's retreat signal is
+now delayed until its planned escape to its own park completes; B then waits
+for A to finish parking. Released bricks remain obstacles. Acceptance waits
+for final park completion and rejects any recorded arm-arm contact.
+
+All changes are within Kean. The shared insertion and brace approach remain
+shared implementations; brace strength and break criteria are unchanged.
+GPU trajectory feasibility and full builds still require cluster validation.
+A conservative model may refuse a path; that now produces motion_plan_failed
+with details in summary.json instead of driving the rejected path.
+
+### 2026-10-27 — braced transport planner obstacles
+
+Investigated the supplied arch/S3 acceptance failures: both stop on B transport
+with three rejected cuRobo queries. The log alone does not identify the solver's
+feasibility failure. Found that the strict planner still used the shared probe's
+single coarse box per other-arm link and locked finger opening, while validation
+used full spheres and measured openings. Added a Kean adapter that partitions
+full-model spheres into up to four enclosing boxes per link and uses measured
+fingers. Preallocated the larger cuboid cache before planner construction/warmup.
+Strict path validation and stop-on-failure remain active. Planner failures now
+print the available result status (or no-result indication) to the terminal.
+
+CPU validation: full suite passed (93 tests, one skipped); the subsequently added
+backend integration regression also passed in the three-test obstacle suite.
+Tests cover sphere containment, open concavities, measured fingers and strict
+backend routing. No GPU acceptance run was possible on the local Mac; rerun
+`bash Kean/scripts/accept.sh --live` on the cluster to establish feasibility.
+The morphit fitting messages and S3 contact guard are not proven causes of the
+transport failure and have not been suppressed.
+
+### 2026-10-28 — planner bypass regression and bounded hover workaround
+
+Inspected the pasted gpu18 run and the latest local summary. These are two
+failures: arch stops at step 10 with no cuRobo result; S3 stops at step 6 with
+`arm_clearance` (-30.96 mm), before any required brace. The existing records
+lack the request/command joints, so they cannot prove the exact geometric
+reason for arch or the command that triggered S3. Earlier claims that both
+were brace transport failures do not apply to this run.
+
+Found a reproducible controller defect: Tick remembered only `id(move)` after
+the move dictionary was freed. Python can reuse that ID for a newly queued
+move, causing the planning eligibility check to skip it and invoke native
+Cartesian IK even in strict mode. Retain the move object and compare with `is`
+instead. A deterministic allocator-reuse regression fails on the old logic
+(only one query for two free-space moves) and passes on the corrected logic.
+This demonstrates the defect, not proof that it caused this particular S3 run.
+
+The fixed 160 mm brace hover has no feasibility guarantee. Supply four bounded
+alternative staging positions (higher, and optionally less far toward B) if
+that query fails. Every candidate uses cuRobo with the same obstacles and held
+brick, the current-joint start check, and full sampled-path validation. The
+accepted position is handed back to Tick so it does not return to the rejected
+hover. Placement/contact targets are unchanged; no direct-motion fallback.
+Start-state validation now reports full-model/held-brick clearance separately.
+
+Planner failures save JSON-safe Request inputs in summary.json. Command-guard
+failures now print/save step, phases, slot modes, measured and target joints,
+and the failing interpolation fraction. Replay captured planner failures with:
+
+```sh
+bash Kean/scripts/run.sh Kean/scripts/replay_motion.py Kean/results/acceptance/summary.json
+```
+
+The previous summary has no snapshots; first run the updated acceptance command
+on HPC. Replay avoids reconstructing all preceding placements, but still needs
+cuRobo/CUDA. No remote shell or shared GPU environment is available in this local
+Mac workspace. Full physical acceptance remains unverified.
+
+Validation: 101 CPU tests, one skipped, passed; old-ID regression was separately
+confirmed to fail as expected. Added candidate rejection/selection, attachment
+cleanup, snapshot round-trip, and accepted-goal handoff coverage.
+
+### 2026-10-28 — serialized execution and full-sphere fallback
+
+User authorized implementation workarounds to achieve final acceptance without
+following every master-plan detail. The gpu20 log shows the elevated arch
+transport succeeded, then pre-insert failed. S3's command guard reported
+-30.73 mm while A had zero arm-joint command change, B's maximum change was
+0.000078 rad, and its fingers closed 1.48 mm. The cause of this observation is
+not proven, but the background planner and live guard shared cached kinematics
+objects and could run concurrently.
+
+Removed the background executor: Planner.submit returns a completed Future
+from the calling thread, preserving Tick's error-handling contract. Planning
+pauses simulation, so planner validation and live guard queries cannot overlap.
+
+Added a bounded strict-planning fallback: after the ordinary boxed queries fail,
+propose paths with the physical world and self-collision checks still enabled,
+but without the coarse other-arm cuboids. No proposal executes unless the full
+sampled validator accepts both arms, measured other-arm fingers, held brick and
+world. Restore the boxed world on success or failure. This can recover a false
+blockage caused by enclosing cuboids; it cannot promise recovery if the actual
+brace pose obstructs the insertion. No brace requirements or support poses were
+removed. Automatic brace reassignment remains a possible next step if replay
+establishes that the actual geometry blocks the endpoint.
+
+Replay now also checks recorded command-guard states three times serially.
+This lets the existing gpu20 summary exercise arch's pre-insert and S3's guard
+without another full-build run. Acceptance reports record accepted fallbacks.
+The README documents replay and a separate output directory for physical runs.
+
+Targeted validation: 30 tests passed, including same-thread completed submission,
+exception propagation, world restoration, rejection of colliding fallback paths,
+invalid-start rejection, and repeated command-guard replay. Live GPU validation
+is unavailable on this Mac and is not claimed.
+
+Final validation: complete CPU suite passed (106 tests run, one skipped).
+Updated the lifecycle regression to check the public submit-after-close contract
+instead of the removed private thread pool. Python compilation and diff whitespace
+checks passed. No GPU or physical-build success is claimed.
+
+### 2026-10-28 — replay launcher path correction
+
+The shared launcher changes cwd to Sakib/brickassembly, so the documented
+repository-relative summary argument was read from the wrong directory.
+Replay now resolves relative input paths from its source-derived repository
+root, preserves absolute paths, and reports missing summaries through argparse.
+Acceptance's relative --out receives the same correction. The shared launcher
+and environment provisioning are unchanged. Added regression coverage for paths
+under the launcher's cwd; targeted motion-workaround/acceptance tests passed.
+
+### 2026-10-28 — gpu20 replay: collision feedback recovery
+
+User replay: arch step 10 pre-insert now produces trajectories in the full-sphere
+fallback, but rejects samples at 0.97, -0.37 and 0.52 mm arm clearance. S3 step 1
+command replay passes three times at 67.108 mm. This strongly supports concurrent
+kinematics corruption as the earlier S3 guard cause, but does not by itself
+establish successful live execution under serialization.
+
+Added collision feedback to the fallback: the validator identifies the nearest
+other-arm sphere at a rejected sample; the next query includes a cuboid enclosing
+that sphere with 1.5 mm extra clearance. Repeated hits on the same sphere increase
+the padding. Up to eight cuts/retries are added, then failure remains explicit.
+World/self-collision checks and the complete full-model path validator remain in
+force; the 1 mm threshold is unchanged. Restores the ordinary boxed scene after
+success or failure. Rejection messages now identify the sample index, helping
+distinguish endpoint blockage from a blocked intermediate path. This is a bounded
+search workaround, not evidence of GPU feasibility.
+
+Targeted tests: 20 passed, covering feedback content, accepted-path validation,
+bounded failure, and restored scene state. Reuse the saved summary for GPU replay;
+no full build is needed to test this new arch search.
+
+Complete CPU regression: 109 tests run successfully, one skipped; diff whitespace
+check passed. GPU replay remains pending on HPC.
+
+### 2026-10-28 — automatic brace configuration search before closure
+
+Implemented Kean-only adapter `motion/brace_search.py`, enabled in strict live
+acceptance after planner warmup. Reuses shared `bracing.candidates`, `brace_at`,
+force model, and `Example.queue_brace`; required supports and order are retained.
+Tries the original configuration followed by generated positions and 60/75/45
+angle leans, bounded to eight distinct configurations. Rejects worse predicted
+utilisation and preserves actual grip force/material friction. Verifies the
+shared planner module and active voxel frame agree.
+
+At the end of the real open-finger brace-guard approach, before A's close move,
+checks B's full staged->transport->pre-insert trajectory chain against measured
+A joints and both open and anticipated closed fingers. Carried geometry is now
+available during B's stage for this check. No hover change is committed until
+both segments pass. Failed trials discard close/hold, retract and park A, then
+try the next candidate; bounded exhaustion reports brace_search_exhausted.
+B's per-trial stage timeout is reset while it remains stationary. Unexpected
+errors and graph captures remain hard failures. Actual B execution is re-planned
+against A's measured closed grip; the pre-close check is not a guarantee of
+physical success or a replacement for that check.
+
+Run summary gains `brace_search` candidate pose/tilt, acceptance and failure data.
+README gives the new live run command with an isolated output directory; old
+request replay cannot test the dynamic brace search.
+
+Validation: full CPU suite passed after initial integration (112 tests, one
+skipped). Four dedicated search regressions also passed, including an actual
+shared-generator/force-model check at the cell's 14.3 N grip and centered frame,
+rejection-before-close, retreat-before-retry, exhaustion, and atomic hover update.
+GPU physical acceptance is pending; no live success is claimed.
+
+### 2026-10-28 — reduce repetitive test runs
+
+User requested removal of repetitive, repeatedly passed tests. Consolidated two
+redundant fallback tests into the existing feedback-success and bounded-failure
+regressions. The recorded test runner now defaults to focused brace-search and
+motion-recovery modules; --full-tests explicitly requests historical discovery.
+Established unique regressions remain available. Added workflow guidance to
+AGENTS.md and README so subsequent edits use only affected checks after a pass.
+Verified CLI help and the two consolidated regressions; no full-suite rerun.
+
+
+### 2026-10-28 — diversify support search and backtrack approach routes
+
+Evidence: supplied GPU log and acceptance_brace_search/summary.json report
+S3 16/16, arch 10/11 with brace_search_exhausted. All eight arch attempts
+used y=-0.036, z=0.020–0.0248; changing lean did not unblock pre-insert.
+The target-first nested candidate loop consumed the retry budget before
+reaching another support column. CPU evaluation using the shared arch force
+model at 14.3 N gives the same nominal utilisation 0.9458 for feasible
+candidates on both piers. This does not establish physical insertion success
+or increase the original force model's margin.
+
+Amendment: replace fixed/locally varied support choice with spatially diverse
+bounded search. Opposite pier is tried immediately after the original; interleave
+columns before additional tilt/height trials. Preserve required support,
+original force and no-worse nominal utilisation. Independently fix greedy
+hover choice: test full two-segment routes and retry another hover if pre-insert
+fails. Reset each proposal to measured staging joints; commit only a fully
+validated route and remove untested live hover alternatives. All open/closed
+finger and carried-brick validators remain, as does live revalidation.
+
+Added --shape arch/S3 diagnosis, explicit summary scope/full_acceptance fields,
+and scoped judge input; combined acceptance remains default. This avoids
+repeating successful S3 while diagnosing arch. No new dependency or shared
+source modification. Five focused brace-search tests passed; follow-up checks
+cover selected-hover pinning and scoped acceptance. Full historical suite was
+not rerun. Local CPU environment cannot validate Newton/cuRobo execution;
+the final goal remains pending HPC confirmation.
+
+### 2026-10-28 — arch crown: wired the scripted wriggle into the cell
+
+Evidence: `acceptance_arch_diverse/summary.json` + the recorded npz. The brace
+search now works — opposite (right) pier reached, arm A closed and held steady
+(joints frozen at 0.0079), the structure stayed put (b_006..b_009 at their
+targets). The crown `b_010` still MISSED: in the recording it descends level
+(tilt 0.1 deg) to z 0.0508, then drifts ~1.1 mm in y (the slot axis), its
+leading edge penetrates the left column top `b_008` by 1.2 mm at frame 8443,
+and it jams at 5 mm high / 9.2 deg tilt. Lateral error (1.5 mm) was inside the
+gate; the jam is what failed it. No crown–arm-A contact event exists, so this
+is the scripted straight-down insert failing a precision socket, not a brace or
+motion-planning failure.
+
+Fix: `Kean/motion/wriggle.py` replays Tanvir's ScriptedBase search phases
+(descend, wiggle, press — `Tanvir/tasks/insertion_env.py` §WP4.4) as waypoints
+on arm B's queue, for steps whose brick drops into a critical socket
+(SLOT/POCKET/ENCLOSED, the `tight_fit_audit.contact_faces` rule re-expressed
+here; the twin's impedance hand is not imported). `install(example, D)` wraps
+`queue_place` after coordinated and replaces the single `insert` waypoint with
+a slow approach, then an 8-sample ±1 mm lateral / ±1.5 deg tilt wiggle @ 2 Hz in
+the clamped slot axis, then a level press that keeps the original `snap`
+callback. Only critical sockets are wriggled: the arch crown (step 10, SLOT
+along y) is the only one; S3 has no critical step, so its passing build is
+untouched. Disable with `KEAN_WRIGGLE=0`. `wriggle_brace.choose` for a sideways
+neighbour is noted as a later refinement, not part of this wiring.
+
+Validation: `Kean/tests/test_wriggle.py` (6 tests) covers the classification
+(real arch plan -> SLOT y; FREE/FLUSH not critical), the waypoint splice (snap
+preserved, lateral sweep only along the slot axis, tilt across it, contact moves
+throughout), install gating, and the env disable. Focused brace-search /
+coordinated / wriggle tests: 24 passed. Full CPU suite: 119 run, one pre-existing
+`NameError` in `acceptance.preview_ok` (undefined `expected_shapes`) unrelated to
+this change. GPU feasibility of the wiggle itself remains unverified on this
+Mac; rerun `bash Kean/scripts/accept.sh --live --shape arch`.
+
+### 2026-10-29 — HPC acceptance passes; wriggle tuned
+
+On gpu19 (L20) `--shape arch` passed once the wiggle band was raised to cover the
+jam zone. The first live try (`acceptance_arch_wriggle`) left the crown at
+dz 2.31 mm / tilt 3.49 deg — the wiggle freed the jam but only after the
+approach had already caught the side neighbour. Raising `APPROACH_CLEAR` 4 -> 12 mm
+(start wiggling before the crown reaches `b_008`), `WIGGLE_AMP` 1 -> 2 mm, and
+lengthening the wiggle (4 periods) and press (0.6 s) seated it: `acceptance_arch_wriggle2`
+snapped `b_010` at lateral 0.13 mm, dz 0.35-0.78 mm, tilt 1.3-2.1 deg, 11/11 placed,
+`accept: ok=True clean`. A combined `accept.sh --live` run then completed arch 11/11
+and was progressing through S3 when the process died silently during S3's step-13
+brace search (no traceback, peak CPU memory 3.4 GB of the 30 G slurm cap, GPU idle) —
+a transient planning crash, not a build failure. S3 re-run in isolation
+(`acceptance_s3_wriggle`) completed 16/16 with all three required supports
+(steps 11, 13, 14) held by Arm A and zero arm-arm events: `accept: ok=True clean`.
+Combined result: arch 11/11 and S3 16/16 both pass in the cell.
+
+Also fixed the pre-existing `acceptance.preview_ok` `NameError` (`expected_shapes`
+was referenced without a parameter) so `--dry-run` works again.
+
+### 2026-10-29 — cleanup: remove the omitted prototypes
+
+Kept the working acceptance path and the auxiliary tools that are still used
+(`scripts/check_env.py`, `p3.sh`/`p3_env.py`, `replay_motion.py`); removed the
+unsuccessful/omitted prototypes the README had flagged as not integrated:
+
+- `insertion/` (CPU insertion-RL smoke fixture), `memory/` (scan/store), and their
+  `scripts/insert.py` entry point.
+- `support/hold.py`, `support/grip_adjust.py`, and `support/sequence.py`'s
+  `Handoff` / `NotSettled` / `ZoneBusy` (kept `Zone`, used by `motion/world.py`).
+- `viz_cameras.py` and the `kean.id` trigger (the camera bridge; Sakib's
+  `_kean_viz` hook is now a no-op without `kean.id`).
+- Legacy tests: `test_insertion.py`, `test_insert_cell.py`, `test_memory.py`,
+  `test_support.py`; dropped `test_shared.test_shared_force_constants` (tested the
+  removed `insertion/env.py` aliases).
+
+CPU suite after cleanup: 98 passed.

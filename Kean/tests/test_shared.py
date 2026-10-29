@@ -26,18 +26,13 @@ class SharedTest(unittest.TestCase):
         self.assertEqual(probe.FR3_YML, Path("/shared/full.yml"))
 
     def test_planner_closes_when_work_raises(self):
-        planner = Planner(object())
+        planner = Planner(SimpleNamespace(warmup=lambda guard: None))
+        planner.warmup()
         with self.assertRaisesRegex(ValueError, "failure"):
             with planner:
                 raise ValueError("failure")
-        with self.assertRaises(RuntimeError):
-            planner._pool.submit(lambda: None)
-
-    def test_shared_force_constants(self):
-        from Kean.insertion.env import F_INSERT, F_BREAK
-        from Sakib.brickassembly.sim.joint_model import capacity
-        self.assertEqual(F_INSERT, capacity.F_INSERT_PER_STUD)
-        self.assertEqual(F_BREAK, capacity.F_BREAK_PER_STUD)
+        with self.assertRaisesRegex(RuntimeError, "closed"):
+            planner.submit(None)
 
     def test_probe_import_uses_shared_overlay_and_cleans_failed_cache(self):
         import importlib
