@@ -564,3 +564,22 @@ unsuccessful/omitted prototypes the README had flagged as not integrated:
   removed `insertion/env.py` aliases).
 
 CPU suite after cleanup: 98 passed.
+
+### 2026-10-29 — cleanup: remove the P3 historical experiment
+
+The earlier pass kept `p3.sh`/`p3_env.py` as "still used"; on review they are the
+opt-in P3 experiment, not part of the acceptance path. Removed:
+
+- `scripts/p3.sh`, `scripts/p3_env.py` (the `--kean-extensions` entry point).
+- `motion/sphere_fit.py` (sphere repair) and `motion/contact_check.py` (step-8
+  rescoring), reachable only from `--kean-extensions`.
+- `motion/iter_budget.py`'s `install`/`install_latency`/`latency_gate`/
+  `latency_from_env`/`diagnostic`; kept `apply`/`scale_from_env`, still used by
+  `plan_curobo` warmup (`P3_ITER_SCALE`).
+- `shared.configure_probe` (redirected P3 reports to `results/p3`) and the
+  `results/p3/` run record.
+- Tests `test_contact_check.py`, `test_sphere_fit.py`, and the P3 cases in
+  `test_iter_budget.py`, `test_shared.py`, `test_test_runner.py`.
+
+The acceptance path (accept.py, m05.run_job, the motion planner/brace/wriggle
+modules, replay, check_env) is untouched. CPU suite after this cleanup: 84 passed.

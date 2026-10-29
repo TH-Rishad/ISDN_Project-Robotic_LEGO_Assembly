@@ -20,12 +20,6 @@ def add_cell_path():
         sys.path.insert(0, path)
 
 
-def configure_probe(probe):
-    """Redirect experiment reports only; Sakib's model paths remain authoritative."""
-    probe.OUT = KEAN / "results" / "p3"
-    return probe
-
-
 def load_probe():
     """Load once, before warmup; top-level motion remains Sakib's package."""
     name = "Kean._curobo_probe"
@@ -37,7 +31,6 @@ def load_probe():
     sys.modules[name] = module
     try:
         spec.loader.exec_module(module)
-        configure_probe(module)
     except Exception:
         sys.modules.pop(name, None)
         raise

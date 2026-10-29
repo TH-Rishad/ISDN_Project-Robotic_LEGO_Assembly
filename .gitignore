@@ -10,7 +10,5 @@ __pycache__/
 Kean/kean.id
 Kean/AGENTS.md
 
-# Kean run artifacts. JSON evidence stays; recorder dumps and unused model copies do not.
+# Kean run artifacts. JSON evidence stays; recorder dumps do not.
 Kean/results/**/*.npz
-Kean/results/p3/fr3.yml
-Kean/results/p3/fr3_plan.yml

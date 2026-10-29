@@ -5,7 +5,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 import unittest
 
-from Kean.motion.iter_budget import _SCALED, apply, latency_gate
+from Kean.motion.iter_budget import _SCALED, apply
 
 
 class Opt:
@@ -86,13 +86,6 @@ class IterBudgetTest(unittest.TestCase):
         self.assertEqual(planner.ik_solver_config.num_iters, 100)
         self.assertEqual(planner.ik_solver_config.inner_iters, 20)
         self.assertEqual(planner.graph_planner_config.max_path_finding_iterations, 10)
-
-    def test_latency_gate_is_150(self):
-        self.assertTrue(latency_gate(0.99, 126.2, 0))
-        self.assertTrue(latency_gate(0.95, 150.0, 0))
-        self.assertFalse(latency_gate(0.99, 150.1, 0))
-        self.assertFalse(latency_gate(0.94, 126.2, 0))
-        self.assertFalse(latency_gate(0.99, 126.2, 1))
 
     def test_scale_one_is_a_noop(self):
         planner = Planner()

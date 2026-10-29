@@ -116,15 +116,13 @@ bash Kean/scripts/accept.sh --live --out Kean/results/acceptance_brace_search
 | Tight insert, only if the cell misses | `Tanvir/socket_env.py` `ScriptedWriggle` (replayed in `motion/wriggle.py`) | Call. Do not copy, retrain, or require for the mark unless a step fails |
 | Insertion RL, perception, memory | Omitted (removed) | Not part of acceptance |
 
-Import local modules as `Kean.*`; the top-level `motion` package belongs to Sakib. `shared.py` loads the existing P3 script once and redirects only report output to Kean. Model paths stay exactly as supplied by Sakib. Old `Kean/results/p3/fr3*.yml` copies are retained as historical artifacts and are no longer selected by the runtime. The shared vendor loader runs as Sakib defines it; Kean does not inject Conda packages or override that loader.
+Import local modules as `Kean.*`; the top-level `motion` package belongs to Sakib. `shared.py` loads the existing P3 probe once. Model paths stay exactly as supplied by Sakib. The shared vendor loader runs as Sakib defines it; Kean does not inject Conda packages or override that loader.
 
 ## Experiments and prototypes
 
 Default M0.5 uses shared grasp execution and optimizer iterations. `P3_ITER_SCALE` explicitly opts into Kean's iteration-budget experiment; its default is now 1.0. The pickup-offset search stays opt-in (`m05.py --experimental-grasp-offset`). Cube job 0 in `results/checks/20261021-191332-980676` placed 8/8, had no unintended contacts, and passed the motion gate; planned-playback clearance was 0.046 m. That cube has no temporary-support section, so it does not meet instructor acceptance. Hollow_box is extra regression only. Contact acceptance thresholds are unchanged.
 
-`p3.sh` runs the shared probe without automatic sphere repair, contact rescoring or summary-source rewriting. Historical extensions require explicit `--kean-extensions`. Collision-model generation (`--step 2` / `--all`) is delegated to Sakib and rejected by this wrapper. P3 report files continue to be written under Kean.
-
-The insertion-RL, memory-scan, grip-adjustment and camera-bridge prototypes were removed (2026-10-29) — they were not part of the acceptance path. Tight steps call `motion/wriggle.py`, which replays Tanvir's `ScriptedWriggle` search phases on the cell's waypoint queue.
+The insertion-RL, memory-scan, grip-adjustment and camera-bridge prototypes and the opt-in P3 extension (`p3.sh`/`p3_env.py`, sphere repair, contact rescoring) were removed (2026-10-29) — they were not part of the acceptance path. Tight steps call `motion/wriggle.py`, which replays Tanvir's `ScriptedWriggle` search phases on the cell's waypoint queue.
 
 See [review.md](review.md) for the audit and validation limits.
 
