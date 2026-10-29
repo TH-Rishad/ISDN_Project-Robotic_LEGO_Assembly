@@ -37,6 +37,5 @@ scratch/
 *.md.bak
 todo-personal.md
 
-# Personal agent / task files (do not push)
+# Personal identity instructions (do not push)
 AGENTS.md
-task.md
