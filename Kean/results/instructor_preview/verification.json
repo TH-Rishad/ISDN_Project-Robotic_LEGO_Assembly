@@ -1,0 +1,68 @@
+{
+ "mode": "plan-check",
+ "criteria": {
+  "1": {
+   "title": "Direct structure input",
+   "status": "PASS",
+   "checks": [
+    {
+     "status": "PASS",
+     "detail": "direct structure ids, no image input",
+     "evidence": []
+    }
+   ]
+  },
+  "2": {
+   "title": "Generated sequence and supports",
+   "status": "PASS",
+   "checks": [
+    {
+     "status": "PASS",
+     "detail": "arch: 11 bricks, supports [10]",
+     "evidence": []
+    },
+    {
+     "status": "PASS",
+     "detail": "S3: 16 bricks, supports [11, 13, 14]",
+     "evidence": []
+    }
+   ]
+  },
+  "3": {
+   "title": "Two braced dual-arm assemblies",
+   "status": "UNVERIFIED",
+   "checks": [
+    {
+     "status": "UNVERIFIED",
+     "detail": "execution was not run",
+     "evidence": []
+    }
+   ]
+  }
+ },
+ "contacts": [],
+ "ignored_flags": [],
+ "hardware": "UNVERIFIED",
+ "hardware_note": "Newton simulation only. A physical robot demonstration is not in this package.",
+ "structures": [
+  {
+   "name": "arch",
+   "bricks": 11,
+   "supports": [
+    10
+   ],
+   "plan": null
+  },
+  {
+   "name": "S3",
+   "bricks": 16,
+   "supports": [
+    11,
+    13,
+    14
+   ],
+   "plan": null
+  }
+ ],
+ "exit_code": 2
+}

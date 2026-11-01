@@ -186,6 +186,8 @@ def run_job(job, out_dir, max_frames, record=False, grasp_offset=False, fresh_pl
                     install_brace_search(example, planner, world, carried, D)
                     from Kean.motion.wriggle import install as install_wriggle
                     install_wriggle(example, D)
+                    from Kean.motion.newton_fit import install as install_newton_fit
+                    install_newton_fit(example, D)
                 pump()
     except BaseException as exc:
         error = "%s: %s" % (type(exc).__name__, exc)

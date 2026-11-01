@@ -1,0 +1,21 @@
+{
+ "image_input": false,
+ "strategy": "weakest_joint",
+ "planner": [
+  "planner.sequence",
+  "planner.build_plan",
+  "bracing.assign"
+ ],
+ "structures": [
+  {
+   "structure": "arch",
+   "kind": "shape",
+   "image": null
+  },
+  {
+   "structure": "S3",
+   "kind": "structure",
+   "image": null
+  }
+ ]
+}

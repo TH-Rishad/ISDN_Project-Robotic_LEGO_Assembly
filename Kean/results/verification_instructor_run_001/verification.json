@@ -1,0 +1,132 @@
+{
+ "mode": "evidence",
+ "criteria": {
+  "1": {
+   "title": "Direct structure input",
+   "status": "PASS",
+   "checks": [
+    {
+     "status": "PASS",
+     "detail": "direct structure ids, no image input",
+     "evidence": []
+    }
+   ]
+  },
+  "2": {
+   "title": "Generated sequence and supports",
+   "status": "PASS",
+   "checks": [
+    {
+     "status": "PASS",
+     "detail": "S3: 16 bricks, supports [11, 13, 14]",
+     "evidence": [
+      "/home/mlieq/ISDN_Project-Robotic_LEGO_Assembly/Kean/results/instructor_run_001/plans/S3_weakest_joint.json"
+     ]
+    },
+    {
+     "status": "PASS",
+     "detail": "arch: 11 bricks, supports [10]",
+     "evidence": [
+      "/home/mlieq/ISDN_Project-Robotic_LEGO_Assembly/Kean/results/instructor_run_001/plans/arch_weakest_joint.json"
+     ]
+    }
+   ]
+  },
+  "3": {
+   "title": "Two braced dual-arm assemblies",
+   "status": "PASS",
+   "checks": [
+    {
+     "status": "PASS",
+     "detail": "bound to revision, dirty hashes, config, seed and simulator",
+     "evidence": []
+    },
+    {
+     "status": "PASS",
+     "detail": "every planned brick placed once",
+     "evidence": []
+    },
+    {
+     "status": "PASS",
+     "detail": "explicit completion and no execution failure",
+     "evidence": []
+    },
+    {
+     "status": "PASS",
+     "detail": "step 11 held before and during insertion, then released",
+     "evidence": []
+    },
+    {
+     "status": "PASS",
+     "detail": "step 13 held before and during insertion, then released",
+     "evidence": []
+    },
+    {
+     "status": "PASS",
+     "detail": "step 14 held before and during insertion, then released",
+     "evidence": []
+    },
+    {
+     "status": "PASS",
+     "detail": "every planned brick placed once",
+     "evidence": []
+    },
+    {
+     "status": "PASS",
+     "detail": "explicit completion and no execution failure",
+     "evidence": []
+    },
+    {
+     "status": "PASS",
+     "detail": "step 10 held before and during insertion, then released",
+     "evidence": []
+    }
+   ]
+  }
+ },
+ "contacts": [
+  {
+   "structure": "arch",
+   "counts": {
+    "neighbour_rub": 14,
+    "unintended": 6,
+    "penetration": 4
+   }
+  },
+  {
+   "structure": "S3",
+   "counts": {
+    "neighbour_rub": 17,
+    "unintended": 11,
+    "penetration": 5
+   }
+  }
+ ],
+ "ignored_flags": [
+  "ok",
+  "full_acceptance"
+ ],
+ "hardware": "UNVERIFIED",
+ "hardware_note": "Newton simulation only. A physical robot demonstration is not in this package.",
+ "structures": [
+  {
+   "name": "S3",
+   "bricks": 16,
+   "supports": [
+    11,
+    13,
+    14
+   ],
+   "plan": "/home/mlieq/ISDN_Project-Robotic_LEGO_Assembly/Kean/results/instructor_run_001/plans/S3_weakest_joint.json"
+  },
+  {
+   "name": "arch",
+   "bricks": 11,
+   "supports": [
+    10
+   ],
+   "plan": "/home/mlieq/ISDN_Project-Robotic_LEGO_Assembly/Kean/results/instructor_run_001/plans/arch_weakest_joint.json"
+  }
+ ],
+ "exit_code": 0
+}

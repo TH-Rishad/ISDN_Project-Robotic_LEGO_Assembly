@@ -1,22 +1,23 @@
 # Reuse audit — 2026-10-21
 
-> Updated 2026-10-29: instructor acceptance now passes on HPC — arch 11/11 and S3
-> 16/16 with every generated support held by Arm A, the arch crown seated by the
-> scripted wriggle (`motion/wriggle.py`). The omitted prototypes listed below
-> (`insertion/`, `memory/`, `support/hold.py` + `grip_adjust.py`, `viz_cameras.py`)
-> and the opt-in P3 experiment (`p3.sh`/`p3_env.py`, sphere repair, contact
-> rescoring) were removed, not kept. The body of this audit is the 2026-10-21 record.
+> Updated 2026-11-01. The 2026-10-21 audit body and the 2026-10-25 "not finished"
+> note below are historical. `results/instructor_run_001` (gpu12) is the certified
+> package: arch 11/11, S3 16/16, verifier exit 0. Support counts come from the plans:
+> arch step 10, S3 steps 11, 13, 14. `results/acceptance` is the older directory
+> with no provenance; the verifier exits 2 on it. Do not replace the certified run.
+> The omitted prototypes listed in older notes were removed. This file's body
+> remains the 2026-10-21 record.
 
 This review supersedes the earlier cleanup notes. It covers all Kean source areas, scripts, tests and existing evidence, compared with Sakib's current launcher, cell controller, P3 probe, perception, observation encoder, camera/contact/record interfaces, motion skills and PPO code. No cluster run, environment installation or shared-source edit was made.
 
 ## Workspaces and finished work (2026-10-25)
 
 - `Sakib/`: cell, planner, vertical-press brace, vision, RL env, standalone sim, BrickSim, docs, environment. Finished unbraced cube, arch, and hollow_box builds, and the sequence/support generators. Perception V1 closed. G-V1 failed. v3.1 frozen. Default strategy is `none`.
-- `Kean/`: planned-motion adapter, M0.5 runner, camera bridge, unwired memory/support prototypes, kinematic insertion fixture, acceptance runner. Finished only cube job 0 with the grasp offset (8/8, 0 braces). Arch and S3 are generated in the CPU preview and not run in the cell. Tanvir is a fallback if the cell insert misses, not a second inserter.
+- `Kean/` (historical, 2026-10-25): planned-motion adapter, M0.5 runner, camera bridge, unwired memory/support prototypes, kinematic insertion fixture, acceptance runner. At that date, finished only cube job 0 with the grasp offset (8/8, 0 braces). Arch and S3 had been generated in the CPU preview and not yet run in the cell. Tanvir is a fallback if the cell insert misses, not a second inserter.
 - `Tanvir/`: tight-fit audit, socket family, scripted wriggle, pad shift, sideways brace, skill/ES search, proposal. Finished: scripted wriggle beats every learned run; pad shift is the gain. Not in the Newton cell.
 - `Richard/`: empty.
 
-Instructor acceptance is not finished. Do not redo the finished pieces above.
+Historical (2026-10-25): instructor acceptance was not finished at the time of this paragraph. Do not redo the finished pieces above. The 2026-11-01 status is the banner at the top.
 
 ## Instructor acceptance (required, 2026-10-25)
 
@@ -26,7 +27,7 @@ The course mark is all three of the following. Master-plan extras are omitted: p
 2. Automatically generate the assembly sequence and determine where temporary support is needed.
 3. Use both robotic arms to autonomously assemble two different structures, each containing at least eight LEGO bricks and at least one section requiring temporary support.
 
-The cube job below does not meet item 3: `brace_required_count` is 0. Hollow_box is the same. Acceptance evidence still required: arch (11 bricks, one generated support) and S3 (16 bricks, two generated supports), each finished by both arms, with Arm A holding every generated support before Arm B inserts. Call `planner.build_plan` and `bracing.assign`. Call Tanvir only if the cell insert misses a step. Do not hand-author the sequence, do not use strategy `none`, do not require an image blueprint, and do not copy Tanvir's tight-fit stack into `Kean/`.
+The cube job below does not meet item 3: it has no required support. Hollow_box is the same. The two builds are arch and S3. Read support counts from each plan's `requires_brace` steps; do not hard-code two or three. Call `planner.build_plan` and `bracing.assign`. Call Tanvir only if the cell insert misses a step. Do not hand-author the sequence, do not use strategy `none`, do not require an image blueprint, and do not copy Tanvir's tight-fit stack into `Kean/`.
 
 ## Unnecessary parallel machinery removed from active paths
 

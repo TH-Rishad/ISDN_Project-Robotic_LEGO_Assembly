@@ -1,0 +1,41 @@
+{
+ "git_revision": "d9fc5d79bcfaa343b687d6eec33257091832e12d",
+ "dirty_hashes": {
+  "Kean/README.md": "ce259a7a105698cbb7db713a05a4c2f991b48b0357c7e9270a65af89b4a057cc",
+  "Kean/review.md": "178e15f384d37eda988f1ebea19c5bc762c82a51ac892f2e33fceeff24cb3680",
+  "Kean/scripts/accept.py": "bf229c1a73f699008dd404e4a481941d6f298d8e0e8ca4c4b101ba721287d334",
+  "Kean/scripts/m05.py": "fc7aefe7f8a38bee43f54d5abcedd4338c261f2f775c7c3217f5a4f68145ad45",
+  "Kean/work_record.md": "26ba9dde35b40b783c22587755f7ed564883176260e536eae1f6d2625b5435c7",
+  "Kean/motion/newton_fit.py": "cae63a7b27b6a5e17f9d34105034d15755d3ffef28a7aa49e0b72f197ba9742a",
+  "Kean/results/evidence_inventory.json": "39ff7db6c37451e7af3041d3c747a0e834cb20e77f9665f98ec71d3fb2470e52",
+  "Kean/results/evidence_inventory.md": "4593bbd944c77aa0915d197e755b8e926444d3ba2f3d3ec555f8314ee23d423f",
+  "Kean/scripts/verify_acceptance.py": "2237a41a0f7bc0f1ccbdb39c8ec89d26523be3e9d8524bc7a09cf693d899d0fe",
+  "Kean/scripts/verify_acceptance.sh": "76de21ea5db7f6788d83fca4d1f0504411fb304c6a950ce292d7322f4a0adb90",
+  "Kean/task.md": "c70e708e8e81006bf48d3decfa43b2776b8e21216f4fa6362d97e942e6cfd333",
+  "Kean/tests/test_newton_fit.py": "2c38c3fe63402e92913debb3da0117bf53f1f19a5aa563638dc4dac64f9649f6",
+  "Kean/tests/test_verify_acceptance.py": "6f7d42c37ab5746d92ca4e406dc088caf34f99705aa9e3acf722147637873b7e",
+  "Kean/verify_acceptance.py": "d32229572a5d6eaed05e001fd0ee9e443360329ac2ae626dfdbb5f8e13799437"
+ },
+ "config": {
+  "image_input": false,
+  "strategy": "weakest_joint",
+  "max_frames": 60000,
+  "strict_motion": true,
+  "planned_motion": true,
+  "fresh_plan": true,
+  "seeds": {
+   "arch": 0,
+   "S3": 0
+  }
+ },
+ "simulator": {
+  "backend": "newton_mujoco",
+  "joint_model": "weld_pool"
+ },
+ "plan_hashes": {
+  "arch": "b0b3fb60e08fd9af768790798b3e77296f29418800f4198e32404580930b1923",
+  "S3": "24b4fda0da446331717d9cdb9d9c3d3a13c3a7d84e6abc33c359d52127405786"
+ },
+ "python": "3.12.3",
+ "hostname": "gpu12"
+}

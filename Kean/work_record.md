@@ -583,3 +583,17 @@ opt-in P3 experiment, not part of the acceptance path. Removed:
 
 The acceptance path (accept.py, m05.run_job, the motion planner/brace/wriggle
 modules, replay, check_env) is untouched. CPU suite after this cleanup: 84 passed.
+
+### 2026-11-01 — evidence inventory and CPU verifier
+
+Inventoried `results/acceptance`, `acceptance_arch_wriggle2`, and `acceptance_s3_wriggle` in `results/evidence_inventory.json`. The combined directory is one package, not an aggregation manifest. Plan hashes match the separate runs. Arch frames match (9139); S3 frames do not (14649 vs 14581). No source revision is stored.
+
+`accept.py` now refuses to overwrite an occupied directory unless `--replace` is passed. A live run writes `provenance.json` and `runs/<shape>.json` before the next structure starts.
+
+`scripts/verify_acceptance.py` recomputes the three criteria and ignores `ok` / `full_acceptance`. Plan-check on `results/instructor_preview` exits 2 (criterion 3 UNVERIFIED). Evidence mode on `results/acceptance` exits 2: criteria 1 and 2 PASS, criterion 3 UNVERIFIED because provenance is missing. Phase records do show Arm A holding each generated support before and during insertion, then releasing. Focused tests: `python3 -m unittest Kean.tests.test_verify_acceptance` (15 passed).
+
+### 2026-11-01 — instructor_run_001 certified
+
+`bash Kean/scripts/accept.sh --live --out Kean/results/instructor_run_001` on gpu12 (A30, Newton) finished both structures with `KEAN_NEWTON_FIT` unset. Arch 11/11, crown `b_010` lateral 0.12 mm. S3 16/16. Supports held at arch step 10 and S3 steps 11, 13, 14. `accept: ok=True clean`.
+
+`python3 Kean/scripts/verify_acceptance.py --run Kean/results/instructor_run_001` exited 0. All three criteria PASS. Contacts: arch unintended 6 / penetration 4, S3 unintended 11 / penetration 5. Those counts do not change the criteria. Provenance revision `d9fc5d79`, hostname gpu12. The `.npz` recordings are gitignored and must be copied with the directory. Do not `--replace` this run.

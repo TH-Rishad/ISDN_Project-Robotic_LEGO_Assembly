@@ -12,31 +12,34 @@ Meeting the three requirements below is a full mark. The M0.5 gate, insertion RL
 
 Input is `--structure` or a named sample such as `--shape` that does not read an image. Do not require `--front`, `--side`, or `--top`. Generate the order and the support poses with `planner.build_plan` and `bracing.assign` (`--strategy weakest_joint` or `nearest`, never `none` on an acceptance run). Do not hand-author the sequence or the support steps. Call Tanvir only if the cell insert misses a step. Do not train.
 
-The two structures are the arch (11 bricks, `brace_required_count` 1 under `weakest_joint`) and S3 (16 bricks, `brace_required_count` 2, `single_arm_fails`). Arm A must hold each generated support pose before Arm B inserts that step. Both builds must finish. Cube and hollow_box have `brace_required_count` 0, so a passing cube job does not meet item 3.
+The two structures are the arch and S3. Support counts are the plan's `requires_brace` steps; `validation.brace_required_count` must match that list. Do not hard-code two or three. The saved plans currently read arch step 10 (count 1) and S3 steps 11, 13, 14 (count 3). Arm A must hold each generated support before and during Arm B's insert, then release. Cube and hollow_box have no required support, so a passing cube job does not meet item 3.
 
 ## Workspaces and what is finished (2026-10-25)
 
 | Workspace | Has | Finished | Not finished |
 | --- | --- | --- | --- |
 | `Sakib/` | `brickassembly/` (cell, planner, bracing, stability, vision, RL env, plans, ledger), `robofab_sim/`, `BrickSim/`, `Docs/`, `setup_env.sh` | Unbraced cube 8/8, arch 11/11, hollow_box 12/12. Sequence and vertical-press support generators. Perception V1 closed. v3.1 frozen. | G-V1. Live default is `--strategy none`, so braced acceptance builds are not the current path. |
-| `Kean/` | `motion/` planned-path adapter and the acceptance runner (`acceptance.py`, `scripts/accept.sh`) | arch 11/11 and S3 16/16 in the cell, with Arm A holding each generated support and the scripted wriggle seating the arch crown. | — |
+| `Kean/` | `motion/` planned-path adapter, acceptance runner, CPU verifier | `results/instructor_run_001` on gpu12: arch 11/11, S3 16/16, verifier exit 0. | Physical robot. `KEAN_NEWTON_FIT` stays off. |
 | `Tanvir/` | `tight_fit_audit.py`, `socket_family.py`, `socket_env.py`, `wriggle_brace.py`, `skill_env.py`, trainers, `report/` | `ScriptedWriggle` is the best policy. Pad shift is the measured gain. Five PPO runs and one ES run did not beat scripted. Proposal written. | Not in the Newton cell. Held-out, no brace, 1–2 mm: 26/68. |
 | `Richard/` | `.gitkeep` | Nothing | Everything |
 
-Do not rebuild those finished pieces. Next work is `bash Kean/scripts/accept.sh --live`: arch and S3, generated support held by Arm A. Perception, insertion RL, the 235-placement gate, and a learned wriggle are omitted.
+Do not rebuild the planner, cell, or scripted wriggle. Do not rerun into `results/instructor_run_001`. Perception, insertion RL, the 235-placement gate, and a learned wriggle are omitted.
 
 ## Run with Sakib's supplied environment
 
 No Conda activation or Kean installer is required. The thin `scripts/run.sh` wrapper delegates to `Sakib/brickassembly/scripts/run.sh`, selecting Sakib's `.venv` through its existing `ROBOFAB_PY` interface. If that environment or a dependency is unavailable, send the diagnostic to Sakib.
 
 ```sh
+python3 Kean/scripts/verify_acceptance.py --plan-check --out Kean/results/instructor_preview
+python3 Kean/scripts/verify_acceptance.py --run Kean/results/instructor_run_001 --out Kean/results/verification_instructor_run_001 --replace
 bash Kean/scripts/run.sh Kean/scripts/check_env.py --gpu
-bash Kean/scripts/test_m05.sh
-python3 Kean/scripts/accept.py --dry-run
-bash Kean/scripts/accept.sh --live
 ```
 
-The smoke check imports Sakib's actual motion probe and reports its model paths. It does not install, repair or pin packages. The recorded test runs CPU checks, manifest generation, that smoke check and cube job 0. It saves logs, source hashes, per-stage exit codes, shared cell rows and the shared Recorder's NPZ in `Kean/results/checks/<Hong-Kong-timestamp>/`. `--max-frames N` bounds simulation frames, not planner wall time.
+CPU verification does not need the GPU environment. `--plan-check` generates both plans and exits 2: criteria 1 and 2 can pass, criterion 3 stays UNVERIFIED. `--run` recomputes the verdict from the saved plan, episodes, cell rows and recording. It ignores `ok` and `full_acceptance`. Exit 0 only when all three criteria PASS. Exit 1 is a criterion FAIL. Exit 2 is UNVERIFIED evidence with no FAIL. A one-structure run cannot exit 0. Contact counts are reported and do not change the three criteria. If an example `--out` already exists, pass a new suffix.
+
+`accept.sh` refuses to write into a directory that already has a run. Pass a new `--out`. `--replace` is the explicit overwrite. Each finished structure is saved under `runs/` before the next one starts, with `provenance.json` (git revision, dirty-file hashes, config, seed, simulator backend, plan hashes). Missing provenance is unverified, not a pass. Recorder NPZ files are gitignored, so a shared submission has to include them outside git.
+
+The GPU check and live run belong on HPC. If Sakib's environment is missing, send that diagnostic to Sakib. The evidence is Newton simulation, not a physical robot. Replay a saved summary with `bash Kean/scripts/run.sh Kean/scripts/replay_motion.py <summary.json>`.
 
 CPU checks can also run with a suitable local interpreter:
 
@@ -124,25 +127,12 @@ Default M0.5 uses shared grasp execution and optimizer iterations. `P3_ITER_SCAL
 
 The insertion-RL, memory-scan, grip-adjustment and camera-bridge prototypes and the opt-in P3 extension (`p3.sh`/`p3_env.py`, sphere repair, contact rescoring) were removed (2026-10-29) — they were not part of the acceptance path. Tight steps call `motion/wriggle.py`, which replays Tanvir's `ScriptedWriggle` search phases on the cell's waypoint queue.
 
+`motion/newton_fit.py` is the opt-in Newton port (impedance, axial clutch, 0.3 mm seat gate). It is off unless `KEAN_NEWTON_FIT=1`, and it does not load or train a policy. Arch and S3 keep the waypoint replay until a Newton slot probe is within 10 points of the twin.
+
 See [review.md](review.md) for the audit and validation limits.
 
-## Final acceptance
+## Current status (2026-11-01)
 
-Both structures assemble in the cell with every generated support held by Arm A:
+Historical notes above that say GPU acceptance is still pending, or that S3 has two supports, are records of that date. Support counts are read from the plans, not fixed at two or three.
 
-- `--shape arch` places 11/11; the crown (`b_010`) seats with the scripted
-  wriggle (lateral < 0.15 mm, dz < 0.8 mm, tilt < 2.1 deg).
-- `--shape S3` places 16/16 with its three required supports.
-
-The strict acceptance path searches up to eight brace configurations per
-required support (including the opposite pier) before closing, and replays
-Tanvir's `ScriptedWriggle` search phases for precision sockets. Run the
-combined acceptance with:
-
-```bash
-bash Kean/scripts/accept.sh --live
-```
-
-A single-structure summary records `scope=<shape>` and `full_acceptance=false`;
-it does not certify the combined goal. Omit `--shape` for the final combined
-acceptance.
+`results/instructor_run_001` is the certified package (gpu12, seed 0, `weakest_joint`, revision `d9fc5d79`). The verifier exits 0: arch 11/11 with support step 10, S3 16/16 with supports 11, 13, and 14. Contacts were arch 6 unintended / 4 penetration and S3 11 unintended / 5 penetration. Those counts do not change the three criteria. Replay clearances with `bash Kean/scripts/run.sh Kean/scripts/replay_motion.py Kean/results/instructor_run_001/summary.json`. Show the saved assembly, without stepping the cell, with `bash Kean/scripts/play_run.sh --run Kean/results/instructor_run_001 --shape arch` and open the tunnel at http://localhost:8080. The `.npz` recordings are gitignored; a sync that follows gitignore must still copy them. `results/acceptance` remains the older package with no provenance. Do not pass `--replace` on `instructor_run_001`.

@@ -1,0 +1,168 @@
+{
+ "runs": {
+  "acceptance": {
+   "present": true,
+   "files": [
+    "S3_weakest_joint_s0.npz",
+    "arch_weakest_joint_s0.npz",
+    "cell_rows.jsonl",
+    "episodes.jsonl",
+    "summary.json",
+    "plans/S3_weakest_joint.json",
+    "plans/arch_weakest_joint.json"
+   ],
+   "scope": "all",
+   "runs": [
+    {
+     "shape": "arch",
+     "placed": 11,
+     "total": 11,
+     "frames": 9139,
+     "done": true,
+     "failure": null,
+     "required_supports": [
+      10
+     ],
+     "sha256": "a5f376faf8aee960469d2f49abf08d8a25f1b886f81d84897ed50cb80df1eb0b"
+    },
+    {
+     "shape": "S3",
+     "placed": 16,
+     "total": 16,
+     "frames": 14649,
+     "done": true,
+     "failure": null,
+     "required_supports": [
+      11,
+      13,
+      14
+     ],
+     "sha256": "a5f376faf8aee960469d2f49abf08d8a25f1b886f81d84897ed50cb80df1eb0b"
+    }
+   ],
+   "plans": {
+    "S3": {
+     "sha256": "24b4fda0da446331717d9cdb9d9c3d3a13c3a7d84e6abc33c359d52127405786",
+     "bricks": 16,
+     "supports": [
+      11,
+      13,
+      14
+     ],
+     "brace_required_count": 3
+    },
+    "arch": {
+     "sha256": "b0b3fb60e08fd9af768790798b3e77296f29418800f4198e32404580930b1923",
+     "bricks": 11,
+     "supports": [
+      10
+     ],
+     "brace_required_count": 1
+    }
+   },
+   "provenance": false,
+   "cell_rows": 2,
+   "episodes": 27
+  },
+  "acceptance_arch_wriggle2": {
+   "present": true,
+   "files": [
+    "arch_weakest_joint_s0.npz",
+    "cell_rows.jsonl",
+    "episodes.jsonl",
+    "summary.json",
+    "plans/arch_weakest_joint.json"
+   ],
+   "scope": "arch",
+   "runs": [
+    {
+     "shape": "arch",
+     "placed": 11,
+     "total": 11,
+     "frames": 9139,
+     "done": true,
+     "failure": null,
+     "required_supports": [
+      10
+     ],
+     "sha256": "38c1069ae475a34690751846deabba703ed9e7872da595b2f946ba19fd2be312"
+    }
+   ],
+   "plans": {
+    "arch": {
+     "sha256": "b0b3fb60e08fd9af768790798b3e77296f29418800f4198e32404580930b1923",
+     "bricks": 11,
+     "supports": [
+      10
+     ],
+     "brace_required_count": 1
+    }
+   },
+   "provenance": false,
+   "cell_rows": 1,
+   "episodes": 11
+  },
+  "acceptance_s3_wriggle": {
+   "present": true,
+   "files": [
+    "S3_weakest_joint_s0.npz",
+    "cell_rows.jsonl",
+    "episodes.jsonl",
+    "summary.json",
+    "plans/S3_weakest_joint.json"
+   ],
+   "scope": "S3",
+   "runs": [
+    {
+     "shape": "S3",
+     "placed": 16,
+     "total": 16,
+     "frames": 14581,
+     "done": true,
+     "failure": null,
+     "required_supports": [
+      11,
+      13,
+      14
+     ],
+     "sha256": "25fea672e6f5c97e75b11e0c3a262a02d93bc4396fa61729d1bcc12b47b6d4c6"
+    }
+   ],
+   "plans": {
+    "S3": {
+     "sha256": "24b4fda0da446331717d9cdb9d9c3d3a13c3a7d84e6abc33c359d52127405786",
+     "bricks": 16,
+     "supports": [
+      11,
+      13,
+      14
+     ],
+     "brace_required_count": 3
+    }
+   },
+   "provenance": false,
+   "cell_rows": 1,
+   "episodes": 16
+  }
+ },
+ "combined_matches_separate_runs": {
+  "arch": {
+   "same_frames": true,
+   "combined_frames": 9139,
+   "separate_frames": 9139,
+   "same_supports": true
+  },
+  "S3": {
+   "same_frames": false,
+   "combined_frames": 14649,
+   "separate_frames": 14581,
+   "same_supports": true
+  }
+ },
+ "plan_hash_matches_separate": {
+  "S3": true,
+  "arch": true
+ },
+ "explicit_aggregation_manifest": false,
+ "conclusion": "results/acceptance holds both structures in one directory and has no aggregation manifest. Plan hashes match the separate runs. Arch frames match (9139) but S3 frames do not (14649 vs 14581). No provenance.json or source revision is stored, so the combined summary is unverified."
+}

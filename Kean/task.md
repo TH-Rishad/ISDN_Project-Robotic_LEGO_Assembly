@@ -25,30 +25,30 @@ Reviewed `../README.md`, `../Sakib/Docs/plan_v4.md`, `README.md`, `review.md`, `
 
 ### P0 — Reconcile and preserve evidence
 
-- [ ] Inventory the combined and individual runs: generated plans, cell rows, event logs, recordings, source revision and available runtime metadata. Identify missing files and whether the combined result came from one execution or an explicit aggregation.
-- [ ] Preserve existing evidence. Use a fresh output directory for each new run; never overwrite a successful run by default.
-- [ ] Correct current-status sections in Kean's README/review, clearly labeling historical notes. Derive support counts from actual plans rather than hard-coding two or three.
+- [x] Inventory the combined and individual runs: generated plans, cell rows, event logs, recordings, source revision and available runtime metadata. Identify missing files and whether the combined result came from one execution or an explicit aggregation.
+- [x] Preserve existing evidence. Use a fresh output directory for each new run; never overwrite a successful run by default.
+- [x] Correct current-status sections in Kean's README/review, clearly labeling historical notes. Derive support counts from actual plans rather than hard-coding two or three.
 
 ### P1 — Dedicated instructor verification (CPU)
 
 Implement `Kean/scripts/verify_acceptance.py` with a thin `verify_acceptance.sh` launcher if needed. These names and commands are proposed deliverables, not existing tools.
 
-- [ ] Provide a plan-check mode that loads direct structure inputs and invokes existing generation. Save input definitions, generated order, support targets/poses and planner configuration. No image input, hand-authored order or manually inserted support steps.
-- [ ] Provide an offline evidence mode accepting an explicit run directory. Recompute the verdict from plans and execution records; do not trust stored `ok` or `full_acceptance` flags.
-- [ ] Check two distinct structure definitions; at least eight unique target bricks each; complete sequence coverage without duplicates; valid generated support locations; and at least one required support per structure.
-- [ ] Cross-check each run against its saved plan and target: all expected bricks placed, no missing/extra placements, explicit completion and no execution failure. Require every generated support to have been executed. Use available per-frame/phase records to establish Arm A held support before and during Arm B insertion, then released/retracted. If the recorder lacks this evidence, extend Kean's adapter recording rather than fabricate it.
-- [ ] Bind evidence to input/plan hashes, source revision plus dirty-file hashes, configuration, seed and simulator/runtime identity. Report missing provenance as unverified, not a pass. Hashes establish consistency, not independent proof of execution.
-- [ ] Emit human-readable `verification.md` and machine-readable `verification.json`, with a separate PASS/FAIL/UNVERIFIED for each criterion and links to evidence. Exit zero only for a complete pass; distinguish invalid evidence and unmet criteria with documented nonzero codes.
-- [ ] A dry run can verify input/planning only: criterion 3 must remain UNVERIFIED. A one-structure run must never pass the full assessment. Keep contact findings visible without silently redefining course requirements.
-- [ ] Add focused negative tests: missing/duplicate structure, fewer than eight bricks, altered or missing plan, missing completion, missing support, support held at the wrong time, incomplete placement and misleading saved success flags. Test the verifier without GPU imports.
+- [x] Provide a plan-check mode that loads direct structure inputs and invokes existing generation. Save input definitions, generated order, support targets/poses and planner configuration. No image input, hand-authored order or manually inserted support steps.
+- [x] Provide an offline evidence mode accepting an explicit run directory. Recompute the verdict from plans and execution records; do not trust stored `ok` or `full_acceptance` flags.
+- [x] Check two distinct structure definitions; at least eight unique target bricks each; complete sequence coverage without duplicates; valid generated support locations; and at least one required support per structure.
+- [x] Cross-check each run against its saved plan and target: all expected bricks placed, no missing/extra placements, explicit completion and no execution failure. Require every generated support to have been executed. Use available per-frame/phase records to establish Arm A held support before and during Arm B insertion, then released/retracted. If the recorder lacks this evidence, extend Kean's adapter recording rather than fabricate it.
+- [x] Bind evidence to input/plan hashes, source revision plus dirty-file hashes, configuration, seed and simulator/runtime identity. Report missing provenance as unverified, not a pass. Hashes establish consistency, not independent proof of execution.
+- [x] Emit human-readable `verification.md` and machine-readable `verification.json`, with a separate PASS/FAIL/UNVERIFIED for each criterion and links to evidence. Exit zero only for a complete pass; distinguish invalid evidence and unmet criteria with documented nonzero codes.
+- [x] A dry run can verify input/planning only: criterion 3 must remain UNVERIFIED. A one-structure run must never pass the full assessment. Keep contact findings visible without silently redefining course requirements.
+- [x] Add focused negative tests: missing/duplicate structure, fewer than eight bricks, altered or missing plan, missing completion, missing support, support held at the wrong time, incomplete placement and misleading saved success flags. Test the verifier without GPU imports.
 
 ### P2 — Reproducible execution and evidence capture (HPC)
 
-- [ ] Reuse `scripts/accept.sh` and `m05.run_job`; do not build another simulator or planner. Add only the orchestration/recording needed by the verifier.
-- [ ] Run arch and S3 with fresh generated plans, strict motion and recording in a new directory using Sakib's supplied GPU environment. Capture stdout/stderr and process exit status, including abnormal termination.
-- [ ] Make partial completion durable: save each structure's result before starting the next. If combining separate runs, explicitly record their provenance and compatibility rather than relabeling an individual summary.
-- [ ] Run the independent verifier on the produced package. Fix only failures preventing these three criteria or trustworthy verification. Preserve existing collision guards and support handshakes.
-- [ ] Include a viewable recording or documented replay command showing both arms and support timing. State explicitly that the evidence is from Newton simulation; if physical robots are required by the instructor, hardware demonstration remains a separate unmet requirement.
+- [x] Reuse `scripts/accept.sh` and `m05.run_job`; do not build another simulator or planner. Add only the orchestration/recording needed by the verifier.
+- [x] Run arch and S3 with fresh generated plans, strict motion and recording in a new directory using Sakib's supplied GPU environment. Capture stdout/stderr and process exit status, including abnormal termination. Done: `results/instructor_run_001` on gpu12, `accept: ok=True clean`.
+- [x] Make partial completion durable: save each structure's result before starting the next. If combining separate runs, explicitly record their provenance and compatibility rather than relabeling an individual summary. `runs/arch.json` and `runs/S3.json` are in that directory.
+- [x] Run the independent verifier on the produced package. Fix only failures preventing these three criteria or trustworthy verification. Preserve existing collision guards and support handshakes. `results/verification_instructor_run_001` exits 0.
+- [x] Include a viewable recording or documented replay command showing both arms and support timing. State explicitly that the evidence is from Newton simulation; if physical robots are required by the instructor, hardware demonstration remains a separate unmet requirement. Recordings are `arch_weakest_joint_s0.npz` and `S3_weakest_joint_s0.npz`.
 
 Existing execution commands, from the repository root:
 
@@ -62,6 +62,6 @@ Use a new run suffix if the directory already exists. GPU checks/live execution 
 
 ### P3 — Instructor handoff
 
-- [ ] Document a short CPU-only verification command and a separate GPU execution command, prerequisites, expected outputs and exit codes in Kean's README.
-- [ ] Package the two target definitions, plans, execution evidence and verification reports with usable relative paths. Ensure collaborators can obtain required artifacts; ignored local results are not a shared submission.
-- [ ] Finish when both structures satisfy all three criteria and the dedicated verifier independently passes the evidence package. Further master-plan work is optional.
+- [x] Document a short CPU-only verification command and a separate GPU execution command, prerequisites, expected outputs and exit codes in Kean's README.
+- [x] Package the two target definitions, plans, execution evidence and verification reports with usable relative paths. Ensure collaborators can obtain required artifacts; ignored local results are not a shared submission. The package is `results/instructor_run_001` plus `results/verification_instructor_run_001`. Copy the gitignored `.npz` files with it.
+- [x] Finish when both structures satisfy all three criteria and the dedicated verifier independently passes the evidence package. Further master-plan work is optional. Simulation acceptance is finished. A physical robot is not in this package.
