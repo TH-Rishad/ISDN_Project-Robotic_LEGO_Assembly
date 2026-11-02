@@ -597,3 +597,9 @@ Inventoried `results/acceptance`, `acceptance_arch_wriggle2`, and `acceptance_s3
 `bash Kean/scripts/accept.sh --live --out Kean/results/instructor_run_001` on gpu12 (A30, Newton) finished both structures with `KEAN_NEWTON_FIT` unset. Arch 11/11, crown `b_010` lateral 0.12 mm. S3 16/16. Supports held at arch step 10 and S3 steps 11, 13, 14. `accept: ok=True clean`.
 
 `python3 Kean/scripts/verify_acceptance.py --run Kean/results/instructor_run_001` exited 0. All three criteria PASS. Contacts: arch unintended 6 / penetration 4, S3 unintended 11 / penetration 5. Those counts do not change the criteria. Provenance revision `d9fc5d79`, hostname gpu12. The `.npz` recordings are gitignored and must be copied with the directory. Do not `--replace` this run.
+
+### 2026-11-01 — M0.5 collision gate scoring
+
+The 235-placement gate was a job list plus a contact judge that ignored the S3 brace-all stress runs, did not require the full grid, and did not check cycle time. `motion/gate.py` now scores stress arm-arm, unintended, displaced and penetration separately from the 235, fails a full package that is missing any of the 23 jobs, and fails a mean cycle above 1.5× the P0 grasp_lp means (cube 8.96 s, arch 9.78 s, hollow_box 8.84 s, S3 9.99 s). Neighbour rubs stay uncounted.
+
+`scripts/m05.py` live runs use strict collision-checked paths unless `--no-strict`. Each job is saved under `runs/` before the next starts. An occupied directory is refused unless `--replace`. `--score` judges a saved directory without Newton. CPU: `python3 -m unittest Kean.tests.test_gate Kean.tests.test_test_runner Kean.tests.test_m05_import` — 12 passed. The 23-job Newton run is not executed on this Mac. Do not write it into `results/m05` or `results/instructor_run_001`.

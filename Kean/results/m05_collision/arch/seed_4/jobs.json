@@ -1,0 +1,48 @@
+{
+ "jobs": [
+  {
+   "shape": "arch",
+   "kind": "shape",
+   "seed": 0,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 11
+  },
+  {
+   "shape": "arch",
+   "kind": "shape",
+   "seed": 1,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 11
+  },
+  {
+   "shape": "arch",
+   "kind": "shape",
+   "seed": 2,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 11
+  },
+  {
+   "shape": "arch",
+   "kind": "shape",
+   "seed": 3,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 11
+  },
+  {
+   "shape": "arch",
+   "kind": "shape",
+   "seed": 4,
+   "strategy": "weakest_joint",
+   "stress": false,
+   "bricks": 11
+  }
+ ],
+ "job_count": 5,
+ "placements": 55,
+ "stress_jobs": 0,
+ "note": "235 placements: cube, arch, hollow_box, S3 x 5 seeds. Arm-arm is split by braced placement. S3 brace-all x 3 is the zone stress."
+}

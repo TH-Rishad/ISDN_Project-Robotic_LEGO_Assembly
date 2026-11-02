@@ -14,8 +14,49 @@ from Kean.motion.gate import fold, jobs, placement_count  # noqa: E402
 OUT = KEAN / "results" / "m05"
 
 
-def write_jobs(path, seeds, stress_seeds):
+def job_name(job):
+    return "%s_%s_s%d" % (job["shape"], job["strategy"], job["seed"])
+
+
+def resolve_out(path):
+    path = Path(path).expanduser()
+    if path.is_absolute():
+        return path.resolve()
+    from_repo = (KEAN.parent / path).resolve()
+    if from_repo.is_relative_to(KEAN):
+        return from_repo
+    return (KEAN / path).resolve()
+
+
+def load_saved(out):
+    run_dir = out / "runs"
+    files = sorted(run_dir.glob("*.json")) if run_dir.is_dir() else []
+    if files:
+        return [json.loads(path.read_text()) for path in files]
+    log = out / "runs.jsonl"
+    if not log.exists():
+        return []
+    return [json.loads(line) for line in log.read_text().splitlines() if line.strip()]
+
+
+def cycle_s(example):
+    steps = example.plan["sequence"]
+    place_t = getattr(example, "place_t", {}) or {}
+    starts = [place_t[step["brick_id"]] for step in steps if step["brick_id"] in place_t]
+    if not starts:
+        return []
+    done_t = getattr(example, "done_t", None)
+    end = done_t if done_t is not None else getattr(example, "sim_time", None)
+    if end is None:
+        return []
+    ends = starts[1:] + [end]
+    return [round(float(stop) - float(start), 2) for start, stop in zip(starts, ends)]
+
+
+def write_jobs(path, seeds, stress_seeds, shape=None):
     rows = jobs(seeds, stress_seeds)
+    if shape:
+        rows = [row for row in rows if row["shape"] == shape and not row["stress"]]
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "jobs": rows,
@@ -203,6 +244,8 @@ def run_job(job, out_dir, max_frames, record=False, grasp_offset=False, fresh_pl
         "events": events,
         "grasp_offsets": grasp_offsets,
         "brace_search": getattr(example, "brace_search_report", []),
+        "cycle_s": cycle_s(example),
+        "min_clearance_m": None if tick is None else tick.report().get("min_clearance_m"),
         "motion": "coordinated" if strict_motion else "planned" if planned_motion else "cell",
         "motion_report": {} if tick is None else tick.report(),
         "done": bool(example.done and example.A.idle() and example.B.idle()),
@@ -229,31 +272,57 @@ def main():
     parser.add_argument("--seeds", type=int, default=5)
     parser.add_argument("--stress-seeds", type=int, default=3)
     parser.add_argument("--max-frames", type=int, default=60000)
-    parser.add_argument("--job", type=int, default=None, help="run one job index from the dry-run list")
+    parser.add_argument("--shape", choices=("cube", "arch", "hollow_box", "S3"),
+                        help="one shape only; the S3 brace-all stress jobs are excluded")
+    parser.add_argument("--job", type=int, default=None, help="run one job index from the selected list")
     parser.add_argument("--out", type=Path, default=OUT, help="output directory inside Kean")
     parser.add_argument("--experimental-grasp-offset", action="store_true",
                         help="opt in to unvalidated pickup offsets; default uses shared grasp execution")
     parser.add_argument("--record", action="store_true", help="use the shared per-frame recorder")
+    parser.add_argument("--score", action="store_true", help="judge a saved run directory; no Newton")
+    parser.add_argument("--replace", action="store_true", help="overwrite an existing run directory")
+    parser.add_argument("--strict", action=argparse.BooleanOptionalAction, default=True,
+                        help="collision-checked full paths; --no-strict keeps the 30 mm Cartesian tail")
     args = parser.parse_args()
-    out = args.out.resolve()
+    out = resolve_out(args.out)
     if not out.is_relative_to(KEAN):
-        parser.error("--out must be inside Kean/")
+        parser.error("--out must be inside Kean/ (resolved %s)" % out)
+    if args.score and args.dry_run:
+        parser.error("choose one of --score or --dry-run")
+    if args.score:
+        if not out.is_dir():
+            parser.error("no run directory %s" % out)
+        runs = load_saved(out)
+        summary = fold(runs, {}, full=True)
+        (out / "summary.json").write_text(json.dumps(summary, indent=1, default=str) + "\n")
+        print("m05: ok=%s %s" % (summary["ok"], ", ".join(summary["reasons"]) or "clean"))
+        if not summary["ok"]:
+            raise SystemExit(1)
+        return
     if args.max_frames <= 0 or args.seeds < 0 or args.stress_seeds < 0:
         parser.error("max-frames must be positive; seed counts must be nonnegative")
-    count = len(jobs(args.seeds, args.stress_seeds))
+    from Kean.verify_acceptance import directory_occupied
+    if not args.dry_run and directory_occupied(out) and not args.replace:
+        parser.error("refusing to overwrite %s; pass a new --out" % out)
+    payload = write_jobs(out / "jobs.json", args.seeds, args.stress_seeds, args.shape)
+    count = payload["job_count"]
     if count == 0 or (args.job is not None and not 0 <= args.job < count):
         parser.error("job index is outside the selected job list")
-    payload = write_jobs(out / "jobs.json", args.seeds, args.stress_seeds)
     print("m05: %d jobs, %d placements, %d stress" % (payload["job_count"], payload["placements"], payload["stress_jobs"]))
     if args.dry_run:
         return
+    if args.replace and (out / "runs.jsonl").exists():
+        (out / "runs.jsonl").write_text("")
     selected = payload["jobs"] if args.job is None else [payload["jobs"][args.job]]
+    full = args.job is None and args.shape is None
     runs, ticks = [], []
+    (out / "runs").mkdir(exist_ok=True)
     for job in selected:
         print("m05: %s %s seed %d" % (job["shape"], job["strategy"], job["seed"]), flush=True)
-        row, tick = run_job(job, out, args.max_frames, record=args.record, grasp_offset=args.experimental_grasp_offset)
+        row, tick = run_job(job, out, args.max_frames, record=args.record, grasp_offset=args.experimental_grasp_offset, strict_motion=args.strict)
         runs.append(row)
         ticks.append(tick)
+        (out / "runs" / ("%s.json" % job_name(job))).write_text(json.dumps(row, indent=1, default=str) + "\n")
         counts = {}
         for event in row["events"]:
             counts[event["class"]] = counts.get(event["class"], 0) + 1
@@ -264,11 +333,17 @@ def main():
             print("m05: unintended %s %s phase %s" % (event.get("a"), event.get("b"), event.get("phase")), flush=True)
         with (out / "runs.jsonl").open("a") as log:
             log.write(json.dumps(row, default=str) + "\n")
+        summary = fold(runs, {
+            "plan_failures": sum(t["plan_failures"] for t in ticks),
+            "captures": sum(t["captures"] for t in ticks),
+            "min_clearance_m": min((t["min_clearance_m"] for t in ticks if t["min_clearance_m"] is not None), default=None),
+        }, full=full)
+        (out / "summary.json").write_text(json.dumps(summary, indent=1, default=str) + "\n")
     summary = fold(runs, {
         "plan_failures": sum(t["plan_failures"] for t in ticks),
         "captures": sum(t["captures"] for t in ticks),
         "min_clearance_m": min((t["min_clearance_m"] for t in ticks if t["min_clearance_m"] is not None), default=None),
-    })
+    }, full=full)
     summary["clearance_scope"] = "planned playback, executed joints, full spheres and measured finger openings; contact segments scored by ContactMonitor"
     (out / "summary.json").write_text(json.dumps(summary, indent=1, default=str) + "\n")
     print("m05: ok=%s %s" % (summary["ok"], ", ".join(summary["reasons"]) or "clean"))

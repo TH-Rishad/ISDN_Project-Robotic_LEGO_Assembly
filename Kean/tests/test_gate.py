@@ -54,6 +54,35 @@ class GateTest(unittest.TestCase):
         dirty = dict(clean, arm_arm_unbraced=1)
         self.assertIn("arm_arm_unbraced", judge(dirty)["reasons"])
 
+    def _grid(self, event=None, cycle=1.0, stress_event=None):
+        rows = []
+        for job in jobs():
+            events = []
+            if event and not job["stress"]:
+                events = [event]
+            if stress_event and job["stress"] and job["seed"] == 0:
+                events = [stress_event]
+            rows.append({
+                "shape": job["shape"], "seed": job["seed"], "stress": job["stress"],
+                "placed": job["bricks"], "events": events, "cycle_s": [cycle],
+                "min_clearance_m": 0.01, "motion_report": {"plan_failures": 0, "captures": 0},
+            })
+        return rows
+
+    def test_full_grid_passes_and_stress_collision_fails(self):
+        clean = fold(self._grid(), {}, full=True)
+        self.assertEqual(clean["placements"], 235)
+        self.assertTrue(clean["ok"], clean["reasons"])
+        hit = fold(self._grid(stress_event={"class": "arm_arm", "braced": True}), {}, full=True)
+        self.assertIn("stress_arm_arm_braced", hit["reasons"])
+        self.assertEqual(hit["arm_arm_braced"], 0)
+
+    def test_partial_grid_and_slow_cycle_fail_the_full_gate(self):
+        partial = fold(self._grid()[:1], {}, full=True)
+        self.assertIn("grid", partial["reasons"])
+        slow = fold(self._grid(cycle=30.0), {}, full=True)
+        self.assertTrue(any(reason.startswith("cycle:") for reason in slow["reasons"]))
+
     def test_held_brick_is_left_out_of_the_world(self):
         self.assertIsNone(held_brick("B", "grasp", "b0"))
         self.assertEqual(held_brick("B", "transport", "b0"), "b0")
