@@ -15,7 +15,9 @@ if str(ROOT) not in sys.path:
 from Kean.motion.playback import apply_recorded, plan_file, recording_file  # noqa: E402
 
 JOBS = {
+    "cube": {"shape": "cube", "kind": "shape", "seed": 0, "strategy": "weakest_joint", "stress": False},
     "arch": {"shape": "arch", "kind": "shape", "seed": 0, "strategy": "weakest_joint", "stress": False},
+    "hollow_box": {"shape": "hollow_box", "kind": "shape", "seed": 0, "strategy": "weakest_joint", "stress": False},
     "S3": {"shape": "S3", "kind": "structure", "seed": 0, "strategy": "weakest_joint", "stress": False},
 }
 

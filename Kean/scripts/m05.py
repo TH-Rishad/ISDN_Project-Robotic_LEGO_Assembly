@@ -160,6 +160,24 @@ def run_job(job, out_dir, max_frames, record=False, grasp_offset=False, fresh_pl
     example.log_path = out_dir / "episodes.jsonl"
     from cell.contacts import ContactMonitor
     example.monitor = ContactMonitor(example)
+    contact_diagnostics = {}
+    original_event = example.monitor._event
+
+    def contact_event(cls, body_a, body_b, label_a, label_b, distance, force, ex, seen):
+        original_event(cls, body_a, body_b, label_a, label_b, distance, force, ex, seen)
+        if cls not in {"penetration", "unintended"}:
+            return
+        key = (cls, ex.b_step, body_a, body_b)
+        previous = contact_diagnostics.get(key)
+        if previous is None or distance < previous["distance_m"]:
+            poses = ex.state_0.body_q.numpy()
+            contact_diagnostics[key] = dict(
+                event=cls, step=ex.b_step, frame=ex.frame, distance_m=float(distance),
+                a=label_a, b=label_b, force_n=float(force),
+                pose_a=poses[body_a].tolist() if body_a >= 0 else None,
+                pose_b=poses[body_b].tolist() if body_b >= 0 else None)
+
+    example.monitor._event = contact_event
     from Kean.motion.plan_curobo import CuroboBackend, Planner
     from Kean.motion.tick import Tick
     from Kean.motion.world import plate_box, zone_of
@@ -222,11 +240,15 @@ def run_job(job, out_dir, max_frames, record=False, grasp_offset=False, fresh_pl
                 clearance = Clearance(planner.backend.probe, world)
                 from Kean.motion.tick import resolve_wrap
                 tick = Tick(planner, zone=zone_of(origin, ni, nj, pitch), world=world, clearance=clearance, wrap_angle=resolve_wrap(D), resample_trajectory=planner.backend.probe.resample, strict=strict_motion, carried=carried if strict_motion else None).attach(example)
+                # Insertion strategies (the arch crown wriggle and hollow_box's
+                # guided insert) are independent of the transport planner, so they
+                # stay on for --no-strict too: the strict full-path planner tilts
+                # the hollow_box walls (b_005) that the Cartesian tail seats cleanly.
+                from Kean.motion.wriggle import install as install_wriggle
+                install_wriggle(example, D)
                 if strict_motion:
                     from Kean.motion.brace_search import install as install_brace_search
                     install_brace_search(example, planner, world, carried, D)
-                    from Kean.motion.wriggle import install as install_wriggle
-                    install_wriggle(example, D)
                     from Kean.motion.newton_fit import install as install_newton_fit
                     install_newton_fit(example, D)
                 pump()
@@ -242,6 +264,7 @@ def run_job(job, out_dir, max_frames, record=False, grasp_offset=False, fresh_pl
         "failure": example.failure, "frames": example.frame,
         "braced_placements": len(braced_steps),
         "events": events,
+        "contact_diagnostics": list(contact_diagnostics.values()),
         "grasp_offsets": grasp_offsets,
         "brace_search": getattr(example, "brace_search_report", []),
         "cycle_s": cycle_s(example),
@@ -311,8 +334,9 @@ def main():
     print("m05: %d jobs, %d placements, %d stress" % (payload["job_count"], payload["placements"], payload["stress_jobs"]))
     if args.dry_run:
         return
-    if args.replace and (out / "runs.jsonl").exists():
-        (out / "runs.jsonl").write_text("")
+    if args.replace:
+        for name in ("runs.jsonl", "episodes.jsonl", "cell_rows.jsonl"):
+            (out / name).unlink(missing_ok=True)
     selected = payload["jobs"] if args.job is None else [payload["jobs"][args.job]]
     full = args.job is None and args.shape is None
     runs, ticks = [], []

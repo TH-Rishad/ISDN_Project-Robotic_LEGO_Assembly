@@ -66,7 +66,7 @@ class GraphGuard:
 
 
 class Request:
-    def __init__(self, arm, q, ee, goal, quat, zone_clear=True, dt=0.02, yaw=0.0, boxes=None, other_q=None, full_path=False, grip=None, carried=None, alternate_goals=()):
+    def __init__(self, arm, q, ee, goal, quat, zone_clear=True, dt=0.02, yaw=0.0, boxes=None, other_q=None, full_path=False, grip=None, carried=None, alternate_goals=(), contact_tail=False):
         self.arm = arm
         self.q = np.asarray(q, float)
         self.ee = np.asarray(ee, float)
@@ -81,6 +81,7 @@ class Request:
         self.grip = grip
         self.carried = carried
         self.alternate_goals = [np.asarray(p, float) for p in alternate_goals]
+        self.contact_tail = bool(contact_tail)
 
     def snapshot(self):
         """JSON-safe inputs for reproducing a failed query without rebuilding."""

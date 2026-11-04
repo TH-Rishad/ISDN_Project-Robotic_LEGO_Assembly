@@ -603,3 +603,89 @@ Inventoried `results/acceptance`, `acceptance_arch_wriggle2`, and `acceptance_s3
 The 235-placement gate was a job list plus a contact judge that ignored the S3 brace-all stress runs, did not require the full grid, and did not check cycle time. `motion/gate.py` now scores stress arm-arm, unintended, displaced and penetration separately from the 235, fails a full package that is missing any of the 23 jobs, and fails a mean cycle above 1.5× the P0 grasp_lp means (cube 8.96 s, arch 9.78 s, hollow_box 8.84 s, S3 9.99 s). Neighbour rubs stay uncounted.
 
 `scripts/m05.py` live runs use strict collision-checked paths unless `--no-strict`. Each job is saved under `runs/` before the next starts. An occupied directory is refused unless `--replace`. `--score` judges a saved directory without Newton. CPU: `python3 -m unittest Kean.tests.test_gate Kean.tests.test_test_runner Kean.tests.test_m05_import` — 12 passed. The 23-job Newton run is not executed on this Mac. Do not write it into `results/m05` or `results/instructor_run_001`.
+
+### 2026-11-04 — hollow_box b_007 insertion_alignment fix
+
+Job 2177688 (hollow_box seed 0) placed 7/12 then stopped at b_007 with
+`insertion_alignment`. Two defects in `Kean/motion/wriggle.py`, both in the
+uncommitted hollow_box work:
+
+1. `_guided_insert` attached an `_alignment_wait` to its approach waypoints.
+   That wait demanded 0.15 mm lateral / 0.5 mm vertical / 0.5° tilt — ~13x
+   tighter than the 2 mm / 1.5 mm / 5° snap gate — and called `fail` after 3 s.
+   The hollow_box walls settle slower than that, so the wait timed out. A
+   previous run (`m05_2174944`) had placed 12/12 before this wait was added.
+2. `install.queue_place` routed every hollow_box step to `_guided_insert`,
+   which only clears a single flush face. b_007 is a two-face slot (clamped on
+   both `-y` and `+y`), so its shift cancels to zero and the brick dropped
+   straight into a 32 mm-in-32 mm socket and jammed. `needs_wriggle` already
+   classifies it critical; the hollow_box branch short-circuited that check.
+
+Fix: delete `_alignment_wait` (and its test), and check `needs_wriggle` before
+the hollow_box branch so critical slots use the established `_splice` wriggle.
+
+Verification on gpu10 (A30, Sakib `.venv`): hollow_box seed 0 now places 12/12,
+`done` true, no failure; b_007 seats at lateral 0.45 mm / dz 0.11 mm / tilt
+0.8°. `ok` stays false on contact counts only (unintended 4, penetration 15),
+the same as the earlier 12/12 run — hollow_box's flush walls rub/penetrate by
+construction, and the gate scores those separately. CPU suite 120 passed.
+Seeds 1–4 still fail earlier at b_005 (`gate_miss`, tilt ~15°), a separate
+single-flush-face issue this change does not address.
+
+### 2026-11-04 — hollow_box: flush-wall contacts are SDF artifacts (classification fix)
+
+The cluster run confirmed the deep "penetration" is not real: at b_007's deepest
+reported penetration (−7.18 mm) its pose is (0.0202, 0.0, 0.0207) — 0.2 mm
+lateral error, still descending — against b_006 at (0.0, 0.02, 0.0128). The
+brick is flush against the wall, and the SDF collision reads that flush thin-wall
+contact as ~7 mm of penetration. Halving the wriggle sweep (2 → 1 mm) changed
+nothing, so the wriggle amplitude was never the lever.
+
+Two defects in `Sakib/brickassembly/cell/contacts.py`, both affecting only the
+held brick during `insert`/`release`:
+
+1. `penetration` fired for *any* brick↔brick overlap past 1 mm, before
+   `_classify`, so the held brick's flush contact with its support / same-course
+   neighbour was counted twice — once as `penetration` (a gate failure) and once
+   as `neighbour_rub` (permitted). All 14 unique penetration pairs are also
+   `neighbour_rub`.
+2. The 4 `unintended` corner grazes (e.g. b_005 west wall vs b_001 south wall)
+   are the brick sliding down flush against a *diagonally adjacent* layer-below
+   brick it does not sit on; `_same_course_neighbours` is same-layer only, so
+   they were not permitted.
+
+Fix: `_classify` runs before the penetration check, and `penetration` now fires
+only when the pair is *not* `neighbour_rub` (pass-through is still caught for
+non-support/non-neighbour pairs). A new `_flush_below` set (footprints adjacent,
+including diagonal, one layer down) joins `supports` and `neighbours` as a
+permitted `neighbour_rub` during insert/release. Self-check extended and passing.
+
+Offline re-score of the saved `hollow_box_nostrict/seed_0` events with the
+corrected rules: all 43 events become `neighbour_rub`, `judge` → `ok=True` (no
+reasons). The braced shapes are unaffected — the arch/S3 brace-driven contacts
+happen during A's hold / B's transport, not B's insert. GPU rerun
+(`Kean/scripts/m05_hollow_box_contactfix.sbatch`, job 2183464) is queued for the
+end-to-end `ok=true`.
+
+### 2026-11-04 — hollow_box b_005: strict full-path planner tilts the walls
+
+The b_007 fix (delete `_alignment_wait`, route the clamped slot to `_splice`)
+left b_005 failing at every other seed: `gate_miss`, tilt ~15°, dz ~4 mm. The
+wall is a 1-wide brick grasped on its ±x faces, so it is free to rock about x,
+and the strict cuRobo transport reaches pre-insert with enough orientation error
+that the −y face catches b_004 on the way down and jams. `--no-strict` (the
+30 mm Cartesian tail) seats b_005 at tilt 0.08° because the last 30 mm is direct
+interpolation, not cuRobo IK.
+
+Fix: hollow_box has no braced steps, so it does not need the full-path planner.
+`scripts/m05.py` now installs the wriggle outside the `strict_motion` gate (the
+insertion strategy is independent of the transport planner), and
+`scripts/m05_collision.sbatch` passes `--no-strict` for `hollow_box` only; the
+braced shapes keep strict paths.
+
+Verified on the cluster (job 2182515): all five seeds place **12/12**, `done`
+true, no failure; b_005 tilt 0.41°, b_007 tilt 0.4°, all walls seat cleanly
+(lateral ≤ 0.45 mm). `ok` is still false on contact counts only (unintended
+1–2, penetration 11–12) — the flush-wall rub/penetration and the 1 mm press are
+inherent, unchanged from every earlier 12/12 run. CPU suite 121 passed (one
+pre-existing `test_shared` `__pycache__` cleanup race, unrelated).

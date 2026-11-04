@@ -110,6 +110,60 @@ class WriggleTest(unittest.TestCase):
         ex.queue_place(ex.plan["sequence"][0])
         self.assertEqual([m["phase"] for m in ex.B.moves], ["insert"])
 
+    def test_hollow_box_critical_slot_wriggles_not_guided(self):
+        ex = Ex()
+        plan = arch_plan()
+        plan["structure_id"] = "hollow_box"
+        step = plan["sequence"][2]                       # the crown: a critical slot
+        step.update(mating_studs=[["b_000", 1]])
+        ex.plan = plan
+        ex.target = {"b_002": (np.array([0.0, 0.0, 0.05]), 0.0, False)}
+        ex.aim_brick = lambda ee, body_q: None           # _track_guided_aim wraps this
+        snap = lambda: None
+
+        def original(step):
+            ex.B.push("insert", [0.0, 0.0, 0.06], 0.0, 0.01, 1.0, then=snap)
+
+        ex.queue_place = original
+        wriggle.install(ex, SimpleNamespace(P=FakeP()))
+        ex.queue_place(step)
+        # A critical slot must be wriggled (descend + wiggle + press), not guided
+        # (which for a two-face slot cancels its shift and drops straight in).
+        n = wriggle.WIGGLE_WAYPOINTS
+        moves = ex.B.moves
+        self.assertEqual(len([m for m in moves if m["phase"] == "insert"]), 1 + n + 1)
+        # the wriggle sweeps laterally along the slot axis; a guided insert would not
+        ys = [m["pos"][1] for m in moves[1:]]
+        self.assertGreater(max(ys) - min(ys), 1e-4)
+        # the snap callback survives the splice
+        self.assertIs(moves[-1]["then"], snap)
+
+    def test_flush_entry_holds_clearance_and_tracks_it(self):
+        ex = Ex()
+        ex.plan = arch_plan()
+        ex.plan["sequence"].pop(1)
+        step = ex.plan["sequence"][1]
+        step.update(step=1, mating_studs=[["support", 2]])
+        ex.target = {"b_002": (np.array([0., 0., .014]), 0., False)}
+        ex.B.push("insert", [0., 0., .026], 0., .01, 1.)
+        wriggle._guided_insert(ex, step, FakeP())
+        moves = ex.B.moves
+        np.testing.assert_allclose([m["pos"][1] for m in moves], [.002, .002, 0., 0.])
+        self.assertEqual(moves[1]["pos"][2], moves[2]["pos"][2])
+
+        ex.B.cur = moves[1]
+        ex.B.cmd = (moves[1]["pos"],)
+        ex.aim, ex.b_step, ex.body = "gt", 1, {"b_002": 0}
+        ex.i_xy, ex.frame_dt = np.zeros(2), 1 / 60
+        def shared_aim(ee, poses):
+            ex.i_xy -= 4 * ex.frame_dt * poses[0, :2]
+            ex.B.bias[:2] = ex.i_xy
+        ex.aim_brick = shared_aim
+        wriggle._track_guided_aim(ex, SimpleNamespace(ALIGN_GAIN=4))
+        ex.aim_brick(None, np.array([[0., .002, .03]]))
+        np.testing.assert_allclose(ex.i_xy, 0., atol=1e-12)
+        np.testing.assert_allclose(ex.B.bias[:2], 0., atol=1e-12)
+
     def test_install_can_be_disabled(self):
         ex = Ex()
         ex.plan = arch_plan()

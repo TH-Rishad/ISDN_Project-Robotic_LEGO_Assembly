@@ -136,16 +136,70 @@ def _splice(ex, step, P):
     B.moves[idx:idx + 1] = band
 
 
+def _guided_insert(ex, step, P):
+    """Seat upper-layer bricks progressively, clearing a single flush face on entry."""
+    if not step.get("mating_studs"):
+        return
+    order = _tuples(ex.plan)
+    n = step["step"]
+    faces = contact_faces(order[n], order[:n], P)
+    away = {"-x": [1, 0, 0], "+x": [-1, 0, 0], "-y": [0, 1, 0], "+y": [0, -1, 0]}
+    shift = WIGGLE_AMP * sum((np.array(away[face]) for face in faces), np.zeros(3))
+    for i, insert in enumerate(ex.B.moves):
+        if insert["phase"] == "insert":
+            final = np.asarray(insert["pos"])
+            # Pass the neighbour top at clearance, then center above the studs.
+            approach = [_move("insert", final + shift + [0, 0, APPROACH_CLEAR],
+                              insert["yaw"], insert["grip"], APPROACH_DUR),
+                        _move("insert", final + [0, 0, 0.004],
+                              insert["yaw"], insert["grip"], APPROACH_DUR)]
+            if faces:
+                low = final + [0, 0, 0.004]
+                approach.insert(1, _move("insert", low + shift, insert["yaw"],
+                                         insert["grip"], APPROACH_DUR))
+                for move in approach:
+                    move["track_waypoint_xy"] = True
+            ex.B.moves[i:i] = approach
+            return
+
+
+def _track_guided_aim(ex, D):
+    """Use the moving brick reference for the GT integral on offset waypoints."""
+    original = ex.aim_brick
+
+    def aim(ee, body_q):
+        arm = ex.B
+        if not (arm.cur and arm.cur.get("track_waypoint_xy") and ex.aim == "gt"):
+            return original(ee, body_q)
+        previous = ex.i_xy.copy()
+        original(ee, body_q)
+        bid = ex.plan["sequence"][ex.b_step]["brick_id"]
+        error = arm.cmd[0][:2] - body_q[ex.body[bid], :2]
+        corrected = np.clip(previous + D.ALIGN_GAIN * ex.frame_dt * error, -0.004, 0.004)
+        arm.bias[:2] += corrected - ex.i_xy
+        ex.i_xy = corrected
+
+    ex.aim_brick = aim
+
+
 def install(example, D):
     """Wire the wriggle into queue_place for critical sockets. D = dual_arm_sim."""
     if os.environ.get("KEAN_WRIGGLE", "1") == "0":
         return
     P = D.P
     original = example.queue_place
+    if example.plan.get("structure_id") == "hollow_box":
+        _track_guided_aim(example, D)
 
     def queue_place(ex, step):
         original(step)
+        # A critical slot (clamped on two opposite faces) always wriggles, in
+        # any structure: _guided_insert only clears a single flush face, and for
+        # a two-face slot (hollow_box b_007) its shift cancels to zero, so the
+        # brick drops straight into a tight socket and jams.
         if needs_wriggle(ex, step, P):
             _splice(ex, step, P)
+        elif ex.plan.get("structure_id") == "hollow_box":
+            _guided_insert(ex, step, P)
 
     example.queue_place = MethodType(queue_place, example)

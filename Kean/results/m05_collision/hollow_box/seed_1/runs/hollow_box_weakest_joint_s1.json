@@ -3,10 +3,10 @@
  "seed": 1,
  "strategy": "weakest_joint",
  "stress": false,
- "placed": 3,
+ "placed": 5,
  "total": 12,
- "failure": "motion_plan_failed",
- "frames": 2692,
+ "failure": "gate_miss",
+ "frames": 4396,
  "braced_placements": 0,
  "events": [
   {
@@ -19,7 +19,7 @@
    },
    "start_frame": 556,
    "max_pen_mm": -0.343,
-   "peak_force_n": 1.56,
+   "peak_force_n": 1.55,
    "end_frame": 563,
    "step": 0,
    "braced": false,
@@ -36,8 +36,8 @@
     "B": "insert"
    },
    "start_frame": 1291,
-   "max_pen_mm": -0.71,
-   "peak_force_n": 1.91,
+   "max_pen_mm": -0.711,
+   "peak_force_n": 1.92,
    "end_frame": 1297,
    "step": 1,
    "braced": false,
@@ -54,16 +54,125 @@
     "B": "insert"
    },
    "start_frame": 2083,
-   "max_pen_mm": -0.74,
-   "peak_force_n": 1.88,
+   "max_pen_mm": -0.731,
+   "peak_force_n": 2.01,
    "end_frame": 2089,
    "step": 2,
    "braced": false,
    "duration_frames": 7,
    "contact_frames": 7,
    "fragments": 1
+  },
+  {
+   "class": "neighbour_rub",
+   "a": "plate#-1",
+   "b": "brick:b_003#31",
+   "phase": {
+    "A": "park",
+    "B": "insert"
+   },
+   "start_frame": 2873,
+   "max_pen_mm": -0.595,
+   "peak_force_n": 2.61,
+   "end_frame": 2876,
+   "step": 3,
+   "braced": false,
+   "duration_frames": 4,
+   "contact_frames": 4,
+   "fragments": 1
+  },
+  {
+   "class": "neighbour_rub",
+   "a": "brick:b_001#29",
+   "b": "brick:b_004#32",
+   "phase": {
+    "A": "park",
+    "B": "insert"
+   },
+   "start_frame": 3662,
+   "max_pen_mm": -0.206,
+   "peak_force_n": 0.37,
+   "end_frame": 3677,
+   "step": 4,
+   "braced": false,
+   "duration_frames": 16,
+   "contact_frames": 16,
+   "fragments": 1
+  },
+  {
+   "class": "neighbour_rub",
+   "a": "brick:b_000#28",
+   "b": "brick:b_004#32",
+   "phase": {
+    "A": "park",
+    "B": "insert"
+   },
+   "start_frame": 3662,
+   "max_pen_mm": -0.874,
+   "peak_force_n": 1.47,
+   "end_frame": 3677,
+   "step": 4,
+   "braced": false,
+   "duration_frames": 16,
+   "contact_frames": 16,
+   "fragments": 1
+  },
+  {
+   "class": "neighbour_rub",
+   "a": "brick:b_003#31",
+   "b": "brick:b_004#32",
+   "phase": {
+    "A": "park",
+    "B": "insert"
+   },
+   "start_frame": 3662,
+   "max_pen_mm": -0.749,
+   "peak_force_n": 1.47,
+   "end_frame": 3677,
+   "step": 4,
+   "braced": false,
+   "duration_frames": 16,
+   "contact_frames": 16,
+   "fragments": 1
+  },
+  {
+   "class": "neighbour_rub",
+   "a": "brick:b_004#32",
+   "b": "brick:b_005#33",
+   "phase": {
+    "A": "park",
+    "B": "insert"
+   },
+   "start_frame": 4307,
+   "max_pen_mm": -0.928,
+   "peak_force_n": 2.58,
+   "end_frame": 4341,
+   "step": 5,
+   "braced": false,
+   "duration_frames": 35,
+   "contact_frames": 35,
+   "fragments": 1
+  },
+  {
+   "class": "neighbour_rub",
+   "a": "brick:b_000#28",
+   "b": "brick:b_005#33",
+   "phase": {
+    "A": "park",
+    "B": "insert"
+   },
+   "start_frame": 4345,
+   "max_pen_mm": -0.664,
+   "peak_force_n": 2.35,
+   "end_frame": 4396,
+   "step": 5,
+   "braced": false,
+   "duration_frames": 52,
+   "contact_frames": 52,
+   "fragments": 1
   }
  ],
+ "contact_diagnostics": [],
  "grasp_offsets": [
   {
    "step": 0,
@@ -96,6 +205,22 @@
     0.0,
     0.0
    ]
+  },
+  {
+   "step": 4,
+   "offset_m": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "step": 5,
+   "offset_m": [
+    0.0,
+    0.0,
+    0.0
+   ]
   }
  ],
  "brace_search": [],
@@ -103,273 +228,21 @@
   10.48,
   12.25,
   13.18,
-  8.77
+  13.18,
+  13.28,
+  10.7
  ],
- "min_clearance_m": 0.018513145960503026,
+ "min_clearance_m": 0.0177614373481651,
  "motion": "coordinated",
  "motion_report": {
   "strict": true,
   "workarounds": [],
-  "failures": [
-   {
-    "arm": "B",
-    "phase": "pre-insert",
-    "error": "boxed goal [0.02, 0.0006, 0.0412]: path clearance 0.74 mm at carried brick / b_001 (sample 37/39); boxed goal [0.02, 0.0006, 0.0412]: path clearance 0.75 mm at carried brick / b_001 (sample 37/39); boxed goal [0.02, 0.0006, 0.0412]: path clearance 0.75 mm at carried brick / b_001 (sample 37/39); full-sphere-filter goal [0.02, 0.0006, 0.0412]: path clearance 0.75 mm at carried brick / b_001 (sample 37/39); full-sphere-filter goal [0.02, 0.0006, 0.0412]: path clearance 0.75 mm at carried brick / b_001 (sample 37/39); full-sphere-filter goal [0.02, 0.0006, 0.0412]: path clearance 0.75 mm at carried brick / b_001 (sample 37/39)",
-    "step": 3,
-    "request": {
-     "arm": "B",
-     "q": [
-      2.2516427040100098,
-      -0.1440272033214569,
-      -2.299147844314575,
-      -2.62689471244812,
-      -0.2574857175350189,
-      2.7095420360565186,
-      -0.5990284085273743
-     ],
-     "ee": [
-      0.020168917253613472,
-      0.0009062252938747406,
-      0.11185473203659058
-     ],
-     "goal": [
-      0.01997887015342712,
-      0.0005500316619873047,
-      0.041155285608768466
-     ],
-     "quat": [
-      0.0,
-      0.0,
-      0.0,
-      1.0
-     ],
-     "zone_clear": true,
-     "dt": 0.02,
-     "yaw": 4.71238898038469,
-     "boxes": [
-      {
-       "name": "table",
-       "dims": [
-        2.0,
-        2.0,
-        0.1
-       ],
-       "c": [
-        0.0,
-        0.0,
-        -0.05
-       ],
-       "yaw": 0.0
-      },
-      {
-       "name": "plate",
-       "dims": [
-        0.08,
-        0.08,
-        0.0032
-       ],
-       "c": [
-        0.0,
-        0.0,
-        0.0016
-       ],
-       "yaw": 0.0
-      },
-      {
-       "name": "b_000",
-       "dims": [
-        0.048,
-        0.008,
-        0.0113
-       ],
-       "c": [
-        -0.019999997690320015,
-        3.168539192189496e-30,
-        0.008849995961040257
-       ],
-       "yaw": 1.570796123978981
-      },
-      {
-       "name": "b_001",
-       "dims": [
-        0.032,
-        0.008,
-        0.0113
-       ],
-       "c": [
-        -8.710098671344418e-30,
-        -0.020000001415610313,
-        0.008849995262548326
-       ],
-       "yaw": -2.2587294556624396e-35
-      },
-      {
-       "name": "b_002",
-       "dims": [
-        0.032,
-        0.008,
-        0.0113
-       ],
-       "c": [
-        2.071062969430154e-28,
-        0.019999997690320015,
-        0.008849995262548326
-       ],
-       "yaw": -9.432466973079144e-34
-      },
-      {
-       "name": "b_004",
-       "dims": [
-        0.048,
-        0.008,
-        0.0113
-       ],
-       "c": [
-        0.10000000149011612,
-        -0.28999999165534973,
-        0.005598183802189305
-       ],
-       "yaw": -1.8709229623621058e-06
-      },
-      {
-       "name": "b_005",
-       "dims": [
-        0.032,
-        0.008,
-        0.0113
-       ],
-       "c": [
-        0.17000000178813934,
-        -0.36000001430511475,
-        0.005598182346997782
-       ],
-       "yaw": 1.5707986296923908
-      },
-      {
-       "name": "b_006",
-       "dims": [
-        0.048,
-        0.008,
-        0.0113
-       ],
-       "c": [
-        0.23999999463558197,
-        -0.4300000071525574,
-        0.005598183733067708
-       ],
-       "yaw": 9.156661622537813e-07
-      },
-      {
-       "name": "b_007",
-       "dims": [
-        0.032,
-        0.008,
-        0.0113
-       ],
-       "c": [
-        0.10000012814998627,
-        -0.36000001430511475,
-        0.00559818198683788
-       ],
-       "yaw": 1.5707964382105977
-      },
-      {
-       "name": "b_008",
-       "dims": [
-        0.048,
-        0.008,
-        0.0113
-       ],
-       "c": [
-        0.17000000178813934,
-        -0.4300000071525574,
-        0.0055981833801837634
-       ],
-       "yaw": 1.5707964389811755
-      },
-      {
-       "name": "b_009",
-       "dims": [
-        0.032,
-        0.008,
-        0.0113
-       ],
-       "c": [
-        0.3100000023841858,
-        -0.5,
-        0.005598182157822884
-       ],
-       "yaw": -2.751701073648795e-06
-      },
-      {
-       "name": "b_010",
-       "dims": [
-        0.032,
-        0.008,
-        0.0113
-       ],
-       "c": [
-        0.23999999463558197,
-        -0.5,
-        0.005598182226944482
-       ],
-       "yaw": -1.3433934591352822e-06
-      },
-      {
-       "name": "b_011",
-       "dims": [
-        0.048,
-        0.008,
-        0.0113
-       ],
-       "c": [
-        0.10000006854534149,
-        -0.4300000071525574,
-        0.005598183653032174
-       ],
-       "yaw": 1.570795427419422
-      }
-     ],
-     "other_q": [
-      -2.3032294848235324e-05,
-      -0.8318219780921936,
-      1.990230884985067e-05,
-      -2.7327022552490234,
-      1.5645631719962694e-05,
-      1.900879979133606,
-      0.7853835821151733,
-      -4.3539814888542106e-16,
-      5.826514651035718e-16
-     ],
-     "full_path": true,
-     "grip": 0.0025,
-     "carried": {
-      "dims": [
-       0.048,
-       0.008,
-       0.0113
-      ],
-      "center": [
-       0.0005706387884117336,
-       -3.082946068871377e-06,
-       0.007205801050187153
-      ],
-      "quat_wxyz": [
-       -0.0005657299659613357,
-       4.877130551460375e-05,
-       0.9999998199936228,
-       0.00019386512678020934
-      ]
-     },
-     "alternate_goals": []
-    }
-   }
-  ],
-  "plans": 14,
-  "plan_failures": 1,
+  "failures": [],
+  "plans": 20,
+  "plan_failures": 0,
   "captures": 0,
-  "segments": 14,
-  "min_clearance_m": 0.018513145960503026,
+  "segments": 20,
+  "min_clearance_m": 0.0177614373481651,
   "clearance_scope": "executed joints during planned playback; full spheres, measured fingers"
  },
  "done": false,

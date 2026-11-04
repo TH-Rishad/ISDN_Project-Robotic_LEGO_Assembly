@@ -117,6 +117,23 @@ class MotionTest(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'closed'):
             planner.submit(request)
 
+    def test_contact_approach_is_planned_to_the_goal(self):
+        seen = []
+
+        class TailBackend(Backend):
+            def plan(self, request, handoff):
+                seen.append(np.asarray(handoff, float).copy())
+                return super().plan(request, handoff)
+
+        planner = Planner(TailBackend())
+        planner.warmup()
+        goal = np.array([0.02, 0.0, 0.04])
+        request = Request("B", np.zeros(7), np.array([0.02, 0.0, 0.12]), goal,
+                          [0, 0, 0, 1], full_path=True, contact_tail=True)
+        planner.plan(request)
+        np.testing.assert_allclose(seen[0], goal)
+        planner.close()
+
     def test_zone_and_thread(self):
         planner = Planner(Backend())
         planner.warmup()

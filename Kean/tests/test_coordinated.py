@@ -32,6 +32,14 @@ class CoordinationTest(unittest.TestCase):
         ex.B.update(.02, ex.B.ee)
         self.assertEqual(ex.B.t, 0.)
 
+    def test_pre_insert_marks_the_slot_approach(self):
+        ex, planner = Ex(), Later()
+        Tick(planner, strict=True, wrap_angle=wrap, resample_trajectory=resample_trajectory).attach(ex)
+        ex.B.push('pre-insert', [0.02, 0.0, 0.04], 0., .01, 1.)
+        ex.B.update(.02, ex.B.ee)
+        self.assertTrue(planner.request.contact_tail)
+        self.assertTrue(planner.request.full_path)
+
     def test_endpoint_does_not_execute_cartesian_tail(self):
         ex, planner, tick = self.setup_tick()
         done = Mock()
@@ -147,6 +155,26 @@ class CoordinationTest(unittest.TestCase):
                     carried=dict(center=[0, 0, 0], dims=[.048, .016, .012]))
         with self.assertRaisesRegex(ValueError, 'carried brick'):
             validate(probe, r, [np.zeros(7)])
+
+    def test_slot_approach_allows_a_close_gap_but_not_overlap(self):
+        from Kean.tests.test_clearance import Probe
+        probe = Probe()
+        goal = np.array([0.02, 0.0, 0.04])
+        probe.tcp_poses = lambda name, q: (goal[None], np.eye(3)[None])
+        probe.clearance_spheres = lambda own, other: .02
+        probe.clearance_boxes = lambda own, boxes: ((.00075, 'b_001') if len(own) == 1 else (.02, 'build'))
+        carried = dict(center=[0, 0, 0], dims=[.032, .016, .011])
+        near = Request('B', np.zeros(7), goal + [0, 0, .05], goal, [0, 0, 0, 1],
+                       boxes=[], other_q=np.zeros(9), grip=.01, full_path=True,
+                       contact_tail=True, carried=carried)
+        validate(probe, near, [np.zeros(7)])
+        probe.clearance_boxes = lambda own, boxes: ((-.0002, 'b_001') if len(own) == 1 else (.02, 'build'))
+        with self.assertRaisesRegex(ValueError, 'carried brick'):
+            validate(probe, near, [np.zeros(7)])
+        probe.tcp_poses = lambda name, q: (np.zeros((1, 3)), np.eye(3)[None])
+        probe.clearance_boxes = lambda own, boxes: ((.00075, 'b_001') if len(own) == 1 else (.02, 'build'))
+        with self.assertRaisesRegex(ValueError, 'carried brick'):
+            validate(probe, near, [np.zeros(7)])
 
     def test_command_guard_stops_before_issuing_arm_collision(self):
         ex, planner, tick = self.setup_tick()

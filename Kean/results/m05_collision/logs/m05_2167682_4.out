@@ -1,0 +1,176 @@
+m05: S3 seed 4 on 0
+m05: 5 jobs, 80 placements, 0 stress
+m05: S3 weakest_joint seed 4
+Warp 1.13.0 initialized:
+   CUDA Toolkit 12.9, Driver 12.8
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA A30" (24 GiB, sm_80, mempool enabled)
+   Kernel cache:
+     /home/mlieq/.cache/warp/1.13.0
+motion: serialized planning; full paths, carried-brick checks, full-sphere fallback, stop on failure
+preflight: S3  2 x 10 studs x 9 layers, 16 bricks {'2x2': 11, '2x4': 4, '2x6': 1}, feeder slots 16 of 24
+k=8  ......PPPP  ......PPPP
+k=7  ......OOOO  ......OOOO
+k=6  ...MMMM.NN  ...MMMM.NN
+k=5  KKKKKK..LL  KKKKKK..LL
+k=4  IIII....JJ  IIII....JJ
+k=3  GG......HH  GG......HH
+k=2  EE......FF  EE......FF
+k=1  CC......DD  CC......DD
+k=0  AA......BB  AA......BB
+Module newton._src.geometry.inertia a7ff42e load on device 'cuda:0' took 1.53 ms  (cached)
+Module newton._src.utils.mesh 1476c2a load on device 'cpu' took 2.50 ms  (cached)
+brace grip: 14.3 N per finger, finger material mu 1.000
+plan -> /home/mlieq/ISDN_Project-Robotic_LEGO_Assembly/Kean/results/m05_collision/S3/seed_4/plans/S3_weakest_joint.json
+Module validate_and_correct_inertia_kernel_524fb5ef 524fb5e load on device 'cuda:0' took 1.22 ms  (cached)
+Module newton._src.sim.ik.ik_solver d9f8ff8 load on device 'cuda:0' took 1.20 ms  (cached)
+Module IKOptimizerLM___build_specialized__locals___fk_local_a9d6f4f5 a9d6f4f load on device 'cuda:0' took 1.11 ms  (cached)
+Module newton._src.sim.ik.ik_common ec7ac17 load on device 'cuda:0' took 1.22 ms  (cached)
+Module newton._src.sim.ik.ik_objectives 2ab3ea8 load on device 'cuda:0' took 1.34 ms  (cached)
+Module IKOptimizerLM___build_specialized__locals___compute_motion_subspace_2d_28061874 2806187 load on device 'cuda:0' took 3.47 ms  (cached)
+Module _lm_solve_tiled_9_15_71b73c32 641c3f9 load on device 'cuda:0' took 159.38 ms  (cached)
+Module newton._src.sim.ik.ik_lm_optimizer d941fd7 load on device 'cuda:0' took 1.47 ms  (cached)
+Module newton._src.geometry.sdf_utils 30505d5 load on device 'cuda:0' took 1.81 ms  (cached)
+Module newton._src.geometry.sdf_texture ba97079 load on device 'cuda:0' took 2.77 ms  (cached)
+Module newton._src.sim.graph_coloring 95273ab load on device 'cpu' took 1.12 ms  (cached)
+Module newton._src.solvers.mujoco.kernels f5ae6c7 load on device 'cuda:0' took 2.09 ms  (cached)
+Module mujoco_warp._src.io 00dd7e1 load on device 'cuda:0' took 1.44 ms  (cached)
+Module mujoco_warp._src.smooth 976a5d7 load on device 'cuda:0' took 1.44 ms  (cached)
+Module _solve_LD_sparse_fused__locals__kernel_7e49368b 290ea73 load on device 'cuda:0' took 1.33 ms  (cached)
+Module newton._src.sim.articulation 9875313 load on device 'cuda:0' took 1.46 ms  (cached)
+Module newton._src.viewer.kernels 6eaf52b load on device 'cuda:0' took 1.29 ms  (cached)
+Module newton._src.sim.collide 0e6be4c load on device 'cuda:0' took 1.19 ms  (cached)
+Module newton._src.geometry.broad_phase_sap 7baa1de load on device 'cuda:0' took 1.13 ms  (cached)
+Module narrow_phase_primitive_write_contact e070310 load on device 'cuda:0' took 1.35 ms  (cached)
+Module narrow_phase_gjk_mpr_True_write_contact_default_default 00fbe52 load on device 'cuda:0' took 1.36 ms  (cached)
+Module newton._src.geometry.narrow_phase f722f21 load on device 'cuda:0' took 1.25 ms  (cached)
+Module newton._src.geometry.contact_reduction_global 5c84d97 load on device 'cuda:0' took 1.28 ms  (cached)
+Module newton._src.geometry.narrow_phase e577950 load on device 'cuda:0' took 1.29 ms  (cached)
+Module newton._src.geometry.sdf_contact 1cfb221 load on device 'cuda:0' took 0.98 ms  (cached)
+Module narrow_phase_mesh_plane_write_contact_to_reducer_True 0316777 load on device 'cuda:0' took 1.06 ms  (cached)
+Module mesh_triangle_contacts_to_reducer_kernel_98f62989 13e0243 load on device 'cuda:0' took 1.42 ms  (cached)
+Module newton._src.geometry.contact_reduction_global 5db63a2 load on device 'cuda:0' took 1.21 ms  (cached)
+Module sdf_contact_write_contact_to_reducer_False_True e0d3f15 load on device 'cuda:0' took 1.20 ms  (cached)
+Module export_reduced_contacts_write_contact c5c25a3 load on device 'cuda:0' took 1.23 ms  (cached)
+Module mujoco_warp._src.constraint eb0e24d load on device 'cuda:0' took 1.33 ms  (cached)
+Module _efc_contact_init__locals__kernel_c7a6ce3a c7a6ce3 load on device 'cuda:0' took 1.16 ms  (cached)
+Module _efc_contact_jac_sparse__locals__kernel_7bafc28b 7bafc28 load on device 'cuda:0' took 1.12 ms  (cached)
+Module _efc_contact_update__locals__kernel_b43fbfe7 b43fbfe load on device 'cuda:0' took 1.19 ms  (cached)
+Module mujoco_warp._src.forward a76b6a3 load on device 'cuda:0' took 1.34 ms  (cached)
+Module mujoco_warp._src.passive 616927b load on device 'cuda:0' took 1.31 ms  (cached)
+Module mujoco_warp._src.forward 398750d load on device 'cuda:0' took 1.51 ms  (cached)
+Module mujoco_warp._src.support f32a4f8 load on device 'cuda:0' took 1.15 ms  (cached)
+Module mujoco_warp._src.solver 7df28c9 load on device 'cuda:0' took 1.33 ms  (cached)
+Module solve_init_jaref__locals__kernel_83b996d5 83b996d load on device 'cuda:0' took 1.36 ms  (cached)
+Module mul_m_sparse__locals___mul_m_sparse_32fa3590 32fa359 load on device 'cuda:0' took 1.12 ms  (cached)
+Module update_constraint_efc__locals__kernel_6bfb2757 6bfb275 load on device 'cuda:0' took 1.25 ms  (cached)
+Module update_constraint_gauss_cost__locals__kernel_73368172 7336817 load on device 'cuda:0' took 1.35 ms  (cached)
+Module update_gradient_cholesky_blocked__locals__kernel_8e3dff9e 48ead09 load on device 'cuda:0' took 189.44 ms  (cached)
+Module linesearch_jv_fused__locals__kernel_db87cbc7 db87cbc load on device 'cuda:0' took 1.39 ms  (cached)
+Module linesearch_iterative__locals__kernel_6131c716 3698647 load on device 'cuda:0' took 1.32 ms  (cached)
+Module mujoco_warp._src.sensor bee2d80 load on device 'cuda:0' took 1.82 ms  (cached)
+Module mujoco_warp._src.derivative f06cf21 load on device 'cuda:0' took 1.20 ms  (cached)
+S3: 16 bricks, 3 braced (weakest_joint), 17 clutch welds
+brick spheres: 8 inscribed (morphit skipped)
+brick spheres: 12 inscribed (morphit skipped)
+  step 0 b_000 SNAP  {'brick': 'b_000', 'lateral_mm': 0.3, 'dz_mm': 0.25, 'yaw_deg': 0.03, 'tilt_deg': 0.06}
+  step 1 b_001 SNAP  {'brick': 'b_001', 'lateral_mm': 0.28, 'dz_mm': 0.29, 'yaw_deg': 0.04, 'tilt_deg': 0.64}
+  step 2 b_002 SNAP  {'brick': 'b_002', 'lateral_mm': 0.96, 'dz_mm': 0.85, 'yaw_deg': 0.02, 'tilt_deg': 0.96}
+  step 3 b_003 SNAP  {'brick': 'b_003', 'lateral_mm': 0.88, 'dz_mm': 0.8, 'yaw_deg': 0.01, 'tilt_deg': 1.17}
+  step 4 b_004 SNAP  {'brick': 'b_004', 'lateral_mm': 0.37, 'dz_mm': 0.74, 'yaw_deg': 0.08, 'tilt_deg': 0.35}
+  step 5 b_005 SNAP  {'brick': 'b_005', 'lateral_mm': 0.55, 'dz_mm': 0.86, 'yaw_deg': 0.02, 'tilt_deg': 0.52}
+  step 6 b_006 SNAP  {'brick': 'b_006', 'lateral_mm': 0.15, 'dz_mm': 0.31, 'yaw_deg': 0.0, 'tilt_deg': 0.52}
+  step 7 b_007 SNAP  {'brick': 'b_007', 'lateral_mm': 0.58, 'dz_mm': 0.8, 'yaw_deg': 0.02, 'tilt_deg': 1.2}
+  step 8 b_009 SNAP  {'brick': 'b_009', 'lateral_mm': 0.38, 'dz_mm': 0.42, 'yaw_deg': 0.02, 'tilt_deg': 0.28}
+brick spheres: 8 inscribed (morphit skipped)
+  step 9 b_008 SNAP  {'brick': 'b_008', 'lateral_mm': 0.56, 'dz_mm': 0.67, 'yaw_deg': 0.01, 'tilt_deg': 2.42}
+  step 10 b_011 SNAP  {'brick': 'b_011', 'lateral_mm': 0.23, 'dz_mm': 0.59, 'yaw_deg': 0.04, 'tilt_deg': 0.52}
+brace transport: hover 160 mm toward B, clear of A
+brace search step 11: pose [0.0, 0.028, 0.0152] tilt [-0.7854, 0.0, 0.0]
+brick spheres: 12 inscribed (morphit skipped)
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search accepted step 11 before closing
+  GUARD STOP step 11: A stops at frame 8656
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+  step 11 b_010 SNAP  {'brick': 'b_010', 'lateral_mm': 1.36, 'dz_mm': 0.99, 'yaw_deg': 0.0, 'tilt_deg': 1.34}
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+  step 12 b_013 SNAP  {'brick': 'b_013', 'lateral_mm': 0.64, 'dz_mm': 0.84, 'yaw_deg': 0.02, 'tilt_deg': 0.96}
+brace transport: hover 160 mm toward B, clear of A
+brace search step 13: pose [0.0, -0.036, 0.0536] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 29.8 mm
+planner recovery: avoid other-arm sphere 2, radius 24.2 mm
+planner recovery: avoid other-arm sphere 3, radius 46.5 mm
+planner recovery: avoid other-arm sphere 4, radius 20.6 mm
+planner recovery: avoid other-arm sphere 5, radius 50.1 mm
+planner recovery: avoid other-arm sphere 6, radius 19.9 mm
+planner recovery: avoid other-arm sphere 7, radius 53.2 mm
+planner recovery: avoid other-arm sphere 8, radius 42.9 mm
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+planner recovery: avoid other-arm sphere 2, radius 19.9 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 24.2 mm
+planner recovery: avoid other-arm sphere 2, radius 41.1 mm
+planner recovery: avoid other-arm sphere 3, radius 10.6 mm
+planner recovery: avoid other-arm sphere 4, radius 50.1 mm
+planner recovery: avoid other-arm sphere 5, radius 50.1 mm
+planner recovery: avoid other-arm sphere 6, radius 53.2 mm
+planner recovery: avoid other-arm sphere 7, radius 42.9 mm
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 53.2 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 53.2 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 24.2 mm
+planner recovery: avoid other-arm sphere 2, radius 19.9 mm
+planner recovery: avoid other-arm sphere 3, radius 46.5 mm
+planner recovery: avoid other-arm sphere 4, radius 46.5 mm
+planner recovery: avoid other-arm sphere 5, radius 20.6 mm
+planner recovery: avoid other-arm sphere 6, radius 29.8 mm
+planner recovery: avoid other-arm sphere 7, radius 37.1 mm
+planner recovery: avoid other-arm sphere 8, radius 37.1 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 19.9 mm
+planner recovery: avoid other-arm sphere 2, radius 46.5 mm
+planner recovery: avoid other-arm sphere 3, radius 29.8 mm
+planner recovery: avoid other-arm sphere 4, radius 37.1 mm
+planner recovery: avoid other-arm sphere 5, radius 53.2 mm
+planner recovery: avoid other-arm sphere 6, radius 46.5 mm
+brace search rejected step 13: hover [0.16, 0.0, 0.1696]: boxed goal [0.0, 0.0016, 0.0981]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.0016, 0.0981]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.0016, 0.0981]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0016, 0.0981]: path clearance -2.19 mm at other arm (sample 23/65); full-sphere-filter goal [0.0, 0.0016, 0.0981]: path clearance 0.66 mm at other arm (sample 103/174); full-sphere-filter goal [0.0, 0.0016, 0.0981]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0016, 0.0981]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0016, 0.0981]: cuRobo plan failed: no result (IK/start feasibility); hover [0.16, 0.0, 0.2496]: boxed goal [0.0, 0.0016, 0.0981]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.0016, 0.0981]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.0016, 0.0981]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0016, 0.0981]: path clearance 0.02 mm at other arm (sample 19/88); full-sphere-filter goal [0.0, 0.0016, 0.0981]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0016, 0.0981]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0016, 0.0981]: cuRobo plan failed: no result (IK/start feasibility); hover [0.16, 0.0, 0.3296]: boxed goal [0.0, 0.0016, 0.0981]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.0016, 0.0981]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.0016, 0.0981]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0016, 0.0981]: path clearance -0.94 mm at other arm (sample 17/88); full-sphere-filter goal [0.0, 0.0016, 0.0981]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0016, 0.0981]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0016, 0.0981]: cuRobo plan failed: no result (IK/start feasibility); hover [0.08, 0.0, 0.2496]: boxed goal [0.08, 0.0016, 0.2489]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.08, 0.0016, 0.2489]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.08, 0.0016, 0.2489]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.08, 0.0016, 0.2489]: path clearance -6.64 mm at carried brick / other arm (sample 29/63); full-sphere-filter goal [0.08, 0.0016, 0.2489]: path clearance 0.95 mm at carried brick / other arm (sample 42/84); full-sphere-filter goal [0.08, 0.0016, 0.2489]: path clearance -4.49 mm at carried brick / other arm (sample 46/85); full-sphere-filter goal [0.08, 0.0016, 0.2489]: path clearance -0.38 mm at carried brick / other arm (sample 53/87); full-sphere-filter goal [0.08, 0.0016, 0.2489]: path clearance -0.02 mm at carried brick / other arm (sample 54/89); full-sphere-filter goal [0.08, 0.0016, 0.2489]: path clearance -2.99 mm at carried brick / other arm (sample 55/89); full-sphere-filter goal [0.08, 0.0016, 0.2489]: path clearance -5.02 mm at carried brick / other arm (sample 55/94); full-sphere-filter goal [0.08, 0.0016, 0.2489]: path clearance -3.84 mm at other arm (sample 62/92); full-sphere-filter goal [0.08, 0.0016, 0.2489]: path clearance 0.60 mm at other arm (sample 70/127); full-sphere-filter goal [0.08, 0.0016, 0.2489]: path clearance 0.71 mm at other arm (sample 54/94); full-sphere-filter goal [0.08, 0.0016, 0.2489]: path clearance 0.09 mm at other arm (sample 55/98); hover [0.0, 0.0, 0.3296]: boxed goal [0.0, 0.0016, 0.3289]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.0016, 0.3289]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.0016, 0.3289]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0016, 0.3289]: path clearance -2.64 mm at carried brick / other arm (sample 32/61); full-sphere-filter goal [0.0, 0.0016, 0.3289]: path clearance -1.74 mm at carried brick / other arm (sample 34/61); full-sphere-filter goal [0.0, 0.0016, 0.3289]: path clearance -3.54 mm at carried brick / other arm (sample 42/61); full-sphere-filter goal [0.0, 0.0016, 0.3289]: path clearance -2.67 mm at carried brick / other arm (sample 43/62); full-sphere-filter goal [0.0, 0.0016, 0.3289]: path clearance -3.15 mm at other arm (sample 51/99); full-sphere-filter goal [0.0, 0.0016, 0.3289]: path clearance -1.20 mm at carried brick / other arm (sample 58/87); full-sphere-filter goal [0.0, 0.0016, 0.3289]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0016, 0.3289]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0016, 0.3289]: cuRobo plan failed: no result (IK/start feasibility)
+brace search step 13: pose [0.0, -0.036, 0.0536] tilt [1.0472, 0.0, 0.0]
+brace search accepted step 13 before closing
+  step 13 b_012 SNAP  {'brick': 'b_012', 'lateral_mm': 1.35, 'dz_mm': 1.13, 'yaw_deg': 0.03, 'tilt_deg': 0.69}
+brace transport: hover 160 mm toward B, clear of A
+brace search step 14: pose [0.0, -0.036, 0.0536] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search accepted step 14 before closing
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+  step 14 b_014 SNAP  {'brick': 'b_014', 'lateral_mm': 1.42, 'dz_mm': 1.2, 'yaw_deg': 0.08, 'tilt_deg': 0.19}
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 55.0 mm
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+  step 15 b_015 SNAP  {'brick': 'b_015', 'lateral_mm': 0.99, 'dz_mm': 1.26, 'yaw_deg': 0.07, 'tilt_deg': 0.34}
+done: 16 / 16 placed -> /home/mlieq/ISDN_Project-Robotic_LEGO_Assembly/Kean/results/m05_collision/S3/seed_4/episodes.jsonl
+m05: placed 16/16 events {'neighbour_rub': 17, 'unintended': 12, 'penetration': 4}
+m05: unintended B_finger#26 brick:b_000#28 phase {'A': 'park', 'B': 'retract'}
+m05: unintended B_finger#26 brick:b_001#29 phase {'A': 'park', 'B': 'retract'}
+m05: unintended B_finger#26 brick:b_002#30 phase {'A': 'park', 'B': 'retract'}
+m05: unintended B_finger#26 brick:b_004#32 phase {'A': 'park', 'B': 'retract'}
+m05: unintended B_finger#26 brick:b_005#33 phase {'A': 'park', 'B': 'retract'}
+m05: unintended B_finger#26 brick:b_011#38 phase {'A': 'park', 'B': 'retract'}
+m05: unintended A_finger#12 brick:b_005#33 phase {'A': 'close', 'B': 'stage'}
+m05: unintended A_finger#13 brick:b_005#33 phase {'A': 'close', 'B': 'stage'}
+m05: unintended A_finger#12 brick:b_006#34 phase {'A': 'close', 'B': 'stage'}
+m05: unintended A_finger#13 brick:b_006#34 phase {'A': 'close', 'B': 'stage'}
+m05: unintended A_finger#13 brick:b_006#34 phase {'A': 'close', 'B': 'stage'}
+m05: unintended A_finger#12 brick:b_006#34 phase {'A': 'close', 'B': 'stage'}
+m05: ok=False unintended, penetration

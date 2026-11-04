@@ -43,4 +43,11 @@ replace=""
 if [ "${REPLACE:-0}" = 1 ]; then
     replace="--replace"
 fi
-bash Kean/scripts/m05.sh --record --experimental-grasp-offset --shape "${shape}" --job "${id}" --out "${out}" ${replace}
+# hollow_box has no braced steps, and the strict full-path cuRobo planner tilts
+# its 1-wide walls (b_005) that the Cartesian tail seats cleanly. Other shapes
+# need the strict collision-checked paths (arm A holds the brace).
+strict=""
+if [ "${shape}" = "hollow_box" ]; then
+    strict="--no-strict"
+fi
+bash Kean/scripts/m05.sh --record --experimental-grasp-offset ${strict} --shape "${shape}" --job "${id}" --out "${out}" ${replace}

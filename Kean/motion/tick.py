@@ -139,6 +139,7 @@ class Tick:
         request = Request(
             slot.name, self.q_of(self.example, arm), ee, goal, np.array([0.0, 0.0, 0.0, 1.0]),
             zone_clear=True, yaw=planner_yaw(self.example, arm, move["yaw"], self.wrap_angle), boxes=boxes, other_q=other_q, full_path=self.strict,
+            contact_tail=self.strict and move.get("phase") == "pre-insert",
             alternate_goals=[np.asarray(p, float) + arm.bias for p in move.get("alternate_goals", [])],
             grip=float(move["grip"]), carried=None if self.carried is None else self.carried(self.example, slot.name))
         slot.other_q = None if other_q is None else np.asarray(other_q[:7], float).copy()

@@ -42,10 +42,13 @@ def validate(probe, request, path):
                 distances = np.linalg.norm(own[:, None, :3] - other[None, :, :3], axis=-1)
                 distances -= own[:, None, 3] + other[None, :, 3]
                 avoid = other[np.unravel_index(np.argmin(distances), distances.shape)[1]].copy()
+        near_slot = False
         if request.carried is not None:
             p, R = probe.tcp_poses(request.arm, q[None])
             brick = request.carried
             center = p[0] + R[0] @ np.asarray(brick['center'])
+            near_slot = bool(getattr(request, "contact_tail", False)) and float(
+                np.linalg.norm(p[0] - np.asarray(request.goal, float)[:3])) <= 0.030
             # A circumsphere encloses all corners regardless of brick rotation.
             sphere = np.r_[center, np.linalg.norm(brick['dims']) / 2][None]
             bgap, who = probe.clearance_boxes(sphere, request.boxes)
@@ -54,6 +57,7 @@ def validate(probe, request, path):
                 gap, obstacle = min(bgap, agap), 'carried brick / ' + (who if bgap <= agap else 'other arm')
                 avoid = (other[np.argmin(np.linalg.norm(other[:, :3] - center, axis=1)
                                          - other[:, 3])].copy() if agap < bgap else None)
-        if not np.isfinite(gap) or gap < 0.001:
+        floor = 0.0 if near_slot and obstacle.startswith("carried brick /") and not obstacle.endswith("other arm") else 0.001
+        if not np.isfinite(gap) or gap < floor:
             raise PathCollision('path clearance %.2f mm at %s (sample %d/%d)' %
                                 (gap * 1000, obstacle, index, len(samples) - 1), avoid)
