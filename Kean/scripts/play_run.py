@@ -37,6 +37,11 @@ def make_viewer(port):
     return viewer
 
 
+def make_gl_viewer():
+    import newton
+    return newton.viewer.ViewerGL(width=1280, height=720, headless=True)
+
+
 def load_record(path):
     with np.load(path, allow_pickle=True) as z:
         record = {key: z[key] for key in z.files}
@@ -118,6 +123,34 @@ def play(example, record, speed, loop, port=8080):
             print("playback: looping", flush=True)
 
 
+def write_mp4(example, record, speed, path, fps=30):
+    """Render the saved recording offscreen at `speed`x into an MP4 file."""
+    import cv2
+    import warp as wp
+    viewer = example.viewer
+    # ponytail: fixed overview of both pads/feeders; add --camera if other views are needed.
+    viewer.set_camera(pos=wp.vec3(*CAMERA[0]), pitch=CAMERA[1], yaw=CAMERA[2])
+    stride = max(1, round(60.0 * speed / fps))
+    writer = None
+    frames = range(0, len(record["frame"]), stride)
+    for k, index in enumerate(frames):
+        show_frame(example, record, index)
+        example.render()
+        image = viewer.get_frame().numpy()[..., ::-1]
+        if writer is None:
+            writer = cv2.VideoWriter(str(path), cv2.VideoWriter_fourcc(*"mp4v"), fps, image.shape[1::-1])
+            if not writer.isOpened():
+                raise SystemExit("OpenCV could not open an MP4 writer for %s" % path)
+        writer.write(np.ascontiguousarray(image))
+        if k % 200 == 0:
+            print("mp4: %d/%d frames" % (k, len(frames)), flush=True)
+    writer.release()
+    print("mp4: wrote %s (%d frames, %.0f s at %gx)" % (path, len(frames), len(frames) / fps, speed), flush=True)
+
+
+CAMERA = ((0.0, -0.8, 1.55), -62.0, 90.0)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run", type=Path, default=KEAN / "results" / "instructor_run_001")
@@ -125,19 +158,25 @@ def main():
     parser.add_argument("--port", type=int, default=8080)
     parser.add_argument("--speed", type=float, default=1.0)
     parser.add_argument("--loop", action="store_true")
+    parser.add_argument("--mp4", type=Path, help="render offscreen to this MP4 file instead of serving Viser")
     args = parser.parse_args()
     if args.speed <= 0:
         parser.error("--speed must be positive")
     run = args.run if args.run.is_absolute() else ROOT / args.run
+    if args.mp4 is not None and not args.mp4.is_absolute():
+        args.mp4 = ROOT / args.mp4
     manifest_file = run / 'manifest.json'
     if manifest_file.is_file() and json.loads(manifest_file.read_text()).get('mode') == 'dual_builder':
         from Kean.dual_build import load_example
         manifest = json.loads(manifest_file.read_text())
         record = load_record(run / manifest['recording'])
-        example = load_example(run, make_viewer(args.port))
+        viewer = make_viewer(args.port) if args.mp4 is None else make_gl_viewer()
+        example = load_example(run, viewer)
         if list(example.body) != record['brick_ids']:
             raise SystemExit('recording brick order does not match the dual-build manifest')
         print('Dual playback:', manifest['names'], flush=True)
+        if args.mp4 is not None:
+            return write_mp4(example, record, args.speed, args.mp4)
         play(example, record, args.speed, args.loop, args.port)
         return
     record_path = recording_file(run, args.shape)
@@ -147,11 +186,13 @@ def main():
     add_cell_path()
     import dual_arm_sim as D
     from Kean.scripts.m05 import _args
-    viewer = make_viewer(args.port)
+    viewer = make_viewer(args.port) if args.mp4 is None else make_gl_viewer()
     example = D.Example(viewer, _args(JOBS[args.shape], plan))
     ids = list(example.body)
     if ids != record["brick_ids"]:
         raise SystemExit("recording brick order does not match the saved plan")
+    if args.mp4 is not None:
+        return write_mp4(example, record, args.speed, args.mp4)
     play(example, record, args.speed, args.loop, args.port)
 
 

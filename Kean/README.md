@@ -23,8 +23,11 @@ Choose a fresh output directory each time. The existing `Sakib/.venv` supplies
 the interpreter and GPU dependencies.
 
 Swept full-arm/finger and carried-brick reservations admit compatible
-free-space motions together. Contact phases reserve exclusive motion while
-the helper's measured joints hold its brace. Both structures, both pads and
+motions together. Free-space segments reserve their planned sweep; Cartesian
+contact/escape moves reserve the measured arm volume padded by the move's
+reach and stop if they leave it. During a supported insertion the helper's
+measured joints hold its brace. The validated full build is
+`results/dual_arch_s3_012`. Both structures, both pads and
 all feeder bricks remain in the clearance world. Support acknowledgment
 requires measured contact force on both fingers; failed clearance or lost
 support stops execution. These are sampled simulation checks.
@@ -53,7 +56,20 @@ contact results, motion failures and a complete recording. Verify or replay:
 ```bash
 Sakib/.venv/bin/python -m Kean.verify_dual --run Kean/results/dual_arch_s3_live_001
 bash Kean/scripts/play_run.sh --run Kean/results/dual_arch_s3_live_001 --port 8081 --loop
+# Offscreen MP4 (OpenCV mp4v, 30 fps, fixed overview camera) at 8x:
+bash Kean/scripts/play_run.sh --run Kean/results/dual_arch_s3_live_001 --speed 8 \
+  --mp4 Kean/results/dual_arch_s3_live_001/replay_8x.mp4
 ```
+
+`results/dual_arch_s3_012/dual_arch_s3_012_8x.mp4` is the 8x video of the
+validated build, transcoded to H.264 for browser playback.
+
+`--build-a pyramid` (or `--build-b`) builds the user's drawing
+`Sakib/brickassembly/blueprints/user/pyramid_*.png`. When no side grip clears
+flush neighbours at the seat, the builder tries the other axis and edge grips,
+then drop-and-press (release above the neighbours' studs, press with closed
+fingertips). It seats the pyramid's multi-stud tight bricks; a dropped 1x1
+still tips on its single stud (`results/dual_pyramid_s3_004`). See the plan.
 
 `--step-limit N` executes a short diagnostic. `--start-step-a N` and
 `--start-step-b N` pre-place earlier bricks for support diagnostics. Such runs

@@ -12,6 +12,12 @@ import numpy as np
 from Kean.dual_build import D, DualExample, make_args, plans_for, feeders_for, pad_for
 from Kean.verify_acceptance import capture_provenance, sha256_file
 
+# The user's drawings, carved and tiled exactly as dual_arm_sim --front/--side --width does.
+DRAWINGS = {'pyramid': ('pyramid_front.png', 'pyramid_side.png', 5)}
+for _name, (_front, _side, _width) in DRAWINGS.items():
+    _dir = D.B.SAMPLE_DIR / 'user'
+    D.P.STRUCTURES.setdefault(_name, D.B.tile(D.B.carve(_dir / _front, _dir / _side, None, _width)))
+
 
 def write(path, value):
     path.write_text(json.dumps(value, indent=2, default=D.jsonable) + '\n')

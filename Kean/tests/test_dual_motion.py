@@ -64,14 +64,40 @@ class ReservationsTest(unittest.TestCase):
         self.assertTrue(self.r.allows_other('A', 'B', np.zeros(9)))
         self.assertFalse(self.r.allows_other('A', 'B', np.ones(9)))
 
-    def test_contact_reservation_excludes_other_arm(self):
-        a, b = object(), object()
+    def cartesian_tick(self, a_x, b_x, reach=.02):
+        class Arm(SimpleNamespace):
+            __hash__ = object.__hash__
+
+        def arm(x):
+            return Arm(cur=None, moves=[dict(pos=[x, 0, .2 - reach], yaw=0., grip=.01)],
+                                   ee=np.array([x, 0, .2]), bias=np.zeros(3), cmd=(np.array([x, 0, .2]), 0., .01))
+        a, b = arm(a_x), arm(b_x - 1)  # Probe offsets B by +1 m
         slots = {a: SimpleNamespace(name='A'), b: SimpleNamespace(name='B')}
-        tick = SimpleNamespace(slots=slots, other=lambda arm: b if arm is a else a, _moving=lambda arm: False)
+        q = {a: np.r_[a_x, np.zeros(6)], b: np.r_[b_x - 1, np.zeros(6)]}
+        return a, b, SimpleNamespace(slots=slots, other=lambda arm: b if arm is a else a, _moving=lambda arm: False,
+                                     q_of=lambda ex, arm: q[arm], example=None, carried=None)
+
+    def test_disjoint_contact_moves_run_together(self):
+        a, b, tick = self.cartesian_tick(0., 1.)
         self.assertTrue(self.r.can_begin(tick, a, False))
-        self.assertFalse(self.r.can_begin(tick, b, True))
+        self.assertTrue(self.r.can_begin(tick, b, False))
+        self.assertTrue(self.r.can_begin(tick, a, False))  # continuing move keeps its grant
+        self.assertTrue(self.r.keeps_own('A', np.zeros(9)))
+        self.assertFalse(self.r.keeps_own('A', np.r_[.1, np.zeros(8)]))
+
+    def test_overlapping_contact_move_waits_for_other_reservation(self):
+        a, b, tick = self.cartesian_tick(0., .05)
+        self.assertTrue(self.r.can_begin(tick, a, False))
+        self.assertFalse(self.r.can_begin(tick, b, False))
+        self.assertTrue(self.r.can_begin(tick, b, True))  # planned paths are checked at admit()
         self.r.release('A')
         self.assertTrue(self.r.can_begin(tick, b, False))
+
+    def test_unreserved_moving_arm_blocks_new_motion(self):
+        a, b, tick = self.cartesian_tick(0., 1.)
+        tick._moving = lambda arm: arm is a
+        self.assertFalse(self.r.can_begin(tick, b, True))
+        self.assertFalse(self.r.can_begin(tick, b, False))
 
     def test_clearance_margin_is_retained(self):
         a = (np.array([[0., 0., 0.]]), np.array([[1., 1., 1.]]))
@@ -95,6 +121,27 @@ class ReservationsTest(unittest.TestCase):
         ex.B.update(.02, ex.B.ee)
         self.assertFalse(slot.paused)
         self.assertEqual(slot.mode, 'waiting')
+
+    def test_failed_plan_defers_while_other_arm_is_between_moves(self):
+        from Kean.tests.test_tick import Ex, Later, wrap, resample_trajectory
+        from Kean.motion.tick import Tick
+        ex = Ex()
+        planner = Later()
+        reservation = SimpleNamespace(can_begin=lambda *a: True, release=lambda name: None)
+        tick = Tick(planner, strict=True, wrap_angle=wrap, resample_trajectory=resample_trajectory,
+                    reservations=reservation).attach(ex)
+        ex.B.push('to feeder', [.5, 0, .3], 0., .01, 1.)
+        ex.B.update(.02, ex.B.ee)
+        slot = tick.slots[ex.B]
+        self.assertEqual(slot.mode, 'waiting')
+        # A finished one Cartesian move and has the next queued: cur is None for this frame.
+        ex.A.push('insert', [.4, 0, .2], 0., .01, 1., contact=True)
+        planner.fut.set_exception(RuntimeError('path clearance 0.65 mm at other arm'))
+        ex.B.update(.02, ex.B.ee)
+        self.assertEqual(slot.mode, 'deferred')
+        self.assertIsNone(getattr(ex, 'failure', None))
+        ex.A.moves.clear()
+        self.assertFalse(tick._busy(ex.A))
 
     def test_force_guard_cancels_playback_and_holds_measured_pose(self):
         from Kean.tests.test_tick import Ex, Later, wrap, resample_trajectory

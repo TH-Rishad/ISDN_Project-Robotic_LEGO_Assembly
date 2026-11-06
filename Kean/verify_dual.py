@@ -156,7 +156,7 @@ def verify_run(run):
                          and lower.startswith(owner + '_')
                          and lower in [m[0] for m in step.get('mating_studs', [])]
                          and pair == {'brick:' + upper, 'brick:' + lower}
-                         and event.get('phase', {}).get(owner) in ('insert', 'release')
+                         and event.get('phase', {}).get(owner) in ('insert', 'release', 'press')
                          and -1.7 <= event.get('max_pen_mm', -999.) < 0.
                          and geometry.get('upper_type') in (7, 8) and feature_valid)
                 if not valid:

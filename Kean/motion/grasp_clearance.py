@@ -16,6 +16,33 @@ def choose_offset(gap_at, direction, max_offset=0.002, margin=0.0005):
     raise RuntimeError('No clear grasp within 2 mm of the planned pad centre')
 
 
+
+def grip_candidates(grasp, extent, step=.001):
+    """(kind, grasp) in fallback order: the planner's grip, the other axis
+    centred, then edge grips nearest first on both axes.
+
+    `extent` is the brick's world (x, y) size in m. Conventions follow
+    planner.grasp_for: yaw 90 closes on the +-x faces with the pads sliding
+    along y; edge offsets keep the 17.5 mm pads on the brick.
+    """
+    lx, ly = extent
+
+    def make(yaw, off):
+        across = lx if yaw == 90 else ly
+        return dict(yaw_offset_deg=yaw, grip_width_m=round(across - .0012, 4),
+                    tcp_offset_m=[0., off] if yaw == 90 else [off, 0.])
+    own = int(grasp['yaw_offset_deg'])
+    other = 0 if own == 90 else 90
+    edges = []
+    for yaw in (own, other):
+        room = max(0., (ly if yaw == 90 else lx) / 2 - .0085 - .001)
+        for off in np.arange(step, room + 1e-9, step):
+            edges += [(off, yaw, sign * round(float(off), 4)) for sign in (1, -1)]
+    edges.sort(key=lambda e: e[0])
+    return ([('planner', grasp), ('other_axis', make(other, 0.))] +
+            [('edge', make(yaw, off)) for _, yaw, off in edges])
+
+
 def install(example, probe, cell):
     original = example.queue_place
     changes = []

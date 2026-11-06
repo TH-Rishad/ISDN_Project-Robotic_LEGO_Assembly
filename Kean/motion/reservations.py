@@ -1,8 +1,11 @@
 """Conservative full-arm swept reservations for Kean's segment playback.
 
-Planning stays synchronous. Independent free-space segments may overlap;
-Cartesian contact/escape phases take an exclusive motion reservation.
+Planning stays synchronous. Independent free-space segments may overlap.
+Cartesian contact/escape moves reserve the arm's measured volume padded by
+the move's displacement and must stay inside it while another arm moves.
 """
+from types import SimpleNamespace
+
 import numpy as np
 
 from Kean.motion.path_check import dense_joints
@@ -21,7 +24,6 @@ class Reservations:
         self.clearance = clearance
         self.active = {}
         self.expected = {}
-        self.exclusive = None
         self.parallel_frames = 0
         self.waits = 0
         self.last_error = None
@@ -29,16 +31,30 @@ class Reservations:
     def can_begin(self, tick, arm, planned):
         name = tick.slots[arm].name
         other = tick.other(arm)
-        if self.exclusive not in (None, name):
+        if other is not None and tick._moving(other) and tick.slots[other].name not in self.active:
             return False
-        if other is not None and tick._moving(other):
-            if not planned or tick.slots[other].mode != 'playing' or tick.slots[other].name not in self.active:
-                return False
-        if not planned:
-            if any(a != name for a in self.active):
-                return False
-            self.exclusive = name
-        return True
+        if planned or name in self.active:
+            return True
+        return self.admit(name, *self.cartesian(tick, arm))
+
+    def cartesian(self, tick, arm):
+        """Measured arm volume padded by this Cartesian move's reach."""
+        name = tick.slots[arm].name
+        move = arm.cur if arm.cur is not None else arm.moves[0]
+        q = np.asarray(tick.q_of(tick.example, arm)[:7], float)
+        here, start = np.asarray(arm.ee, float), np.asarray(arm.cmd[0], float) + arm.bias
+        reach = (np.linalg.norm(np.asarray(move['pos'], float) + arm.bias - here)
+                 + np.linalg.norm(start - here))
+        turn = abs((float(move['yaw']) - float(arm.cmd[1]) + np.pi) % (2 * np.pi) - np.pi)
+        # ponytail: 1.5x TCP reach bounds elbow drift for short IK moves; the
+        # runtime inside() check stops the arm if this ever under-predicts.
+        pad = 1.5 * reach + .15 * turn + .01
+        carried = None if tick.carried is None else tick.carried(tick.example, name)
+        parts = [self.bounds(name, SimpleNamespace(q=q, grip=float(g), carried=carried), q[None])
+                 for g in (arm.cmd[2], move['grip'])]
+        lo = np.minimum(parts[0][0], parts[1][0]) - pad
+        hi = np.maximum(parts[0][1], parts[1][1]) + pad
+        return SimpleNamespace(q=q), None, (lo, hi)
 
     def bounds(self, name, request, path):
         probe = self.clearance.probe
@@ -61,8 +77,8 @@ class Reservations:
             highs.append(c.max(axis=0) + radius)
         return np.asarray(lows), np.asarray(highs)
 
-    def admit(self, name, request, path):
-        bound = self.bounds(name, request, path)
+    def admit(self, name, request, path, bound=None):
+        bound = self.bounds(name, request, path) if bound is None else bound
         for other, other_bound in self.active.items():
             if other != name and not separated(bound, other_bound):
                 self.waits += 1
@@ -79,7 +95,10 @@ class Reservations:
         if bound is None:
             self.last_error = 'no admitted concurrent path'
             return False
-        spheres = self.clearance.spheres(other, joints)
+        return self.inside(bound, other, joints)
+
+    def inside(self, bound, name, joints):
+        spheres = self.clearance.spheres(name, joints)
         lo, hi = bound
         i = 0
         for link, ids in self.clearance.slices.items():
@@ -93,11 +112,15 @@ class Reservations:
             i += 1
         return True
 
+    def keeps_own(self, name, joints):
+        """A Cartesian move overlapping other motion must stay in its reservation."""
+        if len(self.active) < 2 or name not in self.active:
+            return True
+        return self.inside(self.active[name], name, joints)
+
     def release(self, name):
         self.active.pop(name, None)
         self.expected.pop(name, None)
-        if self.exclusive == name:
-            self.exclusive = None
 
     def step(self):
         self.parallel_frames += int(len(self.active) == 2)

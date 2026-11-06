@@ -85,6 +85,7 @@ builder = D.Arm('A builder', D.ARM_A, [-.15, 0., .35])
 staged = set()
 view = Build.__new__(Build)
 view.B = builder
+view.drop_press = {}
 view.owner = 'A'
 step = dict(step=0, brick_id='A_b0', requires_brace=True)
 view.plan = dict(sequence=[step], voxel_origin=D.P.VOXEL_ORIGIN)

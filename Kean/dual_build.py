@@ -77,7 +77,7 @@ def merged_plan(plans):
 
 
 def feeders_for(plans, pads):
-    """Choose tray cells clear of both build pads and the other feeder."""
+    """Choose feeder cells clear of both build pads and the other feeder."""
     feeders, occupied = {}, []
     for pad in pads:
         c, h = np.asarray(pad['c'][:2]), np.asarray(pad['dims'][:2]) / 2
@@ -125,6 +125,7 @@ class Build:
         self.wiggle_tilt = math.radians(.1)
         self.wiggle_press_dur = 1.2
         self.pending_hold = None
+        self.drop_press = {}  # step -> release height (m) when no side pinch can reach the seat
         self.support_loss_frames = 0
         self.active = False
         self.spec = True  # Write a single combined episode log in the dual runner.
@@ -201,6 +202,15 @@ class Build:
         # An ordinary step also ends empty-handed at a checked safe park pose.
         if not self.plan['sequence'][n]['requires_brace']:
             self.B.push('clearance', self.parks[self.B], 0., .01, 1.5)
+        if n in self.drop_press:
+            if step['requires_brace']:
+                # ponytail: no supported tight step exists yet; add when one does.
+                raise RuntimeError('drop-and-press with a generated support is not implemented')
+            from Kean.motion.drop_press import splice
+            splice(self.B.moves, self.target[bid][0], self.drop_press[n], grasp_dz=D.GRASP_DZ, press=D.PRESS,
+                   tip_below_tcp=D.TIP_BELOW_TCP, brick_h=D.P.BRICK_H, stud_h=D.ex.STUD_HEIGHT,
+                   grasp_offset=step['grasp'].get('tcp_offset_m', [0., 0.]))
+            print('drop-and-press %s: release %.2f mm above the seat' % (bid, self.drop_press[n] * 1000), flush=True)
 
     def finger_model(self):
         checker = self.cell.tick.clearance
@@ -216,32 +226,58 @@ class Build:
         return (spheres[ids, :3] - p[0]) @ rotation[0], spheres[ids, 3], len(left)
 
     def pickup_clearance(self, step):
-        """Raise the pickup only as needed to clear lower-course studs on release."""
+        """Choose a grip whose fingers reach the seat, raising it up to 2 mm.
+
+        Fallback order: the planner's grip, the other axis centred, edge grips
+        nearest first (pads kept on the brick), else drop-and-press with the
+        planner's grip. Each candidate uses the full finger-sphere check.
+        """
         from scipy.spatial.transform import Rotation
-        from Kean.motion.grasp_clearance import choose_offset
+        from Kean.motion.grasp_clearance import choose_offset, grip_candidates
         from Kean.motion.tick import planner_yaw, resolve_wrap
         local, radii, nl = self.finger_model()
         probe = self.cell.tick.clearance.probe
-        yaw = planner_yaw(self, self.B, math.radians(step['grasp']['yaw_offset_deg']), resolve_wrap(D))
-        rotation = Rotation.from_euler('z', yaw).as_matrix() @ Rotation.from_quat(D.Q_DOWN).as_matrix()
-        generated = np.r_[step['grasp'].get('tcp_offset_m', [0., 0.]), 0.]
-        tcp = self.target[step['brick_id']][0] + generated + [0, 0, D.GRASP_DZ - D.PRESS]
         boxes, _ = self.cell.world(self, self.owner)
         boxes = [b for b in boxes if b['name'] != step['brick_id']]
-        width = step['grasp']['grip_width_m'] + .0012
-        def gap_at(offset):
-            if offset[2] < 0:
-                return -1.
-            gaps = []
-            for opening in (width / 2 - .0015, width / 2 + .002):
-                xyz = local.copy()
-                xyz[:nl, 1] += opening - probe.FINGER_LOCK
-                xyz[nl:, 1] -= opening - probe.FINGER_LOCK
-                fingers = np.c_[xyz @ rotation.T + tcp + offset, radii]
-                gaps.append(probe.clearance_boxes(fingers, boxes)[0])
-            return min(gaps)
-        offset = choose_offset(gap_at, [0., 0., 1.], margin=.0015)
-        offset += generated
+        brick = next(b for b in self.plan['bricks'] if b['id'] == step['brick_id'])
+        extent = np.asarray(D.P.footprint(brick['type'], brick['yaw_index'])) * D.P.PITCH
+
+        def gap_for(grasp):
+            yaw = planner_yaw(self, self.B, math.radians(grasp['yaw_offset_deg']), resolve_wrap(D))
+            rotation = Rotation.from_euler('z', yaw).as_matrix() @ Rotation.from_quat(D.Q_DOWN).as_matrix()
+            tcp = self.target[step['brick_id']][0] + np.r_[grasp['tcp_offset_m'], 0.] + [0, 0, D.GRASP_DZ - D.PRESS]
+            width = grasp['grip_width_m'] + .0012
+
+            def gap_at(offset):
+                if offset[2] < 0:
+                    return -1.
+                gaps = []
+                for opening in (width / 2 - .0015, width / 2 + .002):
+                    xyz = local.copy()
+                    xyz[:nl, 1] += opening - probe.FINGER_LOCK
+                    xyz[nl:, 1] -= opening - probe.FINGER_LOCK
+                    fingers = np.c_[xyz @ rotation.T + tcp + offset, radii]
+                    gaps.append(probe.clearance_boxes(fingers, boxes)[0])
+                return min(gaps)
+            return gap_at
+
+        for kind, grasp in grip_candidates(step['grasp'], extent):
+            try:
+                offset = choose_offset(gap_for(grasp), [0., 0., 1.], margin=.0015)
+            except RuntimeError:
+                continue
+            if kind != 'planner':
+                step['grasp'].update(grasp, grip_fallback=kind)
+                print('grip fallback %s: %s, yaw %d deg, offset %s mm' % (
+                    step['brick_id'], kind, grasp['yaw_offset_deg'],
+                    np.round(np.asarray(grasp['tcp_offset_m']) * 1000, 1).tolist()), flush=True)
+            break
+        else:
+            # No side pinch reaches the seat beside flush neighbours: release higher, then press.
+            self.drop_press[step['step']] = choose_offset(gap_for(step['grasp']), [0., 0., 1.],
+                                                          max_offset=.015, margin=.0015)[2]
+            offset = np.zeros(3)
+        offset += np.r_[step['grasp'].get('tcp_offset_m', [0., 0.]), 0.]
         print('pickup clearance %s: %s mm' % (step['brick_id'], np.round(offset * 1000, 2).tolist()), flush=True)
         return offset
 
@@ -419,18 +455,6 @@ class DualExample(D.Example):
         scene, c = D.build_cell(plan, exe, n0, self.substeps, False,
                                workspaces=[self.plans[a] for a in 'AB'], feeders=self.feeders,
                                placed_ids=self.preplaced, velocity_control=True)
-        # Feeders are visible pads below the bricks; their collision boxes are
-        # exactly below the existing z=0 pick-up surface.
-        self.feeder_platforms = []
-        for bid, pos in self.feeders.items():
-            box = dict(name='feeder_' + bid, c=[*pos[:2], -.012], dims=[.06, .06, .024], yaw=0.)
-            self.feeder_platforms.append(box)
-            scene.add_shape_box(-1, hx=box['dims'][0]/2, hy=box['dims'][1]/2, hz=.012,
-                                xform=D.wp.transform(box['c'], D.wp.quat_identity()), color=(.22, .24, .28),
-                                # Trays are flush with the physical table. Its
-                                # ground plane supplies their contact surface;
-                                # avoid duplicate coplanar contact constraints.
-                                cfg=D.newton.ModelBuilder.ShapeConfig(has_shape_collision=False, has_particle_collision=False))
         return scene, c
 
     def set_grip_role(self, arm, support):
@@ -522,7 +546,11 @@ class DualExample(D.Example):
                             and pending is not None and pending['phase'] != 'park')
         with view.planner_frame():
             if arm is view.B and view.active:
-                view.aim_brick(ee, body_q)
+                # Anti-windup: a frozen arm cannot act on the brick-aim
+                # integral, which would otherwise saturate into the next goal.
+                tick = getattr(self, 'tick', None)
+                if tick is None or not tick.slots[arm].paused:
+                    view.aim_brick(ee, body_q)
             else:
                 arm.bias[:] = 0.
             return arm.update(self.frame_dt, ee)
@@ -572,7 +600,7 @@ class DualExample(D.Example):
         from cell.contacts import HELD_PHASES
         return {a: v.plan['sequence'][v.b_step]['brick_id'] for a, v in self.views.items()
                 if v.active and v.b_step is not None and v.b_step not in v.placed
-                and self.arms[a].phase in HELD_PHASES}
+                and self.arms[a].phase in (*HELD_PHASES, 'press')}
 
     def measured_state(self):
         # Planning and command validation are synchronous: physics is fixed
@@ -594,7 +622,6 @@ class DualExample(D.Example):
         # Picking/release contacts concern a real world obstacle; only an
         # actually carried brick is excluded from this arm's static scene.
         skip = held.get(arm) if self.arms[arm].phase not in ('descend', 'settle', 'grasp', 'release') else None
-        # Every feeder tray is inside TABLE, whose box already encloses it.
         boxes = [probe.TABLE, *self.platforms]
         boxes += [b for b in self._brick_snapshot if b['name'] != skip]
         index = 9 if arm == 'A' else 0
@@ -621,6 +648,12 @@ class DualExample(D.Example):
         brace = view.plan['sequence'][view.b_step]['brace']
         return tuple(brace.get('gripped_bricks') or [brace['target_brick_id']])
 
+    def neighbours_of(self, bid):
+        if not hasattr(self, '_neighbours'):
+            from Kean.motion.drop_press import placement_neighbours
+            self._neighbours = placement_neighbours(self.plan['bricks'], D.P.footprint)
+        return self._neighbours.get(bid, ())
+
     def classify_contact(self, monitor, cls_a, cls_b):
         pair = {cls_a, cls_b}
         for arm, bid in self.held_objects().items():
@@ -630,10 +663,13 @@ class DualExample(D.Example):
                 return None
             if brick in pair and pair.intersection(('ground', 'plate')) and phase in ('descend', 'settle', 'grasp', 'lift'):
                 return None
-            if brick in pair and phase in ('insert', 'release'):
+            if phase == 'press' and any(pair == {arm + '_finger', 'brick:' + n}
+                                        for n in self.neighbours_of(bid)):
+                return None  # closed tips pressing the course top beside the dropped brick
+            if brick in pair and phase in ('insert', 'release', 'press'):
                 other = next((c for c in pair if c != brick), '')
                 oid = other[6:] if other.startswith('brick:') else None
-                if oid in monitor.supports.get(bid, []) or (other == 'plate' and None in monitor.supports.get(bid, [])) or oid in monitor.neighbours.get(bid, ()):
+                if oid in monitor.supports.get(bid, []) or (other == 'plate' and None in monitor.supports.get(bid, [])) or oid in self.neighbours_of(bid):
                     return 'neighbour_rub'
         for arm, view in self.views.items():
             if view.active and view.b_step is not None and self.arms[arm].phase == 'retract':
@@ -698,7 +734,10 @@ class DualExample(D.Example):
             permitted = set()
             view = self.role_views[arm]
             if arm == view.owner and view.active and view.b_step is not None:
-                permitted.add(view.plan['sequence'][view.b_step]['brick_id'])
+                active = view.plan['sequence'][view.b_step]['brick_id']
+                permitted.add(active)
+                if self.arms[arm].phase == 'press':
+                    permitted.update(self.neighbours_of(active))
             elif self.roles[arm] == 'supporter' and self.arms[arm].phase in ('brace-in', 'brace-guard', 'close', 'hold', 'open', 'retract'):
                 brace = view.plan['sequence'][view.b_step]['brace']
                 permitted.update(brace.get('gripped_bricks') or [brace['target_brick_id']])
@@ -719,11 +758,11 @@ class DualExample(D.Example):
             phase = self.arms[arm].phase
             allowed = {b['name'] for b in predicted.values()}
             if phase == 'lift':
-                allowed.update(('table', 'feeder_' + arm))  # intended pick-up surface contact
+                allowed.add('table')  # intended pick-up surface contact
             if phase == 'insert':
                 step = view.plan['sequence'][view.b_step]
                 allowed.update(m[0] for m in step['mating_studs'])
-                allowed.update(self.monitor.neighbours.get(carried['name'], ()))
+                allowed.update(self.neighbours_of(carried['name']))
                 if not step['mating_studs']:
                     allowed.add('plate_' + arm)
             boxes, _ = self.world(self, arm)

@@ -6,7 +6,7 @@ def stud_mating(phase, lower, mates, depth, stud_type, upper_type, stud_z,
                 brick_height=.0096, stud_height=.0017, inset=.0001,
                 contact_local=None, dims=None):
     expected_z = brick_height + stud_height / 2 - inset
-    if not (phase in ('insert', 'release') and lower in mates
+    if not (phase in ('insert', 'release', 'press') and lower in mates
             and -stud_height <= depth < 0. and upper_type in (7, 8)):
         return False
     if stud_type == 6:  # Newton cylinder proxy at the calibrated stud height

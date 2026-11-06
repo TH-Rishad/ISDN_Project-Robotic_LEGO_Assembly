@@ -1,6 +1,8 @@
 # Dual-builder execution
 
-Status: approved and implemented; GPU validation is in progress.
+Status: implemented and validated. The complete from-empty arch/S3 build
+`results/dual_arch_s3_012` passes `verify_dual` (exit 0), including a live
+A-first simultaneous support request.
 Branch: `feat/dual-builder-coordination`.
 
 Execution refinements from GPU validation: support-waiting builders move with
@@ -40,10 +42,92 @@ on the same body pair.
 | Contact-evidence pipeline | `results/dual_stud_policy_001` | PASS; diagnostic |
 | Stud/wall distinction, mixed contacts and excessive depth | CPU policy/verifier regressions | PASS |
 | Mesh-stud contact evidence | `results/dual_mesh_stud_001` | PASS; diagnostic |
-| Complete build with detailed contact evidence | `results/dual_arch_s3_010` | Running |
+| Complete build with detailed contact evidence | `results/dual_arch_s3_010` | PASS; verifier exit 0, arch 11/11, S3 16/16, 4 supports, no unintended contacts |
+| Bounded Cartesian reservations, before aim anti-windup | `results/dual_arch_s3_011` | FAIL; B step 4 gate miss (2.45 mm), see below |
+| Complete build, bounded Cartesian reservations | `results/dual_arch_s3_012` | PASS; verifier exit 0, 1,643 parallel frames, live A-first tie |
+| Same build without feeder trays | `results/dual_arch_s3_013` | PASS; verifier exit 0 |
+| Regression with grip fallback, drop-and-press and deferred-replan code | `results/dual_arch_s3_014` | PASS; verifier exit 0, 1,642 parallel frames |
+| Pyramid (A) + S3 (B) | `results/dual_pyramid_s3_004` | FAIL at pyramid step 6 (1x1 tips after drop); steps 0-5 seated |
 
 Diagnostic scenes pre-place earlier bricks and do not establish full-build
-completion. A complete from-empty dual build has not yet been accepted.
+completion. `dual_arch_s3_010` is the first accepted from-empty dual build
+(revision `0f2fc3f` plus the mesh-stud files committed in `04dc565`; the
+provenance hashes match). In it, A's step-10 support preceded B's first
+request, so the A-first tie is evidenced only by `dual_support_tie_016`, a
+labeled nominal-start scene as allowed below.
+
+That run overlapped joint motion for only 260 of 26,412 frames, nearly all in
+the first 13 s. Every Cartesian contact/escape move took a global exclusive
+lock, so one arm's descend, grasp, insert or retract stalled the other's
+transport. Cartesian moves now reserve the arm's measured per-link volume,
+padded by 1.5x the move's TCP reach (plus a yaw and 10 mm allowance), and
+admit against the other reservation like planned segments. While both
+reservations are active, a Cartesian arm that leaves its padded volume stops
+(`cartesian_reservation_exceeded`); the per-command 1 mm arm/world guard is
+unchanged.
+
+The first run with this change (`dual_arch_s3_011`) missed B's step-4 snap
+gate. B now waited longer, frozen at the high pre-insert hover, while A
+moved. `aim_brick`'s integral servo (4 /s, clipped at ±4 mm) kept integrating
+the brick error that the frozen hand could not act on. The wound-up bias
+then entered the planned pre-insert goal. B steps frozen there for 7 frames
+reached the low hover 1.0-1.2 mm from target; steps frozen for 61-121 frames
+reached it 4.1-6.2 mm away. The dual runner now skips `aim_brick` while the
+tick holds that arm paused. Sakib's single-build path is unchanged.
+
+`dual_arch_s3_012` (from `04dc565` plus these changes; provenance records
+their hashes) then completed arch 11/11 and S3 16/16 in 411 s of simulation
+against 440 s, with 1,643 frames of simultaneous builder motion against 260.
+A requested step 10 at 241.2 s and B requested step 11 at 244.9 s, before
+either support started. A was served first and B's retained request next,
+followed by B's steps 13 and 14. Minimum planned-playback clearance was
+1.21 mm. There were no unintended, penetration, arm-arm or displaced contacts
+and no broken joints; the maximum snap error was 1.10 mm.
+
+## Scene and replay changes (2026-11-06)
+
+The 27 dark feeder trays under the feeder bricks were visual only (no
+collision, not in the planner world) and z-fought with the floor; they are
+removed. `dual_arch_s3_013` repeated the full build without them and passed
+`verify_dual`. `play_run.sh --mp4 FILE --speed N` renders a saved run offscreen
+at 30 fps from a fixed overview camera; `dual_arch_s3_012_8x.mp4` is the 8x
+video of the validated build.
+
+## Pyramid: grip fallback order and drop-and-press (in progress)
+
+`dual_build.sh --build-a pyramid` builds the user's drawing
+(`Sakib/brickassembly/blueprints/user/pyramid_*.png`, width 5: layers 5x5,
+3x3, 1x1, 11 bricks, no generated supports). Its filled layers leave bricks
+with flush neighbours on the pinched faces: the fingertips sit 4.1 mm above
+the brick bottom and meet the neighbours' studs 7.2 mm above the seat
+(`Sakib/Docs/plan_v4_rl_place.md` fact 2). `dual_pyramid_s3_001` stopped at
+step 2 when Kean's pickup check found no clear grip; Kean's scripted wriggle
+does not apply (it handles socket fit, and these steps are not slots).
+
+`pickup_clearance` now tries grips in a fixed order, each checked with the
+full finger-sphere model at the seat: the planner's grip, the other axis
+centred, edge grips nearest first with the pads kept on the brick, and
+otherwise drop-and-press with the planner's grip (`motion/drop_press.py`):
+descend until open and closed fingers clear the neighbours by 1.5 mm, dwell,
+release, rise, close, press the brick's stud tops with the closed tips 1 mm
+past seated, snap gate, rise. The dropped brick stays the active placement
+object through a `press` phase; only its stud/neighbour contacts and the
+closed tips on it and its same-course neighbours are permitted. Same-course
+neighbours now include corner contacts: a filled layer seats diagonal bricks
+within a millimetre (`dual_pyramid_s3_002` stopped on this at step 3). A
+failed plan is also deferred while the other arm is between two moves of a
+sequence (`dual_pyramid_s3_003` stopped on this race).
+
+`dual_pyramid_s3_004` (final code) seated steps 0-5, with drop-and-press on
+steps 2, 3 and 4 (lateral 0.34-0.39 mm, |dz| <= 0.11 mm). No fallback side
+grip passed the finger-sphere check on the tight steps reached (2, 3, 4, 6);
+the planner's cell rule counts step 6's other-axis grip as clear, but the
+17.5 mm pads overhang the 8 mm brick onto its in-line neighbours. Step 6 (a 1x1) missed the
+gate: released level 0.18 mm from target, it fell 8 mm onto the single stud
+below, whose solid collision proxy it rests on until pressed, rolled 1.6 mm
+toward the open side and tipped 15-20 degrees. Multi-stud bricks land on two
+or more studs and seat; a 1x1 does not. The remaining pyramid tight steps 6-9
+are 1x1 and 1x2 bricks.
 
 ## Requested behavior
 

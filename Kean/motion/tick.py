@@ -114,6 +114,14 @@ class Tick:
             return True
         return arm.cur is not None and arm.phase not in STATIC
 
+    def _busy(self, arm):
+        """Moving, or between two moves of a sequence (one frame with cur None).
+
+        Only used to defer a failed plan: treating queued moves as motion in
+        _moving would let two waiting arms block each other.
+        """
+        return self._moving(arm) or (arm.cur is None and bool(arm.moves) and arm.moves[0]['phase'] not in STATIC)
+
     def _in_zone(self, arm):
         if self.zone is None or not self._moving(arm):
             return False
@@ -248,7 +256,7 @@ class Tick:
                 self.captures += 1
                 raise
             except Exception as exc:
-                if self.reservations is not None and self._moving(self.other(arm)):
+                if self.reservations is not None and self._busy(self.other(arm)):
                     slot.mode, slot.move, slot.q, slot.v = 'deferred', None, None, None
                     return self._freeze(arm)
                 self.plan_failures.append({"arm": slot.name, "phase": getattr(arm, "phase", None), "error": str(exc),
@@ -366,6 +374,12 @@ class Tick:
         if self.reservations is not None and pending is not None and pending['phase'] not in STATIC:
             if not self.reservations.can_begin(self, arm, False):
                 return self._freeze(arm)
+            k = 0 if slot.name == 'A' else 1
+            if not getattr(self.reservations, 'keeps_own', lambda *a: True)(
+                    slot.name, self.example.state_0.joint_q.numpy()[9*k:9*k+9]):
+                self.plan_failures.append(dict(error='cartesian_reservation_exceeded', arm=slot.name,
+                                               phase=pending['phase'], reservation_error=self.reservations.last_error))
+                return self._stop(arm, 'cartesian_reservation_exceeded')
             self._unfreeze(arm)
             result = orig(dt, ee)
             if arm.cur is None:
