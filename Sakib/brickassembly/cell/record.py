@@ -58,11 +58,13 @@ class Recorder:
         isA = lambda b: (b >= 0) & (b < na)
         isB = lambda b: (b >= na) & (b < 2 * na)
         ab = bool((isA(b0) & isB(b1) | isB(b0) & isA(b1)).any())
-        held = -2
-        if ex.b_step is not None and ex.B.phase in HELD_PHASES:
-            held = ex.body[ex.plan["sequence"][ex.b_step]["brick_id"]]
+        held = []
+        if hasattr(ex, 'held_objects'):
+            held = [ex.body[bid] for bid in ex.held_objects().values()]
+        elif ex.b_step is not None and ex.B.phase in HELD_PHASES:
+            held = [ex.body[ex.plan['sequence'][ex.b_step]['brick_id']]]
         wb = self.bodies[welded]
-        agent = lambda b: (b >= 0) & (b < 2 * na) | (b == held)
+        agent = lambda b: (b >= 0) & (b < 2 * na) | np.isin(b, held)
         hit = agent(b0) & np.isin(b1, wb) | agent(b1) & np.isin(b0, wb)
         return ab, bool(hit.any())
 

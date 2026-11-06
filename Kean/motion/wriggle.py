@@ -127,11 +127,11 @@ def _splice(ex, step, P):
     dt = 1.0 / WIGGLE_HZ / 4.0
     for k in range(WIGGLE_WAYPOINTS):
         phase = 2.0 * math.pi * WIGGLE_HZ * (k * dt)
-        off = unit * (WIGGLE_AMP * math.sin(phase))
-        tilt = tilt_ax * (WIGGLE_TILT * math.sin(phase))
+        off = unit * (getattr(ex, 'wiggle_amp', WIGGLE_AMP) * math.sin(phase))
+        tilt = tilt_ax * (getattr(ex, 'wiggle_tilt', WIGGLE_TILT) * math.sin(phase))
         pos = final + off + [0.0, 0.0, APPROACH_CLEAR - (k + 1) * step_z]
         band.append(_move("insert", pos, yaw, grip, dt, tilt=tilt))
-    band.append(_move("insert", final, yaw, grip, PRESS_DUR, then=snap))
+    band.append(_move("insert", final, yaw, grip, getattr(ex, 'wiggle_press_dur', PRESS_DUR), then=snap))
 
     B.moves[idx:idx + 1] = band
 

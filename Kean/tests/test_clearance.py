@@ -4,7 +4,7 @@ from types import SimpleNamespace
 import unittest
 import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from Kean.motion.clearance import Clearance
+from Kean.motion.clearance import Clearance, grouped_sphere_gap
 
 
 class Probe:
@@ -23,6 +23,18 @@ class Probe:
 
 
 class ClearanceTest(unittest.TestCase):
+    def test_link_broadphase_matches_all_sphere_pairs_including_penetration(self):
+        def measure(a, b):
+            return float((np.linalg.norm(a[:, None, :3] - b[None, :, :3], axis=-1)
+                          - a[:, None, 3] - b[None, :, 3]).min())
+        rng = np.random.default_rng(42)
+        groups = np.array_split(np.arange(60), 6)
+        for scale in (.001, .01, .1, 1.):
+            for _ in range(10):
+                a = np.c_[rng.normal(size=(60, 3)) * scale, rng.uniform(.001, .05, 60)]
+                b = np.c_[rng.normal(size=(60, 3)) * scale, rng.uniform(.001, .05, 60)]
+                self.assertAlmostEqual(grouped_sphere_gap(a, b, groups, measure), measure(a, b), places=12)
+
     def test_measured_joints_fingers_and_other_arm_collision(self):
         probe = Probe()
         monitor = Clearance(probe, lambda ex, name: ([], None))

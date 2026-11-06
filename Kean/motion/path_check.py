@@ -34,7 +34,15 @@ def validate(probe, request, path):
     for index, q in enumerate(samples):
         avoid = None
         own = checker.spheres(request.arm, np.r_[q, request.grip, request.grip])
-        gap, obstacle = probe.clearance_boxes(own, request.boxes)
+        if getattr(request, 'allowed_finger_contacts', ()):
+            finger = np.r_[checker.slices['fr3_leftfinger'], checker.slices['fr3_rightfinger']]
+            mask = np.ones(len(own), bool)
+            mask[finger] = False
+            g1, o1 = probe.clearance_boxes(own[mask], request.boxes)
+            g2, o2 = probe.clearance_boxes(own[finger], [b for b in request.boxes if b['name'] not in request.allowed_finger_contacts])
+            gap, obstacle = (g1, o1) if g1 <= g2 else (g2, o2)
+        else:
+            gap, obstacle = probe.clearance_boxes(own, request.boxes)
         pair_gap = probe.clearance_spheres(own, other)
         if pair_gap < gap:
             gap, obstacle = pair_gap, 'other arm'
@@ -57,7 +65,7 @@ def validate(probe, request, path):
                 gap, obstacle = min(bgap, agap), 'carried brick / ' + (who if bgap <= agap else 'other arm')
                 avoid = (other[np.argmin(np.linalg.norm(other[:, :3] - center, axis=1)
                                          - other[:, 3])].copy() if agap < bgap else None)
-        floor = 0.0 if near_slot and obstacle.startswith("carried brick /") and not obstacle.endswith("other arm") else 0.001
+        floor = 0.0 if near_slot and obstacle.startswith("carried brick /") and not obstacle.endswith("other arm") else getattr(request, 'clearance', .001)
         if not np.isfinite(gap) or gap < floor:
             raise PathCollision('path clearance %.2f mm at %s (sample %d/%d)' %
                                 (gap * 1000, obstacle, index, len(samples) - 1), avoid)

@@ -207,6 +207,9 @@ class TickTest(unittest.TestCase):
         self.assertAlmostEqual(planner_yaw(ex, ex.B, 0.2, wrap), 0.2 - math.pi)
         ex.direct = True
         self.assertAlmostEqual(planner_yaw(ex, ex.B, 0.2, wrap), 0.2)
+        ex.direct = False
+        ex.B.absolute_yaw = True
+        self.assertAlmostEqual(planner_yaw(ex, ex.B, math.pi / 2, wrap), math.pi / 2)
 
     def test_request_yaw_matches_cell_at_and_around_boundaries(self):
         for yaw in (0.0, math.pi / 2 - 1e-8, math.pi / 2,

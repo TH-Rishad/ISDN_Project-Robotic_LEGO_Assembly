@@ -66,7 +66,7 @@ class GraphGuard:
 
 
 class Request:
-    def __init__(self, arm, q, ee, goal, quat, zone_clear=True, dt=0.02, yaw=0.0, boxes=None, other_q=None, full_path=False, grip=None, carried=None, alternate_goals=(), contact_tail=False):
+    def __init__(self, arm, q, ee, goal, quat, zone_clear=True, dt=0.02, yaw=0.0, boxes=None, other_q=None, full_path=False, grip=None, carried=None, alternate_goals=(), contact_tail=False, tilt=(0., 0., 0.), allowed_finger_contacts=(), proposal_build=None, clearance=.001):
         self.arm = arm
         self.q = np.asarray(q, float)
         self.ee = np.asarray(ee, float)
@@ -82,6 +82,10 @@ class Request:
         self.carried = carried
         self.alternate_goals = [np.asarray(p, float) for p in alternate_goals]
         self.contact_tail = bool(contact_tail)
+        self.tilt = np.asarray(tilt, float)
+        self.allowed_finger_contacts = tuple(allowed_finger_contacts)
+        self.proposal_build = proposal_build
+        self.clearance = float(clearance)
 
     def snapshot(self):
         """JSON-safe inputs for reproducing a failed query without rebuilding."""
@@ -152,7 +156,8 @@ def _probe():
 class CuroboBackend:
     """In-process cuRobo via Sakib's probe. The socket server is not built."""
 
-    def __init__(self):
+    def __init__(self, world_capacity=0):
+        self.world_capacity = world_capacity
         self.probe = None
         self.rig = None
 
@@ -161,7 +166,7 @@ class CuroboBackend:
         # Reserve four measured boxes per full-model link plus world/brick slots.
         # Set the capacity before constructing or warming either planner.
         self.probe.N_CUBOID = max(int(self.probe.N_CUBOID),
-                                  32 + 4 * len(self.probe.link_slices("full")))
+                                  32 + 4 * len(self.probe.link_slices("full")), self.world_capacity)
         self.rig = self.probe.Rig(("A", "B"))
         from .iter_budget import apply, scale_from_env
         scale = scale_from_env()
@@ -179,8 +184,9 @@ class CuroboBackend:
         probe, pl = self.probe, self.rig.pl[request.arm]
         strict_scene = None
         relaxed_proposal = False
+        planning_boxes = [b for b in request.boxes or [] if b['name'] not in request.allowed_finger_contacts]
         if request.boxes is not None:
-            gap, who = self._start_gap(request)
+            gap, who = (1., '') if request.full_path and (request.allowed_finger_contacts or request.proposal_build) else self._start_gap(request)
             if gap <= 0.0:
                 raise PlannerUnavailable("start in %s by %.1f mm" % (who, -gap * 1000))
             if request.full_path:
@@ -189,7 +195,7 @@ class CuroboBackend:
                     raise PlannerUnavailable("strict paths require measured other-arm fingers")
                 other = "A" if request.arm == "B" else "B"
                 obstacles = other_arm_boxes(probe, other, request.other_q)
-                strict_scene = probe.scene_for(request.arm, list(request.boxes) + obstacles)
+                strict_scene = probe.scene_for(request.arm, planning_boxes + obstacles)
                 pl.update_world(strict_scene)
             else:
                 self.rig.set_world(request.arm, request.boxes, None if request.other_q is None else request.other_q[:7])
@@ -217,15 +223,30 @@ class CuroboBackend:
             # without those cuboids; validate() still checks BOTH full arms,
             # fingers, carried brick and world along every candidate path.
             modes = ['boxed'] + (['full-sphere-filter'] if strict_scene is not None else [])
+            if request.allowed_finger_contacts or request.proposal_build:
+                modes.append('contact-full-sphere-filter')
             for mode in modes:
                 feedback_boxes = []
                 candidates = list(goals)
-                if mode == 'full-sphere-filter':
+                mode_boxes = planning_boxes
+                if mode == 'contact-full-sphere-filter':
+                    # The coarse planner's locked fingers can close an opening
+                    # that measured, open full-model fingers clear. Relax only
+                    # proposals; validate() still checks every structure and
+                    # every non-contact finger/link against the full geometry.
+                    owners = {request.proposal_build} if request.proposal_build else {name.split('_', 1)[0] for name in request.allowed_finger_contacts}
+                    mode_boxes = [b for b in planning_boxes if b['name'].split('_', 1)[0] not in owners]
+                if mode != 'boxed':
                     relaxed_proposal = True
-                    pl.update_world(probe.scene_for(request.arm, list(request.boxes)))
+                    pl.update_world(probe.scene_for(request.arm, mode_boxes))
                     print('planner workaround: trying proposals checked against full other-arm spheres', flush=True)
                 for candidate in candidates:
                     pos, quat = probe.tool_pose_w(request.arm, candidate, request.yaw)
+                    if np.any(request.tilt):
+                        from scipy.spatial.transform import Rotation
+                        world = Rotation.from_rotvec(request.tilt).as_matrix() @ probe.yaw_R(request.yaw) @ probe.Rot.from_quat(probe.D.Q_DOWN).as_matrix()
+                        xyzw = Rotation.from_matrix(probe.yaw_R(-probe.BASE[request.arm][1]) @ world).as_quat()
+                        quat = xyzw[[3, 0, 1, 2]]
                     result = pl.plan_pose(probe.goal_from(pl, pos, quat), probe.js7(request.q[:7]), max_attempts=5)
                     if not probe.plan_ok(result):
                         errors.append("%s goal %s: cuRobo plan failed: %s" % (mode, np.round(candidate, 4).tolist(), "no result (IK/start feasibility)" if result is None else getattr(result, "status", "unknown status")))
@@ -250,7 +271,7 @@ class CuroboBackend:
                                 feedback_boxes.append(dict(name='clearance_cut_%d' % len(feedback_boxes),
                                                            c=np.asarray(sphere[:3]).copy(),
                                                            dims=[2 * radius] * 3, yaw=0.0))
-                                pl.update_world(probe.scene_for(request.arm, list(request.boxes) + feedback_boxes))
+                                pl.update_world(probe.scene_for(request.arm, mode_boxes + feedback_boxes))
                                 candidates.append(candidate)
                                 print('planner recovery: avoid other-arm sphere %d, radius %.1f mm' %
                                       (len(feedback_boxes), radius * 1000), flush=True)

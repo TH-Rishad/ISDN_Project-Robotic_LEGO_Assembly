@@ -34,6 +34,19 @@ def arch_plan():
 
 
 class WriggleTest(unittest.TestCase):
+    def test_per_build_socket_limits_preserve_final_target_and_callback(self):
+        ex = Ex()
+        ex.plan = arch_plan()
+        ex.wiggle_amp, ex.wiggle_tilt, ex.wiggle_press_dur = .00025, np.deg2rad(.25), 1.2
+        snap = lambda: None
+        ex.B.push('insert', [0., 0., .06], 0., .01, 1., then=snap)
+        wriggle._splice(ex, ex.plan['sequence'][2], FakeP())
+        self.assertLessEqual(max(abs(m['pos'][1]) for m in ex.B.moves), .00025)
+        self.assertLessEqual(max(abs(m['tilt'][0]) for m in ex.B.moves), np.deg2rad(.25))
+        np.testing.assert_allclose(ex.B.moves[-1]['pos'], [0., 0., .06])
+        self.assertEqual(ex.B.moves[-1]['dur'], 1.2)
+        self.assertIs(ex.B.moves[-1]['then'], snap)
+
     def test_crown_is_a_critical_slot(self):
         ex = SimpleNamespace(plan=arch_plan())
         order = wriggle._tuples(ex.plan)

@@ -41,6 +41,21 @@ def plate_box(origin, ni, nj, pitch, z0):
     }
 
 
+def box_gap(a, b):
+    """Signed separating-axis clearance for two oriented cuboids."""
+    def rotation(box):
+        if 'R' in box:
+            return np.asarray(box['R'], float)
+        c, s = math.cos(box.get('yaw', 0.)), math.sin(box.get('yaw', 0.))
+        return np.array([[c, -s, 0.], [s, c, 0.], [0., 0., 1.]])
+    ra, rb = rotation(a), rotation(b)
+    axes = np.vstack([ra.T, rb.T, np.cross(ra.T[:, None, :], rb.T[None, :, :]).reshape(-1, 3)])
+    norms = np.linalg.norm(axes, axis=1)
+    axes = axes[norms > 1e-8] / norms[norms > 1e-8, None]
+    extent = np.abs(axes @ ra) @ (np.asarray(a['dims']) / 2) + np.abs(axes @ rb) @ (np.asarray(b['dims']) / 2)
+    return float(np.max(np.abs(axes @ (np.asarray(a['c']) - b['c'])) - extent))
+
+
 def zone_of(origin, ni, nj, pitch):
     from Kean.support.sequence import Zone
     ox, oy = float(origin[0]), float(origin[1])

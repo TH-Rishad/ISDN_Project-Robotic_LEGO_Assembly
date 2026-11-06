@@ -2,6 +2,55 @@
 
 Sakib owns the environment, the Newton cell, and the sequence and support generators. Tanvir owns the tight-fit skill. Kean runs the generators on a structure id and finishes the arch and S3. Do not copy Tanvir's modules into `Kean/`.
 
+## Concurrent independent builders
+
+The new `dual_build` mode gives A and B separate structures, studded pads and
+feeders in one Newton simulation. It reuses Kean's cuRobo planner, joint
+playback, insertion controller and generated brace search. Support requests
+are collected before pickup; the helper finishes its current placement and
+parks before helping. Simultaneous pending requests give A priority, then
+serve B's retained request. A completed builder remains available to help.
+
+From the repository root:
+
+```bash
+bash Kean/scripts/dual_build.sh --build-a arch --build-b S3 \
+  --viewer viser --port 8081 --out Kean/results/dual_arch_s3_live_001
+```
+
+Open `http://localhost:8081`. Omit `--viewer viser` for headless execution.
+Choose a fresh output directory each time. The existing `Sakib/.venv` supplies
+the interpreter and GPU dependencies.
+
+Swept full-arm/finger and carried-brick reservations admit compatible
+free-space motions together. Contact phases reserve exclusive motion while
+the helper's measured joints hold its brace. Both structures, both pads and
+all feeder bricks remain in the clearance world. Support acknowledgment
+requires measured contact force on both fingers; failed clearance or lost
+support stops execution. These are sampled simulation checks.
+
+Before moving a helper, the runner checks its approach, finger-closing sweep
+and the carried brick's insertion corridor. Additional generated grip heights
+and lateral positions must retain the original predicted support capacity.
+The executor uses the generator's grasp offsets. Pickup heights may rise by
+up to 2 mm to clear lower-course studs, and the hand lifts while releasing.
+Precision sockets use Kean's existing wriggle phases with 0.1 mm lateral
+motion, 0.1 degree rocking and a longer final press. A loaded builder waits
+at its checked park pose while the helper approaches.
+
+Runs save both plans and layout, per-arm progress/roles, scheduler events,
+contact results, motion failures and a complete recording. Verify or replay:
+
+```bash
+Sakib/.venv/bin/python -m Kean.verify_dual --run Kean/results/dual_arch_s3_live_001
+bash Kean/scripts/play_run.sh --run Kean/results/dual_arch_s3_live_001 --port 8081 --loop
+```
+
+`--step-limit N` executes a short diagnostic. `--start-step-a N` and
+`--start-step-b N` pre-place earlier bricks for support diagnostics. Such runs
+are explicitly marked diagnostic and cannot pass as complete builds. See
+[the implementation plan](DUAL_BUILDER_PLAN.md) for the handshake and validation criteria.
+
 Meeting the three requirements below is a full mark. The M0.5 gate, insertion RL, perception, and the other master-plan items are omitted.
 
 ## Instructor acceptance (full mark)

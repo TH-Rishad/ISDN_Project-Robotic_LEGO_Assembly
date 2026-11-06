@@ -1,6 +1,7 @@
 """Play a planned free-space path on the cell tick. The last 30 mm stays Cartesian."""
 
 import numpy as np
+from concurrent.futures import Future
 
 from Kean.motion.contact_segment import CONTACT_M
 from Kean.motion.plan_curobo import GraphCaptured, Request
@@ -23,7 +24,7 @@ TAIL_SPEED = 0.020
 
 def planner_yaw(example, arm, yaw, wrap_angle):
     """Match Example.step's choice of symmetric wrist orientation exactly."""
-    if getattr(example, "direct", False):
+    if getattr(arm, 'absolute_yaw', False) or getattr(example, "direct", False):
         return float(yaw)
     shift = getattr(example, "yaw_shift", None)
     if arm is example.B and shift is not None:
@@ -53,10 +54,12 @@ class Slot:
         self.move = None
         self.request = None
         self.other_q = None
+        self.paused = False
 
 
 class Tick:
-    def __init__(self, planner, zone=None, fps=60, world=None, clearance=None, q_of=None, *, wrap_angle, resample_trajectory, strict=False, carried=None):
+    def __init__(self, planner, zone=None, fps=60, world=None, clearance=None, q_of=None, *, wrap_angle, resample_trajectory, strict=False, carried=None, reservations=None):
+        self.reservations = reservations
         self.strict = strict
         self.carried = carried
         self.resample_trajectory = resample_trajectory
@@ -105,6 +108,8 @@ class Tick:
 
     def _moving(self, arm):
         slot = self.slots.get(arm)
+        if slot is not None and slot.mode == 'deferred':
+            return False
         if slot is not None and slot.mode in ("waiting", "playing"):
             return True
         return arm.cur is not None and arm.phase not in STATIC
@@ -132,6 +137,31 @@ class Tick:
         p, yaw, g, tilt = arm.cmd
         return (np.asarray(p, float) + arm.bias, yaw, g, tilt)
 
+    def _freeze(self, arm):
+        slot = self.slots[arm]
+        if not slot.paused:
+            slot.q = self.q_of(self.example, arm)[:7].copy()
+            slot.v = np.zeros(7)
+            slot.paused = True
+        return self._hold(arm)
+
+    def _unfreeze(self, arm):
+        slot = self.slots[arm]
+        if slot.paused:
+            self._seed_ik(arm)
+            slot.q = slot.v = None
+            slot.paused = False
+
+    def cancel_at_measured(self, arm):
+        """A force guard ended a helper approach before its planned endpoint."""
+        slot = self.slots[arm]
+        slot.mode, slot.move, slot.goal, slot.future = 'idle', None, None, None
+        slot.q = slot.v = None
+        slot.paused = False
+        if self.reservations is not None:
+            self.reservations.release(slot.name)
+        self._freeze(arm)
+
     def _begin(self, arm, move, ee):
         slot = self.slots[arm]
         goal = np.asarray(move["pos"], float) + arm.bias
@@ -142,8 +172,24 @@ class Tick:
             contact_tail=self.strict and move.get("phase") == "pre-insert",
             alternate_goals=[np.asarray(p, float) + arm.bias for p in move.get("alternate_goals", [])],
             grip=float(move["grip"]), carried=None if self.carried is None else self.carried(self.example, slot.name))
+        if self.reservations is not None:
+            request.tilt = np.asarray(move['tilt'], float)
+            request.allowed_finger_contacts = getattr(self.example, 'allowed_finger_contacts', lambda *a: ())(slot.name, move['phase'])
+            if getattr(self.example, 'roles', {}).get(slot.name) == 'supporter':
+                request.proposal_build = self.example.task_builds[slot.name]
         slot.other_q = None if other_q is None else np.asarray(other_q[:7], float).copy()
-        slot.future = self.planner.submit(request)
+        cached = move.pop('preplanned', None)
+        if cached is not None:
+            from Kean.motion.path_check import validate
+            try:
+                validate(self.planner.backend.probe, request, np.vstack([request.q[:7], cached['joint_pos']]))
+            except ValueError:
+                cached = None
+        if cached is not None:
+            slot.future = Future()
+            slot.future.set_result(cached)
+        else:
+            slot.future = self.planner.submit(request)
         slot.mode = "waiting"
         slot.goal = goal
         slot.move = move
@@ -182,9 +228,16 @@ class Tick:
 
     def _service(self, arm, orig, dt, ee):
         slot = self.slots[arm]
-        if self.strict and slot.other_q is not None:
+        if self.strict and slot.other_q is not None and (self.reservations is None or slot.mode == 'playing'):
             other = self.other(arm)
-            if np.max(np.abs(self.q_of(self.example, other)[:7] - slot.other_q)) > 0.02:
+            changed = np.max(np.abs(self.q_of(self.example, other)[:7] - slot.other_q)) > 0.02
+            allowed = not changed or (self.reservations is not None and self.reservations.allows_other(
+                slot.name, self.slots[other].name, self.example.state_0.joint_q.numpy()[9*(0 if self.slots[other].name == 'A' else 1):][:9])
+                )
+            if changed and not allowed:
+                self.plan_failures.append(dict(error='motion_obstacle_moved', arm=slot.name,
+                    other_phase=other.phase, other_mode=self.slots[other].mode,
+                    reservation_error=getattr(self.reservations, 'last_error', None)))
                 return self._stop(arm, "motion_obstacle_moved")
         if slot.mode == "waiting":
             if not slot.future.done():
@@ -195,6 +248,9 @@ class Tick:
                 self.captures += 1
                 raise
             except Exception as exc:
+                if self.reservations is not None and self._moving(self.other(arm)):
+                    slot.mode, slot.move, slot.q, slot.v = 'deferred', None, None, None
+                    return self._freeze(arm)
                 self.plan_failures.append({"arm": slot.name, "phase": getattr(arm, "phase", None), "error": str(exc),
                                            "step": getattr(self.example, "b_step", None),
                                            "request": slot.request.snapshot()})
@@ -218,11 +274,14 @@ class Tick:
             if self.strict and result.get("goal") is not None:
                 slot.goal = np.asarray(result["goal"], float)
                 arm.cur["pos"] = slot.goal - arm.bias
-            if result.get("proposal_mode") == "full-sphere-filter":
+            if result.get('proposal_mode') in ('full-sphere-filter', 'contact-full-sphere-filter'):
                 self.workarounds.append({"step": getattr(self.example, "b_step", None),
                                          "arm": slot.name, "phase": arm.phase,
-                                         "method": "full-sphere-filter"})
+                                         "method": result['proposal_mode']})
             pos = np.asarray(result["joint_pos"], float)
+            if self.reservations is not None and not self.reservations.admit(slot.name, slot.request, pos):
+                slot.mode, slot.move, slot.q, slot.v = 'deferred', None, None, None
+                return self._freeze(arm)
             vel = result.get("joint_vel")
             if vel is None:
                 vel = np.zeros_like(pos)
@@ -255,6 +314,9 @@ class Tick:
             arm.cur = None
             slot.mode = "idle"
             slot.q = slot.v = None
+            if self.reservations is not None:
+                self.reservations.release(slot.name)
+                self._freeze(arm)
             if move["then"]:
                 move["then"]()
             return self._hold(arm)
@@ -273,19 +335,46 @@ class Tick:
     def _update(self, arm, orig, dt, ee):
         arm.ee = np.asarray(ee, float).copy()
         slot = self.slots[arm]
+        if self.reservations is not None and getattr(self.example, 'failure', None):
+            slot.mode = 'stopped'
+            slot.q = self.q_of(self.example, arm)[:7].copy()
+            slot.v = np.zeros(7)
+            return self._hold(arm)
+        if slot.mode == 'deferred':
+            if self._moving(self.other(arm)):
+                return self._freeze(arm)
+            slot.mode = 'idle'
         if slot.mode == "stopped":
             return self._hold(arm)
         if slot.mode in ("waiting", "playing"):
             self._seed_ik(arm)
             return self._service(arm, orig, dt, ee)
         pending = arm.cur if arm.cur is not None else (arm.moves[0] if arm.moves else None)
-        if pending is not None and pending is not slot.move and (needs_plan(pending, ee) or (self.strict and pending.get("phase") in FREE and not pending.get("contact") and pending.get("rel") is None)):
-            if (self.strict and self.other(arm) is not None and self._moving(self.other(arm))) or self._blocked(arm, pending["pos"], ee):
-                return self._hold(arm)
+        helper_move = self.reservations is not None and pending is not None and pending['phase'] in ('to brace', 'approach', 'brace-in')
+        if pending is not None and pending is not slot.move and (helper_move or needs_plan(pending, ee) or (self.strict and pending.get("phase") in FREE and not pending.get("contact") and pending.get("rel") is None)):
+            if self.reservations is not None:
+                blocked = not self.reservations.can_begin(self, arm, True)
+            else:
+                blocked = (self.strict and self.other(arm) is not None and self._moving(self.other(arm))) or self._blocked(arm, pending["pos"], ee)
+            if blocked:
+                return self._freeze(arm) if self.reservations is not None else self._hold(arm)
+            self._unfreeze(arm)
             if arm.cur is None:
                 orig(0.0, ee)
             self._begin(arm, arm.cur, ee)
             return self._hold(arm)
+        if self.reservations is not None and pending is not None and pending['phase'] not in STATIC:
+            if not self.reservations.can_begin(self, arm, False):
+                return self._freeze(arm)
+            self._unfreeze(arm)
+            result = orig(dt, ee)
+            if arm.cur is None:
+                self.reservations.release(slot.name)
+            return result
+        if self.reservations is not None:
+            result = orig(dt, ee)
+            self._freeze(arm)
+            return result
         return orig(dt, ee)
 
     def _write(self, tgt):
@@ -315,9 +404,16 @@ class Tick:
                 q = measured + t * (tgt[:18] - measured)
                 a = self.clearance.spheres("A", q[:9])
                 b = self.clearance.spheres("B", q[9:18])
-                gap = self.clearance.probe.clearance_spheres(a, b)
+                gap = getattr(self.clearance, 'pair_gap', self.clearance.probe.clearance_spheres)(a, b)
+                if self.reservations is not None and hasattr(self.example, 'command_clearance'):
+                    world_gap, world_label = self.example.command_clearance(self.clearance, q, spheres={'A': a, 'B': b})
+                    if world_gap < gap:
+                        gap = world_gap
+                        label = world_label
+                    else:
+                        label = 'other arm'
                 if not np.isfinite(gap) or gap < 0.001:
-                    self.example.fail("arm_clearance")
+                    self.example.fail(('command_clearance:' + label) if self.reservations is not None else 'arm_clearance')
                     detail = {"error": "arm clearance %.2f mm" % (gap * 1000),
                               "step": getattr(self.example, "b_step", None),
                               "phases": {a.name: a.phase for a in self.slots},

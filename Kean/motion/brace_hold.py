@@ -10,22 +10,24 @@ class BraceHoldIK:
     def __init__(self, example):
         self.example = example
         self.delegate = example.ik
-        self.joints = None
+        self.joints = {}
 
     def __getattr__(self, name):
         return getattr(self.delegate, name)
 
     def step(self, q_in, q_out, *args, **kwargs):
         ex = self.example
-        holding = ex.A.phase == "hold"
-        if holding and self.joints is None:
-            self.joints = ex.state_0.joint_q.numpy()[:7].copy()
-        elif not holding:
-            self.joints = None
+        measured = ex.state_0.joint_q.numpy()
+        for k, arm in enumerate((ex.A, getattr(ex, 'B', None))):
+            if arm is not None and arm.phase == 'hold':
+                self.joints.setdefault(k, measured[9*k:9*k+7].copy())
+            else:
+                self.joints.pop(k, None)
         result = self.delegate.step(q_in, q_out, *args, **kwargs)
-        if holding:
+        if self.joints:
             q = q_out.numpy()
-            q[0, :7] = self.joints
+            for k, joints in self.joints.items():
+                q[k, :7] = joints
             q_out.assign(q)
         return result
 

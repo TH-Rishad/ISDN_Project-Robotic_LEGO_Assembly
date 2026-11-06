@@ -599,7 +599,27 @@ def solve_park(model_ik):
     return q.numpy()[0].tolist()
 
 
-def build_cell(plan, exe, n0=0, substeps=16, legacy_brace=False):
+def add_build_plate(scene, plan):
+    """Add one physical studded pad at this plan's origin."""
+    ox, oy, z0 = plan['voxel_origin']
+    ni = max(b['grid_pos'][0] + P.footprint(b['type'], b['yaw_index'])[0] for b in plan['bricks'])
+    nj = max(b['grid_pos'][1] + P.footprint(b['type'], b['yaw_index'])[1] for b in plan['bricks'])
+    cx, cy = ox + ni * P.PITCH / 2, oy + nj * P.PITCH / 2
+    v, f = ex._make_brick_mesh(ni + 4, nj + 4)
+    scene.add_shape_mesh(-1, mesh=newton.Mesh(v, f.flatten()), color=(0.45, 0.47, 0.45),
+                         xform=wp.transform((cx, cy, z0 - ex.BRICK_HEIGHT), wp.quat_identity()),
+                         cfg=newton.ModelBuilder.ShapeConfig(has_shape_collision=False, has_particle_collision=False))
+    shapes = [scene.add_shape_box(-1, hx=(ni + 4) * P.PITCH / 2, hy=(nj + 4) * P.PITCH / 2, hz=z0 / 2,
+                                  xform=wp.transform((cx, cy, z0 / 2), wp.quat_identity()), cfg=PROXY_CFG)]
+    hh = .5 * ex.STUD_HEIGHT - ex.COLLIDER_INSET
+    for i in range(ni):
+        for j in range(nj):
+            shapes.append(scene.add_shape_cylinder(-1, radius=ex.STUD_COLLIDER_RADIUS, half_height=hh, cfg=PROXY_CFG,
+                          xform=wp.transform((ox + (i + .5) * P.PITCH, oy + (j + .5) * P.PITCH, z0 + hh), wp.quat_identity())))
+    return (ni, nj), shapes
+
+
+def build_cell(plan, exe, n0=0, substeps=16, legacy_brace=False, *, workspaces=None, feeders=None, placed_ids=(), velocity_control=False):
     """One cell as a world builder, without the ground plane: both arms parked, the baseplate, every brick (steps < n0 at their targets, the rest
     waiting in the feeder with their final yaw) and the clutch pool (one weld per brick and support, enabled for steps < n0). Example.__init__ and
     rl_batched.BatchedCells (which replicates it per world) both build the scene here.
@@ -608,6 +628,8 @@ def build_cell(plan, exe, n0=0, substeps=16, legacy_brace=False):
     steps = plan["sequence"]
     # --- arms ---------------------------------------------------------
     arm = build_arm(substeps)
+    if velocity_control:
+        arm.joint_target_mode[:7] = [int(newton.JointTargetMode.POSITION_VELOCITY)] * 7
     model_ik = arm.finalize()
     # Start parked. HOME_Q reaches 0.41 m out, so two arms 0.9 m apart
     # would begin with their hands interlocked.
@@ -626,30 +648,17 @@ def build_cell(plan, exe, n0=0, substeps=16, legacy_brace=False):
         scene.joint_target_kd[7:9] = [2 * math.sqrt(exe["finger_ke"] * 0.1)] * 2
 
     # --- baseplate: a studded slab, colliding only where the build stands --
-    ox, oy, _ = plan["voxel_origin"]
-    NI = max(b["grid_pos"][0] + P.footprint(b["type"], b["yaw_index"])[0] for b in bricks.values())
-    NJ = max(b["grid_pos"][1] + P.footprint(b["type"], b["yaw_index"])[1] for b in bricks.values())
-    cx, cy = ox + NI * P.PITCH / 2, oy + NJ * P.PITCH / 2
-    NIJ = (NI, NJ)
-    v, f = ex._make_brick_mesh(NI + 4, NJ + 4)
-    scene.add_shape_mesh(-1, mesh=newton.Mesh(v, f.flatten()), color=(0.45, 0.47, 0.45),
-                         xform=wp.transform((cx, cy, Z0 - ex.BRICK_HEIGHT), wp.quat_identity()),
-                         cfg=newton.ModelBuilder.ShapeConfig(has_shape_collision=False,
-                                                             has_particle_collision=False))
-    plate_shapes = [scene.add_shape_box(-1, hx=(NI + 4) * P.PITCH / 2, hy=(NJ + 4) * P.PITCH / 2, hz=Z0 / 2,
-                        xform=wp.transform((cx, cy, Z0 / 2), wp.quat_identity()), cfg=PROXY_CFG)]
-    stud_hh = 0.5 * ex.STUD_HEIGHT - ex.COLLIDER_INSET
-    for i in range(NI):
-        for j in range(NJ):
-            plate_shapes.append(scene.add_shape_cylinder(
-                -1, radius=ex.STUD_COLLIDER_RADIUS, half_height=stud_hh, cfg=PROXY_CFG,
-                xform=wp.transform((ox + (i + 0.5) * P.PITCH, oy + (j + 0.5) * P.PITCH,
-                                    Z0 + stud_hh), wp.quat_identity())))
+    plate_shapes = []
+    for workspace in workspaces or [plan]:
+        NIJ, shapes = add_build_plate(scene, workspace)
+        plate_shapes.extend(shapes)
+        if workspaces is not None:
+            workspace['_plate_shapes'] = shapes
 
     # --- bricks, waiting in the placer's feeder with their final yaw ------
     solimp = scene.custom_attributes["mujoco:geom_solimp"]
     meshes, body, target, dims = {}, {}, {}, {}
-    slots = feeder_slots(len(steps))
+    slots = [feeders[s['brick_id']][:2] for s in steps] if feeders is not None else feeder_slots(len(steps))
     for n, s in enumerate(steps):
         b = bricks[s["brick_id"]]
         nx, ny = P.footprint(b["type"], b["yaw_index"])
@@ -658,7 +667,7 @@ def build_cell(plan, exe, n0=0, substeps=16, legacy_brace=False):
         if (L, W) not in meshes:
             mv, mf = ex._make_brick_mesh(L, W)
             meshes[(L, W)] = ex._build_mesh_with_sdf(mv, mf, color=COLORS[0])
-        at = tuple(s["target_pose"][:3]) if n < n0 else (*slots[n], 0.0005)
+        at = tuple(s["target_pose"][:3]) if n < n0 or s['brick_id'] in placed_ids else (*slots[n], 0.0005)
         xform = wp.transform(at, wp.quat_from_axis_angle(wp.vec3(0, 0, 1), yaw))
         bd = scene.add_body(xform=xform, label=b["id"])
         shape = scene.add_shape_mesh(bd, mesh=meshes[(L, W)], cfg=BRICK_CFG,
@@ -685,9 +694,9 @@ def build_cell(plan, exe, n0=0, substeps=16, legacy_brace=False):
                 rel = wp.transform(rotate(qz(-y1), p2 - p1), qz(y2 - y1))
             eq = scene.add_equality_constraint_weld(
                 body1=-1 if sid is None else body[sid], body2=body[bid],
-                relpose=rel, enabled=n < n0, label="clutch_%s_%s" % (sid or "plate", bid),
+                relpose=rel, enabled=n < n0 or bid in placed_ids, label="clutch_%s_%s" % (sid or "plate", bid),
                 custom_attributes=WELD_ATTRS)
-            welds.setdefault(bid, []).append([eq, sid, rel, n < n0])
+            welds.setdefault(bid, []).append([eq, sid, rel, n < n0 or bid in placed_ids])
     return scene, types.SimpleNamespace(model_ik=model_ik, park_q=park_q, n_arm_bodies=n_arm_bodies, NIJ=NIJ, plate_shapes=plate_shapes,
                                         body=body, target=target, dims=dims, feeder=feeder, welds=welds)
 
@@ -725,7 +734,7 @@ class Example:
             raise SystemExit("rl_control cannot be combined with --manual or --look")
         self.rt_t, self.feed, self.look_feed, self.man_info, self.top_det, self.top_det_ms = time.perf_counter(), None, None, {}, None, 0.0
 
-        self.plan, self.name = make_plan(args)
+        self.plan, self.name = self.plan_input(args)
         self.failure = self.failed_at_step = self.built_at_failure = None   # end at the first failure (see fail())
         self.stopped = False                  # the arms were sent home after a failure
         bricks = {b["id"]: b for b in self.plan["bricks"]}
@@ -746,7 +755,7 @@ class Example:
             self.sham_s = self.set_brace(steps[n0], json.loads(args.brace_json), exe)
 
         # --- the cell: arms, baseplate, bricks, clutch pool (build_cell) -------
-        scene, c = build_cell(self.plan, exe, n0, self.substeps, getattr(args, "legacy_brace", False))
+        scene, c = self.build_scene(self.plan, exe, n0)
         self.model_ik, park_q, n_arm_bodies, self.NIJ, self.plate_shapes = c.model_ik, c.park_q, c.n_arm_bodies, c.NIJ, c.plate_shapes
         self.body, self.target, self.dims, self.feeder, self.welds = c.body, c.target, c.dims, c.feeder, c.welds
         scene.add_ground_plane(cfg=newton.ModelBuilder.ShapeConfig(mu=0.75))
@@ -772,7 +781,7 @@ class Example:
         self.control = self.model.control()
         self.contacts = self.pipeline.contacts()
         newton.eval_fk(self.model, self.model.joint_q, self.model.joint_qd, self.state_0)
-        self.breaker = JointBreaker(self)
+        self.breaker = JointBreaker(self, getattr(self, 'connections', None))
 
         # --- IK: both arms in one batched solve, each in its own base frame ---
         self.ik_q = wp.array(np.tile(park_q, (2, 1)), dtype=wp.float32)
@@ -855,6 +864,18 @@ class Example:
         print("%s: %d bricks, %d braced (%s), %d clutch welds" % (
             self.name, len(steps), self.plan["validation"]["brace_required_count"],
             self.plan["validation"]["bracing_strategy"], sum(len(w) for w in self.welds.values())))
+
+    def plan_input(self, args):
+        return make_plan(args)
+
+    def build_scene(self, plan, exe, n0):
+        return build_cell(plan, exe, n0, self.substeps, getattr(self.args, 'legacy_brace', False))
+
+    def arm_command(self, arm, k, body_q):
+        ee = body_q[EE + k * self.n_arm_bodies][:3]
+        if arm is self.B and not self.direct:
+            self.aim_brick(ee, body_q)
+        return arm.update(self.frame_dt, ee)
 
     def solve_park(self):
         return solve_park(self.model_ik)
@@ -1239,7 +1260,7 @@ class Example:
         pose = np.array(brace["brace_pose"][:3], float)
         tilt = np.array(brace["brace_tilt_rotvec"], float)
         ax = brace.get("brace_axis") or [1, 0, 0]
-        yaw = math.atan2(ax[0], ax[1])                        # closing axis x -> pi/2
+        yaw = brace.get('helper_yaw', math.atan2(ax[0], ax[1]))  # closing axis x -> pi/2
         tool = rotate(qrot(tilt), np.array([0.0, 0.0, -1.0]))  # hand -> fingertips
         back, near = pose - BRACE_BACK * tool, pose - BRACE_GUARD * tool
         g_open, g_shut = BRACE_HALF_W + BRACE_CLEAR, BRACE_HALF_W - BRACE_SQUEEZE
@@ -1249,7 +1270,10 @@ class Example:
             A.rebase(A.ee)                                    # hold where the hand is, not at pose
             self.close_t = self.sim_time
             info["executed"] = True
-            self.braced.add(n)
+            if hasattr(self, 'confirm_brace'):
+                self.confirm_brace(n)
+            else:
+                self.braced.add(n)
 
         A.push("to brace", [back[0], back[1], max(back[2], self.z_travel)], yaw, g_open, 1.5, tilt=tilt)
         A.push("approach", back, yaw, g_open, 0.8, tilt=tilt)
@@ -1305,7 +1329,7 @@ class Example:
         fixture's plateau frames also the signed total force on the bricks and its moment about the brace point
         (plan_v4_rl_brace 2.5, A5), appended to fx_react."""
         n, A = self.a_step, self.A
-        if self.legacy or n is None or A.phase not in BRACE_PHASES:
+        if self.legacy or n is None or A.phase not in getattr(self, 'brace_contact_phases', BRACE_PHASES):
             self.guard_n = 0
             return
         info, na, c = self.brace_info(n), self.n_arm_bodies, self.a_contacts()
@@ -1321,7 +1345,8 @@ class Example:
             b0, b1 = np.where(ok, self.sb[np.maximum(s0, 0)], -9), np.where(ok, self.sb[np.maximum(s1, 0)], -9)
             fv, nrm = c.force.numpy()[:cnt, :3], c.rigid_contact_normal.numpy()[:cnt]
             fn = np.abs((fv * nrm).sum(1))                            # normal force per contact
-            a0, a1 = (b0 >= 0) & (b0 < na), (b1 >= 0) & (b1 < na)    # A's bodies are 0..na-1
+            offset = 0 if A.name[0] == 'A' else na
+            a0, a1 = (b0 >= offset) & (b0 < offset + na), (b1 >= offset) & (b1 < offset + na)
             hit = bool((fn[a0 | a1] > GUARD_N).any())
             body_q, pos = self.state_0.body_q.numpy(), self.solver.mjw_data.contact.pos.numpy()[:cnt]
             acc = {}                                                  # brick -> [force sum, moment sum about its origin]
@@ -1329,8 +1354,8 @@ class Example:
                 a, o = (b0[i], b1[i]) if a0[i] else (b1[i], b0[i])    # A's body, the other one
                 if o < 2 * na:
                     continue                                          # arm-arm (the monitor counts those)
-                if a in (12, 13):
-                    grip[a - 12] += fn[i]
+                if a - offset in (12, 13):
+                    grip[a - offset - 12] += fn[i]
                 bid = self.brick_of[int(o)]
                 f = -fv[i] if a0[i] else fv[i]                        # force on the brick (fv acts on shape0)
                 info["contacted"].add(bid)
@@ -1346,12 +1371,14 @@ class Example:
             self.fx_react.append((Ftot, Mtot))
         if A.phase == "hold" and self.close_t is not None and self.sim_time - self.close_t >= GRIP_SETTLE_S - 1e-9:
             info["grip_samples"].append(grip)
-        self.guard_n = self.guard_n + 1 if hit and A.phase == "brace-guard" and A.cur else 0
+        self.guard_n = self.guard_n + 1 if hit and A.phase in getattr(self, 'guard_phases', ('brace-guard',)) and A.cur else 0
         if self.guard_n >= GUARD_FRAMES:
-            A.stop_here(self.state_0.body_q.numpy()[EE][:3])
+            A.stop_here(self.state_0.body_q.numpy()[EE + (0 if A.name[0] == 'A' else na)][:3])
+            if hasattr(self, 'brace_guard_stopped'):
+                self.brace_guard_stopped(A)
             info.update(guard_stop=True, guard_frame=self.frame)
             self.guard_n = 0
-            print("  GUARD STOP step %d: A stops at frame %d" % (n, self.frame))
+            print("  GUARD STOP step %d: %s stops at frame %d" % (n, A.name[0], self.frame))
 
     def brace_row(self, n):
         """brace_by_step[n] as JSON: requested / planned_feasible / executed, guard_stop, the realised grip per
@@ -1615,16 +1642,13 @@ class Example:
             self.schedule()
         pos, rot, grip, cmd_w = [], [], [], []
         for arm, k in ((self.A, 0), (self.B, 1)):
-            ee = body_q[EE + k * self.n_arm_bodies][:3]
-            if arm is self.B and not self.direct:
-                self.aim_brick(ee, body_q)
-            p, yaw, g, tilt = arm.update(self.frame_dt, ee)
+            p, yaw, g, tilt = self.arm_command(arm, k, body_q)
             cmd_w.append(p)
             (bx, by, bz), byaw = arm.base
             pos.append(rotate(qz(-byaw), p - [bx, by, bz]))
             # a parallel gripper is 180-degree symmetric: pick the nearer wrist. A look step (--look) takes that choice once,
             # at its grasp (yaw_shift), so the wrist can turn 180 deg for the second look and delta-psi cannot flip it
-            yaw = (yaw if self.direct else yaw + self.yaw_shift if arm is self.B and self.yaw_shift is not None
+            yaw = (yaw if self.direct or getattr(arm, 'absolute_yaw', False) else yaw + self.yaw_shift if arm is self.B and self.yaw_shift is not None
                    else byaw + wrap(yaw - byaw, math.pi))     # --manual: the command is the hand's world yaw: no wrap, no wrist flip
             world = qmul(qrot(tilt), qmul(qz(yaw), Q_DOWN))
             rot.append(qmul(qz(-byaw), world))

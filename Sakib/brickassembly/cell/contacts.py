@@ -177,6 +177,8 @@ class ContactMonitor:
         armA, armB = clsA.endswith(("_link", "_finger")), clsB.endswith(("_link", "_finger"))
         if armA and armB and clsA[0] != clsB[0]:
             return "arm_arm"
+        if hasattr(ex, 'classify_contact'):
+            return ex.classify_contact(self, clsA, clsB)
         held_cls = "brick:%s" % held if held else None
         if held_cls and {clsA, clsB} == {"B_finger", held_cls}:
             return None                                   # B grasping its own brick
@@ -202,12 +204,13 @@ class ContactMonitor:
     def step(self, ex):
         self.frame += 1
         held = self._held(ex)
+        held_ids = set(ex.held_objects().values()) if hasattr(ex, 'held_objects') else ({held} if held else set())
         gripped = self._gripped(ex)
 
         body_q = ex.state_0.body_q.numpy()
         for body, bid in self.body_brick.items():         # ground truth, scoring only
             pos = body_q[body][:3]
-            if bid == held:                # in B's hand: it moves by design; rest = where it lands
+            if bid in held_ids:            # in a builder's hand: moves by design
                 self.rest[body] = pos.copy()
                 continue
             prev = self.rest.get(body)
@@ -252,7 +255,7 @@ class ContactMonitor:
                             and dd * 1000 < -PENETRATION_MM * self.scale:
                         self._event("penetration", bA, bB, clsA, clsB, dd, ff, ex, seen)
                     is_candidate = (clsA.endswith(("_link", "_finger")) or clsB.endswith(("_link", "_finger"))
-                                   or (held and "brick:%s" % held in (clsA, clsB)))
+                                   or any('brick:' + bid in (clsA, clsB) for bid in held_ids))
                     if not is_candidate:
                         continue
                     evt = self._classify(ex, held, gripped, clsA, clsB)

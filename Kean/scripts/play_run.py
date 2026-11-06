@@ -1,6 +1,7 @@
 """Play a saved acceptance recording in Viser. Does not step the cell controller."""
 
 import argparse
+import json
 import sys
 import time
 from pathlib import Path
@@ -63,6 +64,29 @@ def show_frame(example, record, index):
     names = record["phase_names"]
     example.A.phase = names[int(record["a_phase"][index])]
     example.B.phase = names[int(record["b_phase"][index])]
+    if 'own_steps' in record and hasattr(example, 'coordinator'):
+        for k, a in enumerate('AB'):
+            example.coordinator.builds[a].step = int(record['own_steps'][index, k])
+            example.roles[a] = str(record['roles'][index, k])
+            example.task_builds[a] = str(record['task_builds'][index, k])
+        if hasattr(example, 'replay_events'):
+            if index == 0:
+                example.replay_event_index = 0
+                example.coordinator.pending.clear()
+                example.coordinator.active = None
+            while example.replay_event_index < len(example.replay_events):
+                event = example.replay_events[example.replay_event_index]
+                if event['time'] > example.sim_time:
+                    break
+                arm = event['arm']
+                if event['event'] == 'support_requested':
+                    example.coordinator.pending[arm] = event['step']
+                elif event['event'] == 'support_granted':
+                    example.coordinator.pending.pop(arm, None)
+                    example.coordinator.active = arm
+                elif event['event'] == 'support_released':
+                    example.coordinator.active = None
+                example.replay_event_index += 1
 
 
 def paused(viewer):
@@ -72,7 +96,7 @@ def paused(viewer):
     return bool(getattr(viewer, "paused", False))
 
 
-def play(example, record, speed, loop):
+def play(example, record, speed, loop, port=8080):
     viewer = example.viewer
     n = len(record["frame"])
     example.frame_dt = (1.0 / 60.0) / speed
@@ -80,7 +104,7 @@ def play(example, record, speed, loop):
     example.rt_t = time.perf_counter()
     if hasattr(viewer, "register_ui_callback"):
         viewer.register_ui_callback(example.gui, position="side")
-    print("playback: %d frames, %.0f s at 1x. Open http://localhost:8080" % (n, n / 60.0), flush=True)
+    print("playback: %d frames, %.0f s at 1x. Open http://localhost:%d" % (n, n / 60.0, port), flush=True)
     print("This is the saved recording, not a new simulation. Uncheck Pause if the scene is frozen.", flush=True)
     index = 0
     while getattr(viewer, "is_running", lambda: True)():
@@ -105,6 +129,17 @@ def main():
     if args.speed <= 0:
         parser.error("--speed must be positive")
     run = args.run if args.run.is_absolute() else ROOT / args.run
+    manifest_file = run / 'manifest.json'
+    if manifest_file.is_file() and json.loads(manifest_file.read_text()).get('mode') == 'dual_builder':
+        from Kean.dual_build import load_example
+        manifest = json.loads(manifest_file.read_text())
+        record = load_record(run / manifest['recording'])
+        example = load_example(run, make_viewer(args.port))
+        if list(example.body) != record['brick_ids']:
+            raise SystemExit('recording brick order does not match the dual-build manifest')
+        print('Dual playback:', manifest['names'], flush=True)
+        play(example, record, args.speed, args.loop, args.port)
+        return
     record_path = recording_file(run, args.shape)
     plan = plan_file(run, args.shape)
     record = load_record(record_path)
@@ -117,7 +152,7 @@ def main():
     ids = list(example.body)
     if ids != record["brick_ids"]:
         raise SystemExit("recording brick order does not match the saved plan")
-    play(example, record, args.speed, args.loop)
+    play(example, record, args.speed, args.loop, args.port)
 
 
 if __name__ == "__main__":

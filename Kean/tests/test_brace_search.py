@@ -30,6 +30,27 @@ class BraceSearchTest(unittest.TestCase):
                 self.assertLessEqual(pick['predicted_util_braced'],
                                      step['brace']['predicted_util_braced'] + 1e-4)
                 self.assertEqual(pick['brace_force_N'], 14.3)
+            ex.brace_high_first = True
+            high = list(candidates(ex, step['step'], step['brace'], SimpleNamespace(P=P)))
+            self.assertEqual(high[0], step['brace'])
+            self.assertGreater(high[1]['brace_pose'][2], step['brace']['brace_pose'][2])
+            ex.brace_height_offsets = (.0012, -.0012)
+            refined = list(candidates(ex, step['step'], step['brace'], SimpleNamespace(P=P)))
+            self.assertGreater(refined[1]['brace_pose'][2], high[1]['brace_pose'][2])
+            self.assertLessEqual(refined[1]['predicted_util_braced'], step['brace']['predicted_util_braced'] + 1e-4)
+            ex.brace_lateral_offsets = (.006, -.006)
+            ex.brace_leans = (75., 60., 45.)
+            wider = list(candidates(ex, step['step'], step['brace'], SimpleNamespace(P=P)))
+            self.assertGreater(wider[1]['brace_pose'][1], high[1]['brace_pose'][1])
+            self.assertAlmostEqual(abs(wider[1]['brace_tilt_rotvec'][0]), np.deg2rad(75), places=4)
+            for pick in wider:
+                self.assertLessEqual(pick['predicted_util_braced'], step['brace']['predicted_util_braced'] + 1e-4)
+            ex.A = SimpleNamespace(base=((-0.45, 0., 0.), 0.))
+            ex.brace_yaw_alternatives = True
+            flipped = list(candidates(ex, step['step'], step['brace'], SimpleNamespace(P=P), limit=3))
+            self.assertAlmostEqual(flipped[2]['helper_yaw'], 3 * np.pi / 2)
+            self.assertEqual(flipped[1]['brace_pose'], flipped[2]['brace_pose'])
+            self.assertEqual(flipped[1]['predicted_util_braced'], flipped[2]['predicted_util_braced'])
 
     def setup_search(self, choices):
         ex = Ex()

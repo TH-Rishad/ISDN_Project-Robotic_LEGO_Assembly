@@ -22,12 +22,21 @@ def candidates(ex, n, original, D, limit=8):
     brick, placed = order[n], order[:n]
     pose = original['brace_pose']
     positions = bracing.candidates(brick, placed)
+    lateral = getattr(ex, 'brace_lateral_offsets', ())
+    if lateral:
+        positions = [(y + dy, z) for y, z in positions for dy in (0., *lateral)
+                     if bracing.feasible(brick, placed, y + dy, z)]
+    offsets = getattr(ex, 'brace_height_offsets', ())
+    if offsets:
+        positions = [(y, z + dz) for y, z in positions for dz in (0., *offsets)
+                     if bracing.feasible(brick, placed, y, z + dz)]
     # Cover different columns before spending physical trials on nearby heights.
     # The old target-first ordering exhausted all eight trials at y=-36 mm.
     ys = sorted({round(y, 8) for y, _ in positions},
                 key=lambda y: (-abs(y - pose[1]), y))
+    height_key = (lambda yz: -yz[1]) if getattr(ex, 'brace_high_first', False) else (lambda yz: abs(yz[1] - pose[2]))
     columns = [sorted([(y, z) for y, z in positions if round(y, 8) == column],
-                      key=lambda yz: abs(yz[1] - pose[2])) for column in ys]
+                      key=height_key) for column in ys]
     positions = [column[i] for i in range(max(map(len, columns), default=0))
                  for column in columns if i < len(column)]
     yield deepcopy(original)
@@ -37,7 +46,7 @@ def candidates(ex, n, original, D, limit=8):
     # to another height, interleaving columns within each tilt round.
     width = max(1, len(columns))
     schedule = [(y, z, lean) for i in range(0, len(positions), width)
-                for lean in (45., 60., 75.) for y, z in positions[i:i + width]]
+                for lean in getattr(ex, 'brace_leans', (45., 60., 75.)) for y, z in positions[i:i + width]]
     for y, z, lean in schedule:
         sign = np.sign(bracing.lean_for(brick, y)[0]) or 1
         pick = bracing.brace_at(brick, placed, y, z, sign * lean,
@@ -56,16 +65,32 @@ def candidates(ex, n, original, D, limit=8):
         count += 1
         if count >= limit:
             return
+        if getattr(ex, 'brace_yaw_alternatives', False):
+            # Parallel jaws can grip along the same axis with the wrist
+            # turned 180 degrees. The nearer wrist choice can be unreachable
+            # for a strongly tilted helper, so test the other orientation too.
+            alternate = deepcopy(pick)
+            ax = pick.get('brace_axis') or [1., 0., 0.]
+            yaw = np.arctan2(ax[0], ax[1])
+            base = ex.A.base[1]
+            alternate['helper_yaw'] = float(base + resolve_wrap(D)(yaw - base, np.pi) + np.pi)
+            yield alternate
+            count += 1
+            if count >= limit:
+                return
 
 
 def check_approach(ex, planner, world, carried, D):
     """Check staged B -> hover -> pre-insert with A's measured open-hand pose."""
     joints = ex.state_0.joint_q.numpy()
-    other = joints[:9].copy()
+    builder = ex.B.name[0]
+    bi = 0 if builder == 'A' else 9
+    hi = 9 - bi
+    other = joints[hi:hi+9].copy()
     # Include both current open fingers and the eventual closed configuration:
     # the open-hand check is conservative for passage outside the hand.
-    boxes, _ = world(ex, 'B')
-    brick = carried(ex, 'B')
+    boxes, _ = world(ex, builder)
+    brick = carried(ex, builder)
     if brick is None:
         raise PlannerUnavailable('brace search requires the staged carried brick')
     moves = [m for m in ex.B.moves if m['phase'] in ('transport', 'pre-insert')]
@@ -76,11 +101,11 @@ def check_approach(ex, planner, world, carried, D):
     failures = []
     hovers = [moves[0]['pos']] + moves[0].get('alternate_goals', [])
     for hover in hovers:
-        q, ee = joints[9:16].copy(), np.asarray(ex.B.ee).copy()
+        q, ee = joints[bi:bi+7].copy(), np.asarray(ex.B.ee).copy()
         selected = []
         try:
             for move, goal in zip(moves, (hover, moves[1]['pos'])):
-                request = Request('B', q, ee, np.asarray(goal) + ex.B.bias, [0, 0, 0, 1],
+                request = Request(builder, q, ee, np.asarray(goal) + ex.B.bias, [0, 0, 0, 1],
                                   yaw=planner_yaw(ex, ex.B, move['yaw'], resolve_wrap(D)),
                                   boxes=boxes, other_q=other, full_path=True,
                                   grip=move['grip'], carried=brick)
@@ -113,7 +138,7 @@ def install(ex, planner, world, carried, D):
     def queue_brace(self, n, brace):
         if self.legacy or not brace.get('feasible', True):
             return original(n, brace)
-        choices = iter(candidates(self, n, brace, D))
+        choices = iter(candidates(self, n, brace, D, limit=getattr(self, 'brace_candidate_limit', 8)))
         initial = deepcopy(brace)
 
         def attempt():
@@ -125,10 +150,20 @@ def install(ex, planner, world, carried, D):
                 return
             self.B.waited = 0.  # each bounded physical trial has its own timeout
             self.plan['sequence'][n]['brace'] = pick
-            record = dict(step=n, pose=pick['brace_pose'], tilt=pick['brace_tilt_rotvec'], accepted=False)
+            record = dict(step=n, pose=pick['brace_pose'], tilt=pick['brace_tilt_rotvec'],
+                          helper_yaw=pick.get('helper_yaw'), accepted=False)
             self.brace_search_report.append(record)
             print('brace search step %d: pose %s tilt %s' % (n, record['pose'], record['tilt']), flush=True)
             original(n, pick)
+            if hasattr(self, 'check_helper_approach'):
+                try:
+                    self.check_helper_approach(self.A.moves)
+                except PlannerUnavailable as exc:
+                    record['error'] = 'helper approach: ' + str(exc)
+                    self.A.moves.clear()
+                    print('brace search rejected helper approach step %d: %s' % (n, str(exc)[-300:]), flush=True)
+                    attempt()
+                    return
             guard = next(m for m in self.A.moves if m['phase'] == 'brace-guard')
             rebase = guard['then']
 
@@ -136,6 +171,8 @@ def install(ex, planner, world, carried, D):
                 rebase()
                 try:
                     check_approach(self, planner, world, carried, D)
+                    if hasattr(self, 'check_insertion_clearance'):
+                        self.check_insertion_clearance()
                 except PlannerUnavailable as exc:
                     record['error'] = str(exc)
                     print('brace search rejected step %d: %s' % (n, exc), flush=True)
