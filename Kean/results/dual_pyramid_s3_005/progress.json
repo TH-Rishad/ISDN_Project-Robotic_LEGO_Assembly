@@ -1,0 +1,17 @@
+{
+  "frame": 9480,
+  "sim_time": 159.00000000001867,
+  "phases": {
+    "A": "pre-insert",
+    "B": "transport"
+  },
+  "modes": {
+    "A": "playing",
+    "B": "playing"
+  },
+  "steps": {
+    "A": 5,
+    "B": 6
+  },
+  "pending": {}
+}

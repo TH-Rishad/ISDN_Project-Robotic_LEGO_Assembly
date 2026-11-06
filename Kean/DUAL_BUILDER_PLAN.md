@@ -48,6 +48,8 @@ on the same body pair.
 | Same build without feeder trays | `results/dual_arch_s3_013` | PASS; verifier exit 0 |
 | Regression with grip fallback, drop-and-press and deferred-replan code | `results/dual_arch_s3_014` | PASS; verifier exit 0, 1,642 parallel frames |
 | Pyramid (A) + S3 (B) | `results/dual_pyramid_s3_004` | FAIL at pyramid step 6 (1x1 tips after drop); steps 0-5 seated |
+| Pyramid with layer 1 placed fewest studs first | `results/dual_pyramid_s3_005` | FAIL; A step 5 carried 1x1 0.98 mm from the lower-course 1x4 beside its support |
+| Pyramid (A) + S3 (B), complete | `results/dual_pyramid_s3_006` | PASS; verifier exit 0, pyramid 11/11, S3 16/16, 858 parallel frames |
 
 Diagnostic scenes pre-place earlier bricks and do not establish full-build
 completion. `dual_arch_s3_010` is the first accepted from-empty dual build
@@ -93,7 +95,7 @@ removed. `dual_arch_s3_013` repeated the full build without them and passed
 at 30 fps from a fixed overview camera; `dual_arch_s3_012_8x.mp4` is the 8x
 video of the validated build.
 
-## Pyramid: grip fallback order and drop-and-press (in progress)
+## Pyramid: grip fallback order, drop-and-press and resequencing
 
 `dual_build.sh --build-a pyramid` builds the user's drawing
 (`Sakib/brickassembly/blueprints/user/pyramid_*.png`, width 5: layers 5x5,
@@ -128,6 +130,24 @@ below, whose solid collision proxy it rests on until pressed, rolled 1.6 mm
 toward the open side and tipped 15-20 degrees. Multi-stud bricks land on two
 or more studs and seat; a 1x1 does not. The remaining pyramid tight steps 6-9
 are 1x1 and 1x2 bricks.
+
+Resequencing (`dual_build.small_first`): a course where the planner finds a
+1x1 with no clear pinch is placed fewest studs first; other courses keep the
+planner's order (arch and S3 are unchanged). The pyramid's layer 1 becomes the
+three 1x1s in a line, the 1x2, then the 2x2. A face shorter than a pad may now
+take an edge grip that keeps at least 70 % of the face under the pad, so each
+1x1 after the first slides its pads off the in-line neighbour already placed
+(7 mm along y), and the 1x2 slides 3 mm off the diagonal 1x1. The 2x2, boxed
+in last, uses drop-and-press on its four studs. Placement neighbours also
+include lower-course bricks beside the supports: a seated brick's bottom edge
+sits 0.2 mm from them (`dual_pyramid_s3_005` stopped on this at A step 5).
+
+`dual_pyramid_s3_006` passes `verify_dual` (exit 0): layer 0 as in 004
+(drop-and-press on steps 2-4), layer 1 1x1s side-gripped (lateral 1.09-1.13 mm,
+tilt <= 1.07 degrees), 1x2 edge-gripped (0.78 mm), 2x2 drop-and-press
+(0.04 mm), top 1x1 planner grip (0.83 mm); S3 16/16 with A supporting after
+its build. Video: `results/dual_pyramid_s3_006/dual_pyramid_s3_006_8x.mp4`
+(H.264, 50 s).
 
 ## Requested behavior
 

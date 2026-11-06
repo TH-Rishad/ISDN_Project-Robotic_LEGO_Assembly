@@ -59,6 +59,8 @@ class DropPressTest(unittest.TestCase):
         self.assertEqual(n['m'], {'c'})
         self.assertEqual(n['c'], {'m'})
         self.assertEqual(n['far'], set())
+        # The course below counts too: its supports and the 2x4 beside them.
+        self.assertEqual(n['up'], {'c', 'm'})
 
     def test_grip_fallback_order(self):
         planner = dict(yaw_offset_deg=0, grip_width_m=.0068, tcp_offset_m=[0., 0.])
@@ -69,14 +71,31 @@ class DropPressTest(unittest.TestCase):
         # The other axis pinches the 32 mm ends, centred.
         self.assertEqual(out[1][1], dict(yaw_offset_deg=90, grip_width_m=.0308, tcp_offset_m=[0., 0.]))
         edges = [g for k, g in out if k == 'edge']
-        offsets = [abs(g['tcp_offset_m'][0]) for g in edges]
+        offsets = [max(map(abs, g['tcp_offset_m'])) for g in edges]
         self.assertEqual(offsets, sorted(offsets))             # nearest first
-        self.assertAlmostEqual(max(offsets), .006)             # 16 - 8.5 - 1 mm: pads stay on the brick
-        self.assertTrue(all(g['yaw_offset_deg'] == 0 for g in edges))   # no room along the 8 mm side
+        long = [max(map(abs, g['tcp_offset_m'])) for g in edges if g['yaw_offset_deg'] == 0]
+        short = [max(map(abs, g['tcp_offset_m'])) for g in edges if g['yaw_offset_deg'] == 90]
+        self.assertAlmostEqual(max(long), .006)                # 16 - 8.5 - 1 mm: pads stay on the brick
+        self.assertAlmostEqual(max(short), .007)               # 8 mm end: 70 % stays under the pad
         self.assertEqual(kinds[2:], ['edge'] * len(edges))
-        # A 1x1 has no room for edge grips: planner, then the other axis only.
-        self.assertEqual([k for k, _ in grip_candidates(planner, (.008, .008))], ['planner', 'other_axis'])
+        # A 1x1's face is shorter than a pad: edges slide up to 70 % coverage on both axes.
+        small = grip_candidates(planner, (.008, .008))
+        self.assertEqual([k for k, _ in small[:2]], ['planner', 'other_axis'])
+        shift = [max(map(abs, g['tcp_offset_m'])) for k, g in small if k == 'edge']
+        self.assertAlmostEqual(max(shift), .007)                # 4 + 8.75 - 5.6 mm
+        self.assertEqual({g['yaw_offset_deg'] for k, g in small if k == 'edge'}, {0, 90})
 
+    def test_pyramid_course_with_boxed_1x1s_goes_fewest_studs_first(self):
+        # Subprocess: planning imports Newton, which other tests keep out of this process.
+        import subprocess, sys
+        code = ("import Kean.scripts.dual_build; from Kean.dual_build import plans_for; "
+                "p = plans_for(dict(A='pyramid', B='S3'))[0]['A']; t = {b['id']: b['type'] for b in p['bricks']}; "
+                "print(' '.join(t[s['brick_id']] for s in p['sequence']))")
+        root = __file__.rsplit('/Kean/', 1)[0]
+        out = subprocess.run([sys.executable, '-c', code], cwd=root, capture_output=True, text=True, check=True)
+        order = out.stdout.split()[-11:]
+        self.assertEqual(order[5:10], ['1x1', '1x1', '1x1', '1x2', '2x2'])
+        self.assertEqual(order[:5], ['1x1', '2x4', '1x4', '2x4', '1x4'])   # layer 0 kept
 
 if __name__ == '__main__':
     unittest.main()

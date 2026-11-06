@@ -23,7 +23,9 @@ def grip_candidates(grasp, extent, step=.001):
 
     `extent` is the brick's world (x, y) size in m. Conventions follow
     planner.grasp_for: yaw 90 closes on the +-x faces with the pads sliding
-    along y; edge offsets keep the 17.5 mm pads on the brick.
+    along y. Edge offsets keep the 17.5 mm pads on a long face; a face shorter
+    than a pad stays at least 70 % covered, so a 1x1 or 1x2 can slide its pads
+    off a flush in-line neighbour.
     """
     lx, ly = extent
 
@@ -35,7 +37,8 @@ def grip_candidates(grasp, extent, step=.001):
     other = 0 if own == 90 else 90
     edges = []
     for yaw in (own, other):
-        room = max(0., (ly if yaw == 90 else lx) / 2 - .0085 - .001)
+        along = ly if yaw == 90 else lx
+        room = max(0., along / 2 - .0085 - .001, along / 2 + .00875 - .7 * along)
         for off in np.arange(step, room + 1e-9, step):
             edges += [(off, yaw, sign * round(float(off), 4)) for sign in (1, -1)]
     edges.sort(key=lambda e: e[0])

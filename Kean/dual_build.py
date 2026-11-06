@@ -35,6 +35,14 @@ def plans_for(names, separation=.32):
             nj = max(b[3] + D.P.footprint(b[1], b[5])[1] for b in bricks)
             D.P.VOXEL_ORIGIN = (-ni * D.P.PITCH / 2, sign * separation / 2 - nj * D.P.PITCH / 2, D.Z0)
             plan = D.P.build_plan(internal, 'weakest_joint', brace_model='grasp_lp', brace_grip_N=D.BRACE_GRIP_N, brace_mu=1.)
+            order = small_first(plan, bricks)
+            if order:
+                sequence, D.P.sequence = D.P.sequence, lambda _: order
+                try:
+                    plan = D.P.build_plan(internal, 'weakest_joint', brace_model='grasp_lp',
+                                          brace_grip_N=D.BRACE_GRIP_N, brace_mu=1.)
+                finally:
+                    D.P.sequence = sequence
             plan.update(structure_id=name, context_name=internal, owner=arm)
             for step in plan['sequence']:
                 step['placer_arm'] = arm
@@ -49,6 +57,24 @@ def plans_for(names, separation=.32):
     if abs(pads[0]['c'][1] - pads[1]['c'][1]) <= (pads[0]['dims'][1] + pads[1]['dims'][1]) / 2 + .02:
         raise ValueError('build pads overlap; increase --separation')
     return plans, connections
+
+
+def small_first(plan, bricks):
+    """Reorder courses where a 1x1 has no clear pinch, fewest studs first.
+
+    A dropped 1x1 rolls off the single stud below and tips (dual_pyramid_s3_004
+    step 6), so it must be side-gripped: placed before the larger bricks that
+    would box it in, beside at most an in-line neighbour that a short-face edge
+    grip slides off. Larger bricks then go last with drop-and-press. Other
+    courses keep the planner's order (its docstring: a per-layer search pushed
+    the arch crown into a tight slot). None when nothing changes.
+    """
+    by_id = {b[0]: b for b in bricks}
+    order = [by_id[s['brick_id']] for s in plan['sequence']]
+    studs = lambda b: np.prod(D.P.BRICKS[b[1]])
+    tight = {b[4] for b, s in zip(order, plan['sequence']) if studs(b) == 1 and not s['grasp']['accessible']}
+    new = sorted(order, key=lambda b: (b[4], studs(b) if b[4] in tight else 0))
+    return new if new != order else None
 
 
 def pad_for(plan):

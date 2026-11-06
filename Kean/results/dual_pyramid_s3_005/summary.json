@@ -1,0 +1,197 @@
+{
+  "done": false,
+  "failure": "command_clearance:A:carried/A_b_004",
+  "error": null,
+  "frames": 9558,
+  "builds": {
+    "A": {
+      "structure": "pyramid",
+      "placed": 5,
+      "preplaced": 0,
+      "total": 11,
+      "completed_steps": 5,
+      "supports": [],
+      "brace_search": []
+    },
+    "B": {
+      "structure": "S3",
+      "placed": 6,
+      "preplaced": 0,
+      "total": 16,
+      "completed_steps": 6,
+      "supports": [],
+      "brace_search": []
+    }
+  },
+  "contacts": {
+    "neighbour_rub": {
+      "count": 22,
+      "examples": [
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:A_b_000#28",
+          "phase": {
+            "A": "insert",
+            "B": "pre-insert"
+          },
+          "start_frame": 738,
+          "max_pen_mm": -0.741,
+          "peak_force_n": 0.49,
+          "end_frame": 745,
+          "duration_frames": 8,
+          "contact_frames": 8,
+          "fragments": 1
+        },
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:B_b_000#39",
+          "phase": {
+            "A": "release",
+            "B": "insert"
+          },
+          "start_frame": 809,
+          "max_pen_mm": -0.893,
+          "peak_force_n": 3.86,
+          "end_frame": 816,
+          "duration_frames": 8,
+          "contact_frames": 8,
+          "fragments": 1
+        },
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:A_b_001#29",
+          "phase": {
+            "A": "insert",
+            "B": "pre-insert"
+          },
+          "start_frame": 2200,
+          "max_pen_mm": -0.727,
+          "peak_force_n": 6.72,
+          "end_frame": 2207,
+          "duration_frames": 8,
+          "contact_frames": 8,
+          "fragments": 1
+        },
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:B_b_001#40",
+          "phase": {
+            "A": "insert",
+            "B": "insert"
+          },
+          "start_frame": 2271,
+          "max_pen_mm": -0.744,
+          "peak_force_n": 2.79,
+          "end_frame": 2278,
+          "duration_frames": 8,
+          "contact_frames": 8,
+          "fragments": 1
+        },
+        {
+          "class": "neighbour_rub",
+          "a": "brick:B_b_000#39",
+          "b": "brick:B_b_002#41",
+          "phase": {
+            "A": "insert",
+            "B": "insert"
+          },
+          "start_frame": 3674,
+          "max_pen_mm": -0.933,
+          "peak_force_n": 5.24,
+          "end_frame": 3681,
+          "duration_frames": 8,
+          "contact_frames": 8,
+          "fragments": 1
+        }
+      ]
+    }
+  },
+  "parallel_frames": 591,
+  "diagnostic": false,
+  "motion": {
+    "strict": true,
+    "workarounds": [
+      {
+        "step": 14,
+        "arm": "B",
+        "phase": "clearance",
+        "method": "full-sphere-filter"
+      },
+      {
+        "step": 16,
+        "arm": "B",
+        "phase": "transport",
+        "method": "full-sphere-filter"
+      }
+    ],
+    "failures": [
+      {
+        "error": "arm clearance 0.98 mm",
+        "step": 17,
+        "phases": {
+          "A builder": "insert",
+          "B builder": "pre-insert"
+        },
+        "modes": {
+          "A builder": "idle",
+          "B builder": "deferred"
+        },
+        "measured_q": [
+          -0.08365598320960999,
+          0.45655977725982666,
+          0.3334991931915283,
+          -2.408724546432495,
+          -0.4593697488307953,
+          2.8102316856384277,
+          -0.130064457654953,
+          0.003923534881323576,
+          0.0039239260368049145,
+          -0.23250988125801086,
+          0.10113349556922913,
+          0.6254853010177612,
+          -2.4278814792633057,
+          -0.10054493695497513,
+          2.5076630115509033,
+          -0.3085401654243469,
+          0.007979035377502441,
+          0.007979035377502441
+        ],
+        "target_q": [
+          -0.0778588205575943,
+          0.4651610851287842,
+          0.3261317312717438,
+          -2.404989242553711,
+          -0.4661480486392975,
+          2.8161251544952393,
+          -0.12486837059259415,
+          0.0024999999441206455,
+          0.0024999999441206455,
+          -0.23252244293689728,
+          0.1011338084936142,
+          0.6254612803459167,
+          -2.4278814792633057,
+          -0.10054358839988708,
+          2.5076630115509033,
+          -0.3085371255874634,
+          0.006500000134110451,
+          0.006500000134110451
+        ],
+        "fraction": 1.0
+      }
+    ],
+    "plans": 97,
+    "plan_failures": 1,
+    "captures": 0,
+    "segments": 97,
+    "min_clearance_m": 0.015993932042084637,
+    "clearance_scope": "executed joints during planned playback; full spheres, measured fingers"
+  },
+  "reserved_parallel_frames": 1024,
+  "initial_settling_xy_m": 3.427267074584961e-07,
+  "ok": false,
+  "full_build": false
+}

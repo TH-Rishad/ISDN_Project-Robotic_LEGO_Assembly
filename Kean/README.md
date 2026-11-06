@@ -68,8 +68,10 @@ validated build, transcoded to H.264 for browser playback.
 `Sakib/brickassembly/blueprints/user/pyramid_*.png`. When no side grip clears
 flush neighbours at the seat, the builder tries the other axis and edge grips,
 then drop-and-press (release above the neighbours' studs, press with closed
-fingertips). It seats the pyramid's multi-stud tight bricks; a dropped 1x1
-still tips on its single stud (`results/dual_pyramid_s3_004`). See the plan.
+fingertips). A dropped 1x1 tips on its single stud, so a course with a boxed-in
+1x1 is placed fewest studs first. `results/dual_pyramid_s3_006` builds the
+pyramid and S3 completely (`verify_dual` exit 0); its 8x video is
+`dual_pyramid_s3_006_8x.mp4`. See the plan.
 
 `--step-limit N` executes a short diagnostic. `--start-step-a N` and
 `--start-step-b N` pre-place earlier bricks for support diagnostics. Such runs

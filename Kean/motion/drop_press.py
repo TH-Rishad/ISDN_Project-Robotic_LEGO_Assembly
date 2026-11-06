@@ -50,11 +50,13 @@ def splice(moves, target, release_dz, *, grasp_dz, press, tip_below_tcp, brick_h
 
 
 def placement_neighbours(bricks, footprint):
-    """{id: {ids}} of same-course bricks touching by a face or a corner.
+    """{id: {ids}} of bricks in the same or the course below touching by a face or a corner.
 
     A filled layer seats diagonal bricks within a fraction of a millimetre of
     each other's corners, as close as face neighbours; both are intended
-    placement adjacency, not collisions.
+    placement adjacency, not collisions. A seated brick's bottom edge is just
+    as close to a lower-course brick beside its supports (dual_pyramid_s3_005
+    step 5: a 1x1 0.98 mm from the 1x4 one column over).
     """
     cells = {}
     for b in bricks:
@@ -64,5 +66,5 @@ def placement_neighbours(bricks, footprint):
     out = {}
     for bid, (own, k) in cells.items():
         grown = {(x + dx, y + dy) for x, y in own for dx in (-1, 0, 1) for dy in (-1, 0, 1)}
-        out[bid] = {oid for oid, (other, ok) in cells.items() if oid != bid and ok == k and grown & other}
+        out[bid] = {oid for oid, (other, ok) in cells.items() if oid != bid and ok in (k, k - 1) and grown & other}
     return out
