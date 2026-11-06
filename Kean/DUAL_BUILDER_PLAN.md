@@ -356,3 +356,24 @@ arm/other-structure, or carried-brick collisions, joint breaks, unserved
 requests, and deadlock/timeouts fail the new mode's checks. Intended mating,
 grasping, and bracing contacts are classified explicitly. Save replayable
 recordings and the scheduler event history for review.
+
+## Stud resistance (`--stud-fit`, branch `feat/dual-stud-fit`)
+
+The cell's stud proxies (radius 2.2 mm) clear a brick's walls (inner face
+2.8 mm from the stud centre) by 0.6 mm a side, and there are no tube
+proxies, so a brick seats under its own weight; the clutch is only the snap
+gate. `dual_build.sh --stud-fit` adds the press fit (`motion/stud_fit.py`): a
+brick reaching its support's stud tops (within 1.7 + 0.3 mm of the seat, 2 mm
+laterally) is held there by its first clutch weld at its current pose, and
+released once the axial push measured through that weld reaches n x 8.9 N
+(`F_INSERT_PER_STUD` over its mating studs; a first-course brick mates its
+whole footprint with the baseplate). A brick never pushed through stays on the
+stud tops and misses the 1.5 mm gate. Events go to `stud_fit.json`. Default
+runs are unchanged.
+
+`dual_studfit_diag_002` (pyramid + S3, 2 steps): the first brick, a 1x1
+needing 8.9 N, was held at dz 1.77 mm, peaked at 2.9 N of push and missed the
+gate (dz 1.76 mm). The builder's grip is FINGER_KE 1000 N/m x 1.5 mm = 1.5 N
+per finger, so the brick slips in the pads at about 3 N; a side grip cannot
+press a brick in. Pressing needs a stronger grip (A's 9500 N/m gives ~14 N per
+finger, enough for 1-2 studs) or a press on the brick's top.

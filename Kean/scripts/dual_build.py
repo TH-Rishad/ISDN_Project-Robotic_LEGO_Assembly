@@ -59,6 +59,8 @@ def main():
     parser.add_argument('--start-step-a', type=int, default=0, help='diagnostic nominal start; earlier bricks are pre-placed')
     parser.add_argument('--start-step-b', type=int, default=0, help='diagnostic nominal start; earlier bricks are pre-placed')
     parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('--stud-fit', action='store_true',
+                        help='studs resist insertion: n x 8.9 N push to seat (Kean/motion/stud_fit.py)')
     args = parser.parse_args()
     out = args.out if args.out.is_absolute() else ROOT / args.out
     out = out.resolve()
@@ -83,7 +85,7 @@ def main():
         write(out / 'plans' / (a + '.json'), plans[a])
     feeders = feeders_for(plans, [pad_for(plans[a]) for a in 'AB'])
     manifest = dict(mode='dual_builder', names=names, separation=args.separation, starts=starts, feeders=feeders,
-                    step_limit=args.step_limit, priority='A', plans={a: 'plans/' + a + '.json' for a in 'AB'},
+                    step_limit=args.step_limit, stud_fit=args.stud_fit, priority='A', plans={a: 'plans/' + a + '.json' for a in 'AB'},
                     recording='recording.npz', contacts='contacts.json', diagnostic=bool(any(starts.values()) or args.step_limit))
     write(out / 'manifest.json', manifest)
     if args.dry_run:
@@ -110,7 +112,8 @@ def main():
     provenance['source_hashes'] = {str(p.relative_to(ROOT)): sha256_file(p) for p in sorted(sources)}
     provenance['plan_hashes'] = {a: sha256_file(out / 'plans' / (a + '.json')) for a in 'AB'}
     write(out / 'provenance.json', provenance)
-    example = DualExample(viewer, cell_args, plans, connections, out, starts=starts, step_limit=args.step_limit, feeders=feeders)
+    example = DualExample(viewer, cell_args, plans, connections, out, starts=starts, step_limit=args.step_limit, feeders=feeders,
+                          stud_fit=args.stud_fit)
     example.settle_feeders()
     example.monitor = ContactMonitor(example)
     example.recorder = recorder(example)

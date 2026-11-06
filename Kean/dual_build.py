@@ -437,7 +437,8 @@ class Build:
 
 
 class DualExample(D.Example):
-    def __init__(self, viewer, args, plans, connections, out, replay=False, starts=None, step_limit=None, feeders=None):
+    def __init__(self, viewer, args, plans, connections, out, replay=False, starts=None, step_limit=None, feeders=None,
+                 stud_fit=False):
         self.plans, self.connections, self.out = plans, connections, Path(out)
         self.combined = merged_plan(plans)
         self.replay = replay
@@ -473,6 +474,10 @@ class DualExample(D.Example):
         self.last_measured = self.state_0.joint_q.numpy()[:18].copy()
         self.contact_shape_types = self.model.shape_type.numpy()
         self.contact_shape_poses = self.model.shape_transform.numpy()
+        self.stud_fit = None
+        if stud_fit:
+            from Kean.motion.stud_fit import StudFit
+            self.stud_fit = StudFit(self, D, self.out / 'stud_fit.json')
 
     def plan_input(self, args):
         return self.combined, 'dual'
@@ -590,6 +595,8 @@ class DualExample(D.Example):
 
     def step(self):
         super().step()
+        if self.stud_fit is not None:
+            self.stud_fit.update()
         for a, view in self.views.items():
             key = (a, view.b_step)
             if view.b_step in view.braced and key not in self.held_reported:

@@ -1,0 +1,20 @@
+{
+  "ok": false,
+  "full_build": false,
+  "errors": [
+    "recorded execution failure: A:gate_miss",
+    "A: incomplete/nonmonotonic own-build progress",
+    "A step 0: no recorded mating",
+    "A step 1: no recorded mating",
+    "A step 1: no insertion frames",
+    "B: incomplete/nonmonotonic own-build progress",
+    "B step 0: no recorded mating",
+    "B step 0: no insertion frames",
+    "B step 1: no recorded mating",
+    "B step 1: no insertion frames",
+    "execution did not finish cleanly"
+  ],
+  "recorded_parallel_frames": 311,
+  "grants": [],
+  "frames": 746
+}
