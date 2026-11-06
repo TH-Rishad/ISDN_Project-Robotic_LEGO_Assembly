@@ -6,6 +6,33 @@ from pathlib import Path
 import numpy as np
 
 
+def mesh_stud_evidence(geometry, brick, record, ids):
+    """Recompute the mesh feature location from recorded body pose and contact."""
+    try:
+        nx, ny = map(int, brick['type'].split('x'))
+        dims = np.array([max(nx, ny), min(nx, ny)]) * .008
+        frame = int(geometry['contact_frame']) - 1
+        if not 0 <= frame < len(record['frame']):
+            return False
+        pose = record['brick_q'][frame, ids.index(geometry['lower'])]
+        q = np.asarray(pose[3:], float)
+        q /= np.linalg.norm(q)
+        x, y, z, w = q
+        rotation = np.array([[1-2*(y*y+z*z), 2*(x*y-z*w), 2*(x*z+y*w)],
+                             [2*(x*y+z*w), 1-2*(x*x+z*z), 2*(y*z-x*w)],
+                             [2*(x*z-y*w), 2*(y*z+x*w), 1-2*(x*x+y*y)]])
+        local = rotation.T @ (np.asarray(geometry['contact_world']) - pose[:3])
+        if not np.allclose(local, geometry['contact_local'], atol=1e-6, rtol=0):
+            return False
+        if not np.allclose(dims, geometry['lower_dims'], atol=1e-6, rtol=0):
+            return False
+        centres = np.array([((i+.5)*.008-dims[0]/2, (j+.5)*.008-dims[1]/2)
+                            for i in range(round(dims[0]/.008)) for j in range(round(dims[1]/.008))])
+        return bool(.0098 <= local[2] <= .0115 and np.linalg.norm(centres-local[:2], axis=1).min() <= .0027)
+    except (KeyError, ValueError, TypeError, IndexError):
+        return False
+
+
 def verify_run(run):
     run = Path(run)
     manifest = json.loads((run / 'manifest.json').read_text())
@@ -111,6 +138,7 @@ def verify_run(run):
             if len(studs) != stud_count:
                 errors.append('stud contact count differs from detailed evidence')
             steps_by_id = {s['brick_id']: s for p in plans.values() for s in p['sequence']}
+            bricks_by_id = {b['id']: b for p in plans.values() for b in p['bricks']}
             for event in contacts:
                 if event['class'] in ('arm_arm', 'unintended', 'penetration', 'displaced'):
                     errors.append('detailed contact evidence: ' + event['class'])
@@ -120,14 +148,17 @@ def verify_run(run):
                 step = steps_by_id.get(upper, {})
                 owner = upper.split('_', 1)[0] if upper else ''
                 pair = {event.get(k, '').split('#', 1)[0] for k in ('a', 'b')}
+                feature_valid = ((geometry.get('stud_type') == 6 and
+                                  abs(geometry.get('stud_local_z', 0.) - .01035) < 1e-6)
+                                 or (geometry.get('stud_type') == 8 and mesh_stud_evidence(
+                                     geometry, bricks_by_id.get(lower, {}), record, ids)))
                 valid = (owner in ('A', 'B') and lower in steps_by_id
                          and lower.startswith(owner + '_')
                          and lower in [m[0] for m in step.get('mating_studs', [])]
                          and pair == {'brick:' + upper, 'brick:' + lower}
                          and event.get('phase', {}).get(owner) in ('insert', 'release')
                          and -1.7 <= event.get('max_pen_mm', -999.) < 0.
-                         and geometry.get('stud_type') == 6 and geometry.get('upper_type') in (7, 8)
-                         and abs(geometry.get('stud_local_z', 0.) - .01035) < 1e-6)
+                         and geometry.get('upper_type') in (7, 8) and feature_valid)
                 if not valid:
                     errors.append('invalid stud-mating contact evidence')
     if not summary.get('done') or summary.get('failure') or summary.get('error'):

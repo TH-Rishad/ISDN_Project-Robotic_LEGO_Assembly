@@ -93,7 +93,7 @@ class VerifyDualTest(unittest.TestCase):
             manifest['contacts'] = 'contacts.json'
             (p/'manifest.json').write_text(json.dumps(manifest))
             (p/'A.json').write_text(json.dumps(dict(
-                bricks=[dict(id='A_base'), dict(id='A_b0')], sequence=[
+                bricks=[dict(id='A_base', type='2x2'), dict(id='A_b0', type='2x2')], sequence=[
                     dict(step=0, brick_id='A_base', requires_brace=False),
                     dict(step=1, brick_id='A_b0', requires_brace=False, mating_studs=[['A_base',4]])])))
             fields['own_steps'][:,0] += 1
@@ -117,6 +117,16 @@ class VerifyDualTest(unittest.TestCase):
                 (p/'contacts.json').write_text(json.dumps([bad]))
                 self.assertIn('invalid stud-mating contact evidence', verify_run(p)['errors'])
             event['max_pen_mm'] = -1.71
+            (p/'contacts.json').write_text(json.dumps([event]))
+            self.assertIn('invalid stud-mating contact evidence', verify_run(p)['errors'])
+            event['max_pen_mm'] = -1.2
+            event['geometry'].update(stud_type=8, stud_local_z=0., contact_frame=2,
+                                     contact_local=[-.0065,-.004,.0107],
+                                     contact_world=[-.0065,-.004,.0107], lower_dims=[.016,.016])
+            (p/'contacts.json').write_text(json.dumps([event]))
+            self.assertTrue(verify_run(p)['ok'], verify_run(p)['errors'])
+            event['geometry']['contact_world'][2] = .005
+            event['geometry']['contact_local'][2] = .005
             (p/'contacts.json').write_text(json.dumps([event]))
             self.assertIn('invalid stud-mating contact evidence', verify_run(p)['errors'])
 

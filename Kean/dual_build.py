@@ -648,7 +648,7 @@ class DualExample(D.Example):
                     return None
         return 'unintended'
 
-    def penetration_kind(self, monitor, cls_a, cls_b, shape_a, shape_b, depth):
+    def penetration_kind(self, monitor, cls_a, cls_b, shape_a, shape_b, depth, point=None):
         from Kean.motion.contact_policy import stud_mating
         for arm, bid in self.held_objects().items():
             upper = 'brick:' + bid
@@ -661,10 +661,19 @@ class DualExample(D.Example):
             stud, top = (shape_b, shape_a) if cls_a == upper else (shape_a, shape_b)
             st, tt = int(self.contact_shape_types[stud]), int(self.contact_shape_types[top])
             z = float(self.contact_shape_poses[stud, 2])
+            local = None
+            if st == 8 and point is not None:
+                pose = monitor.body_poses[self.body[lower]]
+                local = D.rotmat(pose[3:]).T @ (point - pose[:3])
             if stud_mating(self.arms[arm].phase, lower, monitor.supports.get(bid, ()),
-                           depth, st, tt, z, D.P.BRICK_H, D.ex.STUD_HEIGHT, D.ex.COLLIDER_INSET):
-                return 'stud_mating', dict(upper=bid, lower=lower, stud_shape=int(stud),
-                                          upper_shape=int(top), stud_type=st, upper_type=tt, stud_local_z=z)
+                           depth, st, tt, z, D.P.BRICK_H, D.ex.STUD_HEIGHT, D.ex.COLLIDER_INSET,
+                           contact_local=local, dims=self.dims[lower]):
+                evidence = dict(upper=bid, lower=lower, stud_shape=int(stud),
+                                upper_shape=int(top), stud_type=st, upper_type=tt, stud_local_z=z)
+                if local is not None:
+                    evidence.update(contact_frame=int(self.frame), contact_world=np.asarray(point).tolist(),
+                                    contact_local=local.tolist(), lower_dims=list(self.dims[lower]))
+                return 'stud_mating', evidence
         return 'penetration', None
 
     def command_clearance(self, checker, joints, spheres=None):

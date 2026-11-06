@@ -42,7 +42,10 @@ Detailed contact evidence distinguishes intended engagement of a lower stud
 with its planned upper mating brick from unintended collisions. Stud contacts
 retain their measured depth and shape IDs in `contacts.json`; the verifier
 requires the expected geometry and caps this contact at the 1.7 mm stud
-height. Non-stud wall collisions, other brick pairs and deeper penetrations fail.
+height. Mesh studs additionally require a contact point above the brick shell
+and within a stud footprint; the verifier recomputes that point from the
+recorded body pose. Non-stud wall collisions, other brick pairs and deeper
+penetrations fail.
 
 Runs save both plans and layout, per-arm progress/roles, scheduler events,
 contact results, motion failures and a complete recording. Verify or replay:

@@ -16,6 +16,9 @@ degree limits and a longer press; existing single-build defaults are retained.
 Contact evidence identifies individual collision shapes. During a planned
 insertion or release, contact between a lower mating stud cylinder and its
 upper brick is logged as `stud_mating` up to the calibrated 1.7 mm stud height.
+For studs embedded in the full mesh, the contact must lie above the shell and
+within 0.3 mm of the calibrated stud radius. The verifier recomputes the local
+contact coordinate from the saved world contact and recorded lower-brick pose.
 The raw depth, shape types and local stud position remain in `contacts.json`.
 The verifier checks those fields against the saved mating references. Other
 deep contacts, wrong brick pairs and excessive penetration still fail; the
@@ -27,7 +30,7 @@ on the same body pair.
 
 | Check | Evidence | Status |
 | --- | --- | --- |
-| Kean CPU regressions | 155 tests | PASS |
+| Kean CPU regressions | 158 tests | PASS |
 | Shared handoff protocol, aiming and manual controls | Existing shared tests | PASS |
 | Concurrent placement by both arms | `results/dual_pick_probe_004` | PASS; diagnostic |
 | Upper-course clearance | `results/dual_upper_course_001` | PASS; diagnostic |
@@ -36,7 +39,8 @@ on the same body pair.
 | Latest later-support regression | `results/dual_late_support_005` | PASS; diagnostic |
 | Contact-evidence pipeline | `results/dual_stud_policy_001` | PASS; diagnostic |
 | Stud/wall distinction, mixed contacts and excessive depth | CPU policy/verifier regressions | PASS |
-| Complete build with detailed contact evidence | `results/dual_arch_s3_009` | Running |
+| Mesh-stud contact evidence | `results/dual_mesh_stud_001` | PASS; diagnostic |
+| Complete build with detailed contact evidence | `results/dual_arch_s3_010` | Running |
 
 Diagnostic scenes pre-place earlier bricks and do not establish full-build
 completion. A complete from-empty dual build has not yet been accepted.

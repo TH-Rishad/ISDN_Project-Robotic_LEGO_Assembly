@@ -208,6 +208,7 @@ class ContactMonitor:
         gripped = self._gripped(ex)
 
         body_q = ex.state_0.body_q.numpy()
+        self.body_poses = body_q
         for body, bid in self.body_brick.items():         # ground truth, scoring only
             pos = body_q[body][:3]
             if bid in held_ids:            # in a builder's hand: moves by design
@@ -242,6 +243,7 @@ class ContactMonitor:
                 pairs = {}                       # per unordered body pair: worst (min) dist, sum of |force|
                 penetration_hook = getattr(ex, 'penetration_kind', None)
                 deep_pairs = {}
+                contact_positions = None
                 for i in range(len(neg)):
                     key = (b0[i], b1[i], s0[i], s1[i]) if b0[i] <= b1[i] else (b1[i], b0[i], s1[i], s0[i])
                     key, sh = key[:2], key[2:]
@@ -253,7 +255,9 @@ class ContactMonitor:
                     if penetration_hook is not None and d[i] * 1000 < -PENETRATION_MM * self.scale:
                         ca, cb = self._cls(key[0], sh[0]), self._cls(key[1], sh[1])
                         if ca.startswith('brick:') and cb.startswith('brick:'):
-                            kind, evidence = penetration_hook(self, ca, cb, sh[0], sh[1], float(d[i]))
+                            if contact_positions is None:
+                                contact_positions = mjw.contact.pos.numpy()[neg]
+                            kind, evidence = penetration_hook(self, ca, cb, sh[0], sh[1], float(d[i]), contact_positions[i])
                             dk = (kind, *key)
                             previous = deep_pairs.get(dk)
                             if previous is None or d[i] < previous[0]:

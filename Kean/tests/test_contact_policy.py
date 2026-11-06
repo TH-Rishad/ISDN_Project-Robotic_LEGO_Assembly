@@ -35,3 +35,18 @@ class StudMatingTest(unittest.TestCase):
         args = self.args()
         args['stud_z'] = .004
         self.assertFalse(stud_mating(**args))
+
+    def test_mesh_stud_feature_above_shell_is_intentional(self):
+        args = self.args()
+        args.update(stud_type=8, stud_z=0., contact_local=[-.0065,-.004,.0107], dims=[.016,.016])
+        self.assertTrue(stud_mating(**args))
+
+    def test_mesh_wall_below_studs_is_not_exempt(self):
+        args = self.args()
+        args.update(stud_type=8, stud_z=0., contact_local=[-.0065,-.004,.005], dims=[.016,.016])
+        self.assertFalse(stud_mating(**args))
+
+    def test_mesh_contact_between_studs_is_not_exempt(self):
+        args = self.args()
+        args.update(stud_type=8, stud_z=0., contact_local=[0.,0.,.0107], dims=[.016,.016])
+        self.assertFalse(stud_mating(**args))
