@@ -240,6 +240,8 @@ class ContactMonitor:
                 fmag = np.linalg.norm(self.contacts.force.numpy()[neg][:, :3], axis=1)
 
                 pairs = {}                       # per unordered body pair: worst (min) dist, sum of |force|
+                penetration_hook = getattr(ex, 'penetration_kind', None)
+                deep_pairs = {}
                 for i in range(len(neg)):
                     key = (b0[i], b1[i], s0[i], s1[i]) if b0[i] <= b1[i] else (b1[i], b0[i], s1[i], s0[i])
                     key, sh = key[:2], key[2:]
@@ -248,10 +250,25 @@ class ContactMonitor:
                     elif d[i] < pairs[key][0]:
                         pairs[key][:2] = d[i], sh
                     pairs[key][2] += fmag[i]
+                    if penetration_hook is not None and d[i] * 1000 < -PENETRATION_MM * self.scale:
+                        ca, cb = self._cls(key[0], sh[0]), self._cls(key[1], sh[1])
+                        if ca.startswith('brick:') and cb.startswith('brick:'):
+                            kind, evidence = penetration_hook(self, ca, cb, sh[0], sh[1], float(d[i]))
+                            dk = (kind, *key)
+                            previous = deep_pairs.get(dk)
+                            if previous is None or d[i] < previous[0]:
+                                deep_pairs[dk] = (d[i], sh, float(fmag[i]), evidence)
+
+                # Classify every deep shape contact before merging by body pair.
+                # An intended stud contact must not conceal a simultaneous wall collision.
+                for (kind, bA, bB), (dd, (shA, shB), ff, evidence) in deep_pairs.items():
+                    self._event(kind, bA, bB, self._cls(bA, shA), self._cls(bB, shB), dd, ff, ex, seen)
+                    if evidence is not None:
+                        self._active[(kind, bA, bB)]['geometry'] = evidence
 
                 for (bA, bB), (dd, (shA, shB), ff) in pairs.items():
                     clsA, clsB = self._cls(bA, shA), self._cls(bB, shB)
-                    if clsA.startswith("brick:") and clsB.startswith("brick:") \
+                    if penetration_hook is None and clsA.startswith("brick:") and clsB.startswith("brick:") \
                             and dd * 1000 < -PENETRATION_MM * self.scale:
                         self._event("penetration", bA, bB, clsA, clsB, dd, ff, ex, seen)
                     is_candidate = (clsA.endswith(("_link", "_finger")) or clsB.endswith(("_link", "_finger"))

@@ -78,7 +78,7 @@ def main():
     feeders = feeders_for(plans, [pad_for(plans[a]) for a in 'AB'])
     manifest = dict(mode='dual_builder', names=names, separation=args.separation, starts=starts, feeders=feeders,
                     step_limit=args.step_limit, priority='A', plans={a: 'plans/' + a + '.json' for a in 'AB'},
-                    recording='recording.npz', diagnostic=bool(any(starts.values()) or args.step_limit))
+                    recording='recording.npz', contacts='contacts.json', diagnostic=bool(any(starts.values()) or args.step_limit))
     write(out / 'manifest.json', manifest)
     if args.dry_run:
         for a in 'AB':

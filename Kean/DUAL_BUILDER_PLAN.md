@@ -13,18 +13,30 @@ sweep and carried-brick insertion corridor must clear before a helper moves.
 Dual-build precision sockets retain Kean's wriggle phases with 0.1 mm / 0.1
 degree limits and a longer press; existing single-build defaults are retained.
 
+Contact evidence identifies individual collision shapes. During a planned
+insertion or release, contact between a lower mating stud cylinder and its
+upper brick is logged as `stud_mating` up to the calibrated 1.7 mm stud height.
+The raw depth, shape types and local stud position remain in `contacts.json`.
+The verifier checks those fields against the saved mating references. Other
+deep contacts, wrong brick pairs and excessive penetration still fail; the
+1 mm free-space/arm clearance checks are unchanged. Every deep shape contact
+is classified separately so a valid stud contact cannot hide a wall collision
+on the same body pair.
+
 ## Validation in progress
 
 | Check | Evidence | Status |
 | --- | --- | --- |
-| Kean CPU regressions | 147 tests | PASS |
+| Kean CPU regressions | 155 tests | PASS |
 | Shared handoff protocol, aiming and manual controls | Existing shared tests | PASS |
 | Concurrent placement by both arms | `results/dual_pick_probe_004` | PASS; diagnostic |
 | Upper-course clearance | `results/dual_upper_course_001` | PASS; diagnostic |
 | A-first tie and reciprocal support | `results/dual_support_tie_016` | PASS; diagnostic |
 | Later S3 supports and completed-arm helping | `results/dual_late_support_004` | PASS; diagnostic |
-| Latest later-support regression | `results/dual_late_support_005` | Running |
-| Complete build from empty pads | `results/dual_arch_s3_008` | Running |
+| Latest later-support regression | `results/dual_late_support_005` | PASS; diagnostic |
+| Contact-evidence pipeline | `results/dual_stud_policy_001` | PASS; diagnostic |
+| Stud/wall distinction, mixed contacts and excessive depth | CPU policy/verifier regressions | PASS |
+| Complete build with detailed contact evidence | `results/dual_arch_s3_009` | Running |
 
 Diagnostic scenes pre-place earlier bricks and do not establish full-build
 completion. A complete from-empty dual build has not yet been accepted.

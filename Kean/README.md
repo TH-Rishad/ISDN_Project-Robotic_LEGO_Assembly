@@ -38,6 +38,12 @@ Precision sockets use Kean's existing wriggle phases with 0.1 mm lateral
 motion, 0.1 degree rocking and a longer final press. A loaded builder waits
 at its checked park pose while the helper approaches.
 
+Detailed contact evidence distinguishes intended engagement of a lower stud
+with its planned upper mating brick from unintended collisions. Stud contacts
+retain their measured depth and shape IDs in `contacts.json`; the verifier
+requires the expected geometry and caps this contact at the 1.7 mm stud
+height. Non-stud wall collisions, other brick pairs and deeper penetrations fail.
+
 Runs save both plans and layout, per-arm progress/roles, scheduler events,
 contact results, motion failures and a complete recording. Verify or replay:
 

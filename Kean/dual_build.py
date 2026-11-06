@@ -409,6 +409,8 @@ class DualExample(D.Example):
         self.held_reported = set()
         self.actual_parallel_frames = 0
         self.last_measured = self.state_0.joint_q.numpy()[:18].copy()
+        self.contact_shape_types = self.model.shape_type.numpy()
+        self.contact_shape_poses = self.model.shape_transform.numpy()
 
     def plan_input(self, args):
         return self.combined, 'dual'
@@ -646,6 +648,25 @@ class DualExample(D.Example):
                     return None
         return 'unintended'
 
+    def penetration_kind(self, monitor, cls_a, cls_b, shape_a, shape_b, depth):
+        from Kean.motion.contact_policy import stud_mating
+        for arm, bid in self.held_objects().items():
+            upper = 'brick:' + bid
+            if upper not in (cls_a, cls_b):
+                continue
+            other = cls_b if cls_a == upper else cls_a
+            if not other.startswith('brick:'):
+                continue
+            lower = other[6:]
+            stud, top = (shape_b, shape_a) if cls_a == upper else (shape_a, shape_b)
+            st, tt = int(self.contact_shape_types[stud]), int(self.contact_shape_types[top])
+            z = float(self.contact_shape_poses[stud, 2])
+            if stud_mating(self.arms[arm].phase, lower, monitor.supports.get(bid, ()),
+                           depth, st, tt, z, D.P.BRICK_H, D.ex.STUD_HEIGHT, D.ex.COLLIDER_INSET):
+                return 'stud_mating', dict(upper=bid, lower=lower, stud_shape=int(stud),
+                                          upper_shape=int(top), stud_type=st, upper_type=tt, stud_local_z=z)
+        return 'penetration', None
+
     def command_clearance(self, checker, joints, spheres=None):
         """Full links versus both structures/platforms, including Cartesian phases."""
         minimum, label = float('inf'), ''
@@ -723,6 +744,7 @@ class DualExample(D.Example):
     def finish(self, error=None):
         if self.monitor:
             self.monitor.finalize()
+            (self.out / 'contacts.json').write_text(json.dumps(self.monitor.events, indent=2))
         if self.recorder:
             self.recorder.save(self.args.record_all, self)
         (self.out / 'events.json').write_text(json.dumps(self.coordinator.events, indent=2))

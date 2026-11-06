@@ -100,6 +100,36 @@ def verify_run(run):
     for cls in ('arm_arm', 'unintended', 'penetration', 'displaced'):
         if summary.get('contacts', {}).get(cls, {}).get('count', 0):
             errors.append('contact monitor: ' + cls)
+    stud_count = summary.get('contacts', {}).get('stud_mating', {}).get('count', 0)
+    if manifest.get('contacts') or stud_count:
+        contact_file = run / manifest.get('contacts', 'contacts.json')
+        if not contact_file.is_file():
+            errors.append('missing detailed contact evidence')
+        else:
+            contacts = json.loads(contact_file.read_text())
+            studs = [e for e in contacts if e['class'] == 'stud_mating']
+            if len(studs) != stud_count:
+                errors.append('stud contact count differs from detailed evidence')
+            steps_by_id = {s['brick_id']: s for p in plans.values() for s in p['sequence']}
+            for event in contacts:
+                if event['class'] in ('arm_arm', 'unintended', 'penetration', 'displaced'):
+                    errors.append('detailed contact evidence: ' + event['class'])
+            for event in studs:
+                geometry = event.get('geometry', {})
+                upper, lower = geometry.get('upper'), geometry.get('lower')
+                step = steps_by_id.get(upper, {})
+                owner = upper.split('_', 1)[0] if upper else ''
+                pair = {event.get(k, '').split('#', 1)[0] for k in ('a', 'b')}
+                valid = (owner in ('A', 'B') and lower in steps_by_id
+                         and lower.startswith(owner + '_')
+                         and lower in [m[0] for m in step.get('mating_studs', [])]
+                         and pair == {'brick:' + upper, 'brick:' + lower}
+                         and event.get('phase', {}).get(owner) in ('insert', 'release')
+                         and -1.7 <= event.get('max_pen_mm', -999.) < 0.
+                         and geometry.get('stud_type') == 6 and geometry.get('upper_type') in (7, 8)
+                         and abs(geometry.get('stud_local_z', 0.) - .01035) < 1e-6)
+                if not valid:
+                    errors.append('invalid stud-mating contact evidence')
     if not summary.get('done') or summary.get('failure') or summary.get('error'):
         errors.append('execution did not finish cleanly')
     return dict(ok=not errors, full_build=not errors and not manifest.get('diagnostic'),

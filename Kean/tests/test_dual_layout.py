@@ -113,6 +113,38 @@ view.start(0)
 assert sum(m['phase'] == 'insert' for m in builder.moves) == 1
 assert next(m for m in builder.moves if m['phase'] == 'insert')['dur'] == 1.
 assert builder.moves[-1]['phase'] == 'clearance'
+
+# A valid stud contact must not conceal a deep wall contact on the same pair.
+from cell.contacts import ContactMonitor
+from types import MethodType
+class Buffer:
+    def __init__(self, value): self.value = np.asarray(value)
+    def numpy(self): return self.value
+ex = SimpleNamespace(
+    plan=dict(sequence=[dict(brick_id='A_top')]), b_step=0,
+    A=SimpleNamespace(phase='insert'), B=SimpleNamespace(phase='park'),
+    arms=dict(A=SimpleNamespace(phase='insert'), B=SimpleNamespace(phase='park')),
+    state_0=SimpleNamespace(body_q=Buffer(np.zeros((30,7)))),
+    contact_shape_types=np.array([6,8,7,8]),
+    contact_shape_poses=np.array([[0,0,.01035],[0,0,0],[0,0,.005],[0,0,0]]))
+ex.held_objects = lambda: {'A':'A_top'}
+ex.classify_contact = lambda *args: 'neighbour_rub'
+ex.penetration_kind = MethodType(DualExample.penetration_kind, ex)
+ex.solver = SimpleNamespace(
+    mjw_data=SimpleNamespace(nacon=Buffer([2]), contact=SimpleNamespace(
+        dist=Buffer([-.0012,-.0011]), geom=Buffer([[0,1],[2,3]]), worldid=Buffer([0,0]))),
+    mjc_geom_to_newton_shape=Buffer([[0,1,2,3]]), update_contacts=lambda *args: None)
+monitor = ContactMonitor.__new__(ContactMonitor)
+monitor.n_arm, monitor.finger, monitor.ground_shape = 14, {12,13}, 999
+monitor.sb = np.array([28,29,28,29])
+monitor.body_brick = {28:'A_base',29:'A_top'}
+monitor.supports, monitor.neighbours = {'A_top':['A_base']}, {}
+monitor.brace_phases, monitor.scale = (), 1.
+monitor.rest, monitor.raw, monitor._active, monitor.frame = {}, [], {}, 0
+monitor.contacts = SimpleNamespace(force=Buffer([[0.,0.,1.],[0.,0.,1.]]))
+monitor.step(ex)
+monitor.finalize()
+assert monitor.counts['stud_mating'] == 1 and monitor.counts['penetration'] == 1
 """
 
 if __name__ == '__main__':
