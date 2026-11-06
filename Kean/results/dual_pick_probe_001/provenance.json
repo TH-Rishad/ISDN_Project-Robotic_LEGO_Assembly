@@ -1,0 +1,37 @@
+{
+  "git_revision": "255769ae3b9cf77a25edda9cec9c0bd7017d47e2",
+  "dirty_hashes": {
+    "Kean/motion/brace_search.py": "99b5f983c2c5108f469f54d2cfc8d4db3849905c29da0e745017a6b0816ea049",
+    "Kean/motion/plan_curobo.py": "787a3be7f87ae525202636da2ae7f1261b32d0814cb3cbe62a6745bfd6cec9d9",
+    "Kean/motion/tick.py": "71d0aadab1f403dfa183d782b56ba28991dd1903be38e8506e069bdb41934f02",
+    "Kean/scripts/play_run.sh": "c87fd3b1b7dc1868459e904ab3e3a5826f2973213d811187f23462804ee4e2a9",
+    "Kean/DUAL_BUILDER_PLAN.md": "fe1822327bf34b47e9211a11475e9c327bec0cbd4c23471043436cf1bf9b7b5d",
+    "Kean/dual_build.py": "977f44825dd789c6f2d05845a06005246a5be4627fcba5dda7f91d49fc364c59",
+    "Kean/dual_coordinator.py": "355d77af12992da074f0df69b6d00b30c4af60497259ca2d4449887faf3cc6e6",
+    "Kean/motion/reservations.py": "f8f70ff19475317402b199fbb6d12e9d52eaea97369a45697c4ae1a314d03efa",
+    "Kean/scripts/dual_build.py": "0fd1eb26ba74694a1048e5860849ee6cc28d1645bee1af23b7b9a8153cc7646d",
+    "Kean/scripts/dual_build.sh": "9dd373b4f8ec397c1b03d6c9636395225fca07c83cee6dd906c71c906f6b0014",
+    "Kean/tests/test_dual_coordinator.py": "de0f09c5564a206f5527dcc7a5ba892dbe22cc26b5df7063ffc791396ed32761"
+  },
+  "config": {
+    "build_a": "arch",
+    "build_b": "S3",
+    "out": "/home/bakasakib/Documents/ISDN_Project-Robotic_LEGO_Assembly/Kean/results/dual_pick_probe_001",
+    "viewer": "null",
+    "port": 8081,
+    "separation": 0.32,
+    "max_frames": 60000,
+    "step_limit": 1,
+    "start_step_a": 0,
+    "start_step_b": 0,
+    "dry_run": false,
+    "mode": "dual_builder"
+  },
+  "simulator": null,
+  "plan_hashes": {
+    "A": "96962323ee3f641314b81ed028997c30a40a8fcd0b21b8d1c495a87e0d811d65",
+    "B": "3eb551e2f9eca1d3bb016b5e7170f2df0bb029247c3e675a69287bf736422e79"
+  },
+  "python": "3.12.3",
+  "hostname": "MEE2440"
+}

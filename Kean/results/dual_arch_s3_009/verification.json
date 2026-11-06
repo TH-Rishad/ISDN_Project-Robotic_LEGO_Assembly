@@ -1,0 +1,32 @@
+{
+  "ok": false,
+  "full_build": false,
+  "errors": [
+    "contact monitor: penetration",
+    "detailed contact evidence: penetration"
+  ],
+  "recorded_parallel_frames": 260,
+  "grants": [
+    {
+      "arm": "A",
+      "step": 10,
+      "time": 260.1666666667587
+    },
+    {
+      "arm": "B",
+      "step": 11,
+      "time": 309.9833333333801
+    },
+    {
+      "arm": "B",
+      "step": 13,
+      "time": 359.06666666666877
+    },
+    {
+      "arm": "B",
+      "step": 14,
+      "time": 394.78333333330295
+    }
+  ],
+  "frames": 26414
+}

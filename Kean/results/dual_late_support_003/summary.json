@@ -1,0 +1,576 @@
+{
+  "done": false,
+  "failure": "B:brace_search_exhausted",
+  "error": null,
+  "frames": 411,
+  "builds": {
+    "A": {
+      "structure": "arch",
+      "placed": 0,
+      "preplaced": 11,
+      "total": 11,
+      "completed_steps": 11,
+      "supports": [],
+      "brace_search": []
+    },
+    "B": {
+      "structure": "S3",
+      "placed": 0,
+      "preplaced": 13,
+      "total": 16,
+      "completed_steps": 13,
+      "supports": [
+        {
+          "step": 13,
+          "requested": true,
+          "planned_feasible": true,
+          "executed": false,
+          "brace_infeasible": false,
+          "guard_stop": false,
+          "guard_frame": null,
+          "realised_grip_N": null,
+          "grip_samples": 0,
+          "contacted": [],
+          "gripped_bricks": [
+            "B_b_008",
+            "B_b_010"
+          ],
+          "max_F_N": {},
+          "max_M_Nm": {}
+        }
+      ],
+      "brace_search": [
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.196,
+            0.0536
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry 0.94 mm at B_b_006"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.202,
+            0.0556
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, -0.2503, 0.0685]: cuRobo plan failed: unknown status; boxed goal [0.0, -0.2503, 0.0685]: cuRobo plan failed: unknown status; boxed goal [0.0, -0.2503, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2503, 0.0685]: path clearance -1.34 mm at other arm (sample 7/39); full-sphere-filter goal [0.0, -0.2503, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2503, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2503, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2503, 0.0685]: path clearance -1.33 mm at other arm (sample 7/39); contact-full-sphere-filter goal [0.0, -0.2503, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2503, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2503, 0.0685]: cuRobo plan failed: unknown status"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.202,
+            0.0556
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, -0.2503, 0.0685]: cuRobo plan failed: unknown status; boxed goal [0.0, -0.2503, 0.0685]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.2503, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2503, 0.0685]: path clearance 0.56 mm at other arm (sample 7/39); full-sphere-filter goal [0.0, -0.2503, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2503, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2503, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2503, 0.0685]: path clearance 0.62 mm at other arm (sample 7/39); contact-full-sphere-filter goal [0.0, -0.2503, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2503, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2503, 0.0685]: cuRobo plan failed: unknown status"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.2,
+            0.0556
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, -0.2483, 0.0685]: cuRobo plan failed: unknown status; boxed goal [0.0, -0.2483, 0.0685]: cuRobo plan failed: unknown status; boxed goal [0.0, -0.2483, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2483, 0.0685]: path clearance -1.30 mm at other arm (sample 7/39); full-sphere-filter goal [0.0, -0.2483, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2483, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2483, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2483, 0.0685]: path clearance -2.91 mm at other arm (sample 126/183); contact-full-sphere-filter goal [0.0, -0.2483, 0.0685]: path clearance 0.72 mm at other arm (sample 6/55); contact-full-sphere-filter goal [0.0, -0.2483, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2483, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2483, 0.0685]: cuRobo plan failed: unknown status"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.2,
+            0.0556
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, -0.2483, 0.0685]: cuRobo plan failed: unknown status; boxed goal [0.0, -0.2483, 0.0685]: cuRobo plan failed: unknown status; boxed goal [0.0, -0.2483, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2483, 0.0685]: path clearance 0.91 mm at other arm (sample 7/39); full-sphere-filter goal [0.0, -0.2483, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2483, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2483, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2483, 0.0685]: path clearance 0.78 mm at other arm (sample 7/39); contact-full-sphere-filter goal [0.0, -0.2483, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2483, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2483, 0.0685]: cuRobo plan failed: unknown status"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.192,
+            0.0556
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, -0.2403, 0.0685]: cuRobo plan failed: unknown status; boxed goal [0.0, -0.2403, 0.0685]: cuRobo plan failed: unknown status; boxed goal [0.0, -0.2403, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2403, 0.0685]: path clearance 0.33 mm at other arm (sample 7/39); full-sphere-filter goal [0.0, -0.2403, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2403, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2403, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2403, 0.0685]: path clearance 0.33 mm at other arm (sample 7/39); contact-full-sphere-filter goal [0.0, -0.2403, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2403, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2403, 0.0685]: cuRobo plan failed: unknown status"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.192,
+            0.0556
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, -0.2403, 0.0685]: cuRobo plan failed: unknown status; boxed goal [0.0, -0.2403, 0.0685]: cuRobo plan failed: unknown status; boxed goal [0.0, -0.2403, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2403, 0.0685]: path clearance -0.44 mm at other arm (sample 8/39); full-sphere-filter goal [0.0, -0.2403, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2403, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2403, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2403, 0.0685]: path clearance -0.42 mm at other arm (sample 8/39); contact-full-sphere-filter goal [0.0, -0.2403, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2403, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2403, 0.0685]: cuRobo plan failed: unknown status"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.198,
+            0.0556
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, -0.2463, 0.0685]: cuRobo plan failed: unknown status; boxed goal [0.0, -0.2463, 0.0685]: cuRobo plan failed: unknown status; boxed goal [0.0, -0.2463, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2463, 0.0685]: path clearance -0.75 mm at other arm (sample 7/39); full-sphere-filter goal [0.0, -0.2463, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2463, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2463, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2463, 0.0685]: path clearance -0.75 mm at other arm (sample 7/39); contact-full-sphere-filter goal [0.0, -0.2463, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2463, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2463, 0.0685]: cuRobo plan failed: unknown status"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.198,
+            0.0556
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, -0.2463, 0.0685]: cuRobo plan failed: unknown status; boxed goal [0.0, -0.2463, 0.0685]: cuRobo plan failed: unknown status; boxed goal [0.0, -0.2463, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2463, 0.0685]: path clearance -1.98 mm at other arm (sample 8/39); full-sphere-filter goal [0.0, -0.2463, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2463, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2463, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2463, 0.0685]: path clearance -1.98 mm at other arm (sample 8/39); contact-full-sphere-filter goal [0.0, -0.2463, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2463, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2463, 0.0685]: cuRobo plan failed: unknown status"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.194,
+            0.0556
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, -0.2423, 0.0685]: cuRobo plan failed: unknown status; boxed goal [0.0, -0.2423, 0.0685]: cuRobo plan failed: unknown status; boxed goal [0.0, -0.2423, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2423, 0.0685]: path clearance 0.13 mm at other arm (sample 7/39); full-sphere-filter goal [0.0, -0.2423, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2423, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2423, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2423, 0.0685]: path clearance 0.13 mm at other arm (sample 7/39); contact-full-sphere-filter goal [0.0, -0.2423, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2423, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2423, 0.0685]: cuRobo plan failed: unknown status"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.194,
+            0.0556
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, -0.2423, 0.0685]: cuRobo plan failed: unknown status; boxed goal [0.0, -0.2423, 0.0685]: cuRobo plan failed: unknown status; boxed goal [0.0, -0.2423, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2423, 0.0685]: path clearance -1.03 mm at other arm (sample 8/39); full-sphere-filter goal [0.0, -0.2423, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2423, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2423, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2423, 0.0685]: path clearance -1.03 mm at other arm (sample 8/39); contact-full-sphere-filter goal [0.0, -0.2423, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2423, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2423, 0.0685]: cuRobo plan failed: unknown status"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.196,
+            0.0556
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, -0.2443, 0.0685]: cuRobo plan failed: unknown status; boxed goal [0.0, -0.2443, 0.0685]: cuRobo plan failed: unknown status; boxed goal [0.0, -0.2443, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2443, 0.0685]: path clearance -0.34 mm at other arm (sample 7/39); full-sphere-filter goal [0.0, -0.2443, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2443, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2443, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2443, 0.0685]: path clearance -0.34 mm at other arm (sample 7/39); contact-full-sphere-filter goal [0.0, -0.2443, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2443, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2443, 0.0685]: cuRobo plan failed: unknown status"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.196,
+            0.0556
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, -0.2443, 0.0685]: cuRobo plan failed: unknown status; boxed goal [0.0, -0.2443, 0.0685]: cuRobo plan failed: unknown status; boxed goal [0.0, -0.2443, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2443, 0.0685]: path clearance -1.65 mm at other arm (sample 8/39); full-sphere-filter goal [0.0, -0.2443, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2443, 0.0685]: cuRobo plan failed: unknown status; full-sphere-filter goal [0.0, -0.2443, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2443, 0.0685]: path clearance -1.59 mm at other arm (sample 8/39); contact-full-sphere-filter goal [0.0, -0.2443, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2443, 0.0685]: cuRobo plan failed: unknown status; contact-full-sphere-filter goal [0.0, -0.2443, 0.0685]: cuRobo plan failed: unknown status"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.202,
+            0.0556
+          ],
+          "tilt": [
+            1.0472,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry 1.13 mm at B_b_006"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.202,
+            0.0556
+          ],
+          "tilt": [
+            1.0472,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry 1.13 mm at B_b_006"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.2,
+            0.0556
+          ],
+          "tilt": [
+            1.0472,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry 1.13 mm at B_b_006"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.2,
+            0.0556
+          ],
+          "tilt": [
+            1.0472,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry 1.13 mm at B_b_006"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.192,
+            0.0556
+          ],
+          "tilt": [
+            1.0472,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry 1.13 mm at B_b_006"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.192,
+            0.0556
+          ],
+          "tilt": [
+            1.0472,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry 1.13 mm at B_b_006"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.198,
+            0.0556
+          ],
+          "tilt": [
+            1.0472,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry 1.13 mm at B_b_006"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.198,
+            0.0556
+          ],
+          "tilt": [
+            1.0472,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry 1.13 mm at B_b_006"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.194,
+            0.0556
+          ],
+          "tilt": [
+            1.0472,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry 1.13 mm at B_b_006"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.194,
+            0.0556
+          ],
+          "tilt": [
+            1.0472,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry 1.13 mm at B_b_006"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.196,
+            0.0556
+          ],
+          "tilt": [
+            1.0472,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry 1.13 mm at B_b_006"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.196,
+            0.0556
+          ],
+          "tilt": [
+            1.0472,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry 1.13 mm at B_b_006"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.202,
+            0.0556
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry 1.07 mm at B_b_006"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.202,
+            0.0556
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry 1.07 mm at B_b_006"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.2,
+            0.0556
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry 1.17 mm at B_b_006"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.2,
+            0.0556
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry 1.17 mm at B_b_006"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.192,
+            0.0556
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry 1.17 mm at B_b_006"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.192,
+            0.0556
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry 1.17 mm at B_b_006"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.198,
+            0.0556
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry 1.17 mm at B_b_006"
+        }
+      ]
+    }
+  },
+  "contacts": {},
+  "parallel_frames": 0,
+  "diagnostic": true,
+  "motion": {
+    "strict": true,
+    "workarounds": [],
+    "failures": [],
+    "plans": 3,
+    "plan_failures": 0,
+    "captures": 0,
+    "segments": 3,
+    "min_clearance_m": 0.0879090279340744,
+    "clearance_scope": "executed joints during planned playback; full spheres, measured fingers"
+  },
+  "reserved_parallel_frames": 3,
+  "initial_settling_xy_m": 7.092952728271484e-06,
+  "ok": false,
+  "full_build": false
+}

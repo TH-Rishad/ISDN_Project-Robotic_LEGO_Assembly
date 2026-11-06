@@ -1,0 +1,154 @@
+{
+  "done": false,
+  "failure": "command_clearance:B:A_b_001",
+  "error": null,
+  "frames": 887,
+  "builds": {
+    "A": {
+      "structure": "arch",
+      "placed": 0,
+      "preplaced": 10,
+      "total": 11,
+      "completed_steps": 10,
+      "supports": [
+        {
+          "step": 10,
+          "requested": true,
+          "planned_feasible": true,
+          "executed": false,
+          "brace_infeasible": false,
+          "guard_stop": false,
+          "guard_frame": null,
+          "realised_grip_N": null,
+          "grip_samples": 0,
+          "contacted": [],
+          "gripped_bricks": [
+            "A_b_003",
+            "A_b_005"
+          ],
+          "max_F_N": {},
+          "max_M_Nm": {}
+        }
+      ],
+      "brace_search": [
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.124,
+            0.0224
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.1169, 0.0295]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1169, 0.0295]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1169, 0.0295]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1169, 0.0295]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1169, 0.0295]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1169, 0.0295]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.1169, 0.0295]: path clearance 1.00 mm at A_b_006 (sample 14/20); contact-full-sphere-filter goal [0.0, 0.1169, 0.0295]: path clearance 1.00 mm at A_b_006 (sample 14/20); contact-full-sphere-filter goal [0.0, 0.1169, 0.0295]: path clearance 1.00 mm at A_b_006 (sample 14/20)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.196,
+            0.0224
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "accepted": true
+        }
+      ]
+    },
+    "B": {
+      "structure": "S3",
+      "placed": 0,
+      "preplaced": 11,
+      "total": 16,
+      "completed_steps": 11,
+      "supports": [],
+      "brace_search": []
+    }
+  },
+  "contacts": {},
+  "parallel_frames": 0,
+  "diagnostic": true,
+  "motion": {
+    "strict": true,
+    "workarounds": [
+      {
+        "step": 10,
+        "arm": "B",
+        "phase": "brace-in",
+        "method": "contact-full-sphere-filter"
+      }
+    ],
+    "failures": [
+      {
+        "error": "arm clearance 0.89 mm",
+        "step": 10,
+        "phases": {
+          "A builder": "stage",
+          "B builder": "close"
+        },
+        "modes": {
+          "A builder": "idle",
+          "B builder": "idle"
+        },
+        "measured_q": [
+          0.7014918327331543,
+          0.23636513948440552,
+          0.4725017845630646,
+          -2.238909959793091,
+          -0.17023545503616333,
+          2.4485065937042236,
+          0.5073614716529846,
+          0.007999034598469734,
+          0.007999053224921227,
+          1.40640389919281,
+          -1.314336895942688,
+          -2.03713321685791,
+          -2.030029058456421,
+          -0.6179708242416382,
+          2.0834906101226807,
+          -1.0405935049057007,
+          0.00951285008341074,
+          0.00951284822076559
+        ],
+        "target_q": [
+          0.7015211582183838,
+          0.23625978827476501,
+          0.4725189805030823,
+          -2.238739013671875,
+          -0.17023859918117523,
+          2.4485647678375244,
+          0.5073713660240173,
+          0.006500000134110451,
+          0.006500000134110451,
+          1.4065443277359009,
+          -1.3145017623901367,
+          -2.037041664123535,
+          -2.029672861099243,
+          -0.6179516911506653,
+          2.0830066204071045,
+          -1.0406019687652588,
+          0.009386073797941208,
+          0.009386073797941208
+        ],
+        "fraction": 1.0
+      }
+    ],
+    "plans": 6,
+    "plan_failures": 1,
+    "captures": 0,
+    "segments": 6,
+    "min_clearance_m": 0.001314832102981077,
+    "clearance_scope": "executed joints during planned playback; full spheres, measured fingers"
+  },
+  "reserved_parallel_frames": 3,
+  "initial_settling_xy_m": 1.1920928955078125e-06,
+  "ok": false,
+  "full_build": false
+}

@@ -1,0 +1,34 @@
+[
+  {
+    "class": "neighbour_rub",
+    "a": "brick:B_b_004#43",
+    "b": "brick:B_b_006#45",
+    "phase": {
+      "A": "park",
+      "B": "insert"
+    },
+    "start_frame": 588,
+    "max_pen_mm": -1.065,
+    "peak_force_n": 3.29,
+    "end_frame": 595,
+    "duration_frames": 8,
+    "contact_frames": 8,
+    "fragments": 1
+  },
+  {
+    "class": "penetration",
+    "a": "brick:B_b_004#43",
+    "b": "brick:B_b_006#45",
+    "phase": {
+      "A": "park",
+      "B": "insert"
+    },
+    "start_frame": 593,
+    "max_pen_mm": -1.065,
+    "peak_force_n": 0.27,
+    "end_frame": 594,
+    "duration_frames": 2,
+    "contact_frames": 2,
+    "fragments": 1
+  }
+]

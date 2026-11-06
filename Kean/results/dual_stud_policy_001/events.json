@@ -1,0 +1,14 @@
+[
+  {
+    "event": "step_started",
+    "arm": "B",
+    "step": 5,
+    "time": 1.1166666666666676
+  },
+  {
+    "event": "step_complete",
+    "arm": "B",
+    "step": 5,
+    "time": 16.16666666666703
+  }
+]

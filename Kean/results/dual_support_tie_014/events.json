@@ -1,0 +1,82 @@
+[
+  {
+    "event": "support_requested",
+    "arm": "A",
+    "step": 10,
+    "time": 1.100000000000001
+  },
+  {
+    "event": "support_requested",
+    "arm": "B",
+    "step": 11,
+    "time": 1.1166666666666676
+  },
+  {
+    "event": "support_granted",
+    "arm": "A",
+    "step": 10,
+    "time": 1.1166666666666676,
+    "helper": "B"
+  },
+  {
+    "event": "helper_ready",
+    "arm": "A",
+    "step": 10,
+    "time": 1.1166666666666676,
+    "helper": "B"
+  },
+  {
+    "event": "support_held",
+    "arm": "A",
+    "step": 10,
+    "time": 15.466666666667015,
+    "helper": "B"
+  },
+  {
+    "event": "step_complete",
+    "arm": "A",
+    "step": 10,
+    "time": 30.466666666666217
+  },
+  {
+    "event": "support_released",
+    "arm": "A",
+    "step": 10,
+    "time": 30.466666666666217,
+    "helper": "B"
+  },
+  {
+    "event": "support_granted",
+    "arm": "B",
+    "step": 11,
+    "time": 30.466666666666217,
+    "helper": "A"
+  },
+  {
+    "event": "helper_ready",
+    "arm": "B",
+    "step": 11,
+    "time": 30.466666666666217,
+    "helper": "A"
+  },
+  {
+    "event": "support_held",
+    "arm": "B",
+    "step": 11,
+    "time": 44.8666666666654,
+    "helper": "A"
+  },
+  {
+    "event": "step_complete",
+    "arm": "B",
+    "step": 11,
+    "time": 57.2166666666647
+  },
+  {
+    "event": "support_released",
+    "arm": "B",
+    "step": 11,
+    "time": 57.2166666666647,
+    "helper": "A"
+  }
+]

@@ -1,0 +1,160 @@
+{
+  "done": false,
+  "failure": "B:gate_miss",
+  "error": null,
+  "frames": 6051,
+  "builds": {
+    "A": {
+      "structure": "arch",
+      "placed": 4,
+      "preplaced": 0,
+      "total": 11,
+      "completed_steps": 4,
+      "supports": [],
+      "brace_search": []
+    },
+    "B": {
+      "structure": "S3",
+      "placed": 4,
+      "preplaced": 0,
+      "total": 16,
+      "completed_steps": 4,
+      "supports": [],
+      "brace_search": []
+    }
+  },
+  "contacts": {
+    "neighbour_rub": {
+      "count": 9,
+      "examples": [
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:A_b_000#28",
+          "phase": {
+            "A": "insert",
+            "B": "pre-insert"
+          },
+          "start_frame": 738,
+          "max_pen_mm": -0.743,
+          "peak_force_n": 3.3,
+          "end_frame": 745,
+          "duration_frames": 8,
+          "contact_frames": 8,
+          "fragments": 1
+        },
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:B_b_000#39",
+          "phase": {
+            "A": "release",
+            "B": "insert"
+          },
+          "start_frame": 809,
+          "max_pen_mm": -0.975,
+          "peak_force_n": 4.74,
+          "end_frame": 815,
+          "duration_frames": 7,
+          "contact_frames": 7,
+          "fragments": 1
+        },
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:A_b_001#29",
+          "phase": {
+            "A": "insert",
+            "B": "pre-insert"
+          },
+          "start_frame": 2143,
+          "max_pen_mm": -0.915,
+          "peak_force_n": 3.36,
+          "end_frame": 2150,
+          "duration_frames": 8,
+          "contact_frames": 8,
+          "fragments": 1
+        },
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:B_b_001#40",
+          "phase": {
+            "A": "insert",
+            "B": "insert"
+          },
+          "start_frame": 2214,
+          "max_pen_mm": -1.074,
+          "peak_force_n": 5.07,
+          "end_frame": 2221,
+          "duration_frames": 8,
+          "contact_frames": 8,
+          "fragments": 1
+        },
+        {
+          "class": "neighbour_rub",
+          "a": "brick:A_b_000#28",
+          "b": "brick:A_b_002#30",
+          "phase": {
+            "A": "insert",
+            "B": "pre-insert"
+          },
+          "start_frame": 3430,
+          "max_pen_mm": -0.992,
+          "peak_force_n": 5.19,
+          "end_frame": 3437,
+          "duration_frames": 8,
+          "contact_frames": 8,
+          "fragments": 1
+        }
+      ]
+    },
+    "stud_mating": {
+      "count": 1,
+      "examples": [
+        {
+          "class": "stud_mating",
+          "a": "brick:B_b_000#39",
+          "b": "brick:B_b_002#41",
+          "phase": {
+            "A": "insert",
+            "B": "insert"
+          },
+          "start_frame": 3504,
+          "max_pen_mm": -1.246,
+          "peak_force_n": 0.28,
+          "end_frame": 3508,
+          "geometry": {
+            "upper": "B_b_002",
+            "lower": "B_b_000",
+            "stud_shape": 287,
+            "upper_shape": 298,
+            "stud_type": 6,
+            "upper_type": 8,
+            "stud_local_z": 0.010350000113248825
+          },
+          "duration_frames": 5,
+          "contact_frames": 5,
+          "fragments": 1
+        }
+      ]
+    }
+  },
+  "parallel_frames": 909,
+  "diagnostic": false,
+  "motion": {
+    "strict": true,
+    "workarounds": [],
+    "failures": [],
+    "plans": 62,
+    "plan_failures": 0,
+    "captures": 0,
+    "segments": 62,
+    "min_clearance_m": 0.026449651470221578,
+    "clearance_scope": "executed joints during planned playback; full spheres, measured fingers"
+  },
+  "reserved_parallel_frames": 1298,
+  "initial_settling_xy_m": 1.2665987014770508e-07,
+  "ok": false,
+  "full_build": false
+}

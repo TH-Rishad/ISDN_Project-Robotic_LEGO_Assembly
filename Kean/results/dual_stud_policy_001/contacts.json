@@ -1,0 +1,18 @@
+[
+  {
+    "class": "neighbour_rub",
+    "a": "brick:B_b_003#42",
+    "b": "brick:B_b_005#44",
+    "phase": {
+      "A": "park",
+      "B": "insert"
+    },
+    "start_frame": 643,
+    "max_pen_mm": -0.911,
+    "peak_force_n": 4.41,
+    "end_frame": 650,
+    "duration_frames": 8,
+    "contact_frames": 8,
+    "fragments": 1
+  }
+]

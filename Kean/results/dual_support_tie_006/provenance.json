@@ -1,0 +1,45 @@
+{
+  "git_revision": "255769ae3b9cf77a25edda9cec9c0bd7017d47e2",
+  "dirty_hashes": {
+    "Kean/motion/brace_search.py": "caa1398519537fca9a343da16c760f040fd6f8fa2faa8e904cff6486b93d7101",
+    "Kean/motion/clearance.py": "a67dc7ec04d05e0fd83842a44b0b973f943ddf3fcc2b7780e80e889be622f14a",
+    "Kean/motion/path_check.py": "89357eeaf057f2e6f3d7244b784fb08fbf947da8105cb3f0c88673f7af448e19",
+    "Kean/motion/plan_curobo.py": "356b00deee839d0b57fee0b991e8cc8790fc6f407315f709e33da5b811a08a94",
+    "Kean/motion/tick.py": "b8ca746966eea462bfa927212e2d275950869cc4ca2bb2db9ed8d5a95b6691e0",
+    "Kean/motion/world.py": "0558a2c5776c66b6ba6aad5b1c7ca8f238603a48a3411550096632e1401f0f3a",
+    "Kean/scripts/play_run.py": "c5677476a6105a3c79dbb48bd431e1e3914b928868c1a2d223ead9b366e3193b",
+    "Kean/scripts/play_run.sh": "c87fd3b1b7dc1868459e904ab3e3a5826f2973213d811187f23462804ee4e2a9",
+    "Kean/DUAL_BUILDER_PLAN.md": "fe1822327bf34b47e9211a11475e9c327bec0cbd4c23471043436cf1bf9b7b5d",
+    "Kean/dual_build.py": "6e7303a125ca7643b7b12ac8eacf60fc6ec953b50f6001ad64b287cb76e35d3d",
+    "Kean/dual_coordinator.py": "355d77af12992da074f0df69b6d00b30c4af60497259ca2d4449887faf3cc6e6",
+    "Kean/motion/reservations.py": "183a20f85db20ac7227e9ff9cd62045f83f03e3d6fa3c0e1e764ba24bcad3fe3",
+    "Kean/scripts/dual_build.py": "451b468bb310c3b3d6d4030bb1779aa58f66d7bc39274940f7a4c1ad5d69202c",
+    "Kean/scripts/dual_build.sh": "9dd373b4f8ec397c1b03d6c9636395225fca07c83cee6dd906c71c906f6b0014",
+    "Kean/tests/test_dual_coordinator.py": "de0f09c5564a206f5527dcc7a5ba892dbe22cc26b5df7063ffc791396ed32761",
+    "Kean/tests/test_dual_layout.py": "9be4e6e30f6f6b4d26beda794f1c8d046c7b3b1b46378909554de23cf7895fc0",
+    "Kean/tests/test_dual_motion.py": "f58ae144b3b15e58528678744f638dc3eb161844a2e81676da863f41aa807d72",
+    "Kean/tests/test_verify_dual.py": "46d4c4b41c22055488244cb6c8e1286e1f771d8868224be8f0842949ef82c2cc",
+    "Kean/verify_dual.py": "879e8dd751b0432c2ba08319b86980982a4b0ba59691c37893cc783272c0b09a"
+  },
+  "config": {
+    "build_a": "arch",
+    "build_b": "S3",
+    "out": "/home/bakasakib/Documents/ISDN_Project-Robotic_LEGO_Assembly/Kean/results/dual_support_tie_006",
+    "viewer": "null",
+    "port": 8081,
+    "separation": 0.32,
+    "max_frames": 60000,
+    "step_limit": 1,
+    "start_step_a": 10,
+    "start_step_b": 11,
+    "dry_run": false,
+    "mode": "dual_builder"
+  },
+  "simulator": null,
+  "plan_hashes": {
+    "A": "96962323ee3f641314b81ed028997c30a40a8fcd0b21b8d1c495a87e0d811d65",
+    "B": "3eb551e2f9eca1d3bb016b5e7170f2df0bb029247c3e675a69287bf736422e79"
+  },
+  "python": "3.12.3",
+  "hostname": "MEE2440"
+}

@@ -1,0 +1,66 @@
+[
+  {
+    "class": "neighbour_rub",
+    "a": "plate#-1",
+    "b": "brick:A_b_000#28",
+    "phase": {
+      "A": "insert",
+      "B": "pre-insert"
+    },
+    "start_frame": 738,
+    "max_pen_mm": -0.743,
+    "peak_force_n": 0.53,
+    "end_frame": 745,
+    "duration_frames": 8,
+    "contact_frames": 8,
+    "fragments": 1
+  },
+  {
+    "class": "neighbour_rub",
+    "a": "plate#-1",
+    "b": "brick:B_b_000#39",
+    "phase": {
+      "A": "release",
+      "B": "insert"
+    },
+    "start_frame": 809,
+    "max_pen_mm": -0.893,
+    "peak_force_n": 3.85,
+    "end_frame": 816,
+    "duration_frames": 8,
+    "contact_frames": 8,
+    "fragments": 1
+  },
+  {
+    "class": "neighbour_rub",
+    "a": "plate#-1",
+    "b": "brick:A_b_001#29",
+    "phase": {
+      "A": "insert",
+      "B": "pre-insert"
+    },
+    "start_frame": 2200,
+    "max_pen_mm": -0.756,
+    "peak_force_n": 6.6,
+    "end_frame": 2207,
+    "duration_frames": 8,
+    "contact_frames": 8,
+    "fragments": 1
+  },
+  {
+    "class": "neighbour_rub",
+    "a": "plate#-1",
+    "b": "brick:B_b_001#40",
+    "phase": {
+      "A": "insert",
+      "B": "insert"
+    },
+    "start_frame": 2271,
+    "max_pen_mm": -0.748,
+    "peak_force_n": 2.82,
+    "end_frame": 2278,
+    "duration_frames": 8,
+    "contact_frames": 8,
+    "fragments": 1
+  }
+]

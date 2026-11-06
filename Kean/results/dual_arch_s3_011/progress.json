@@ -1,0 +1,17 @@
+{
+  "frame": 6000,
+  "sim_time": 100.99999999999555,
+  "phases": {
+    "A": "pre-insert",
+    "B": "insert"
+  },
+  "modes": {
+    "A": "deferred",
+    "B": "idle"
+  },
+  "steps": {
+    "A": 4,
+    "B": 4
+  },
+  "pending": {}
+}

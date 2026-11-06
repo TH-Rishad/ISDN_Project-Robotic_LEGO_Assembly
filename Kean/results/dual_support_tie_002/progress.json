@@ -1,0 +1,19 @@
+{
+  "frame": 600,
+  "sim_time": 11.000000000000126,
+  "phases": {
+    "A": "stage",
+    "B": "brace-in"
+  },
+  "modes": {
+    "A": "idle",
+    "B": "idle"
+  },
+  "steps": {
+    "A": 10,
+    "B": 11
+  },
+  "pending": {
+    "B": 11
+  }
+}

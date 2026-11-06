@@ -1,0 +1,17 @@
+{
+  "frame": 11400,
+  "sim_time": 191.00000000004414,
+  "phases": {
+    "A": "press",
+    "B": "to feeder"
+  },
+  "modes": {
+    "A": "idle",
+    "B": "deferred"
+  },
+  "steps": {
+    "A": 6,
+    "B": 8
+  },
+  "pending": {}
+}

@@ -1,0 +1,24 @@
+{
+ "git_revision": "255769ae3b9cf77a25edda9cec9c0bd7017d47e2",
+ "dirty_hashes": {},
+ "config": {
+  "image_input": false,
+  "strategy": "weakest_joint",
+  "max_frames": 60000,
+  "strict_motion": true,
+  "planned_motion": true,
+  "fresh_plan": true,
+  "seeds": {
+   "arch": 0
+  }
+ },
+ "simulator": {
+  "backend": "newton_mujoco",
+  "joint_model": "weld_pool"
+ },
+ "plan_hashes": {
+  "arch": "b0b3fb60e08fd9af768790798b3e77296f29418800f4198e32404580930b1923"
+ },
+ "python": "3.12.3",
+ "hostname": "MEE2440"
+}

@@ -1,0 +1,544 @@
+{
+  "done": false,
+  "failure": "A:brace_search_exhausted",
+  "error": null,
+  "frames": 406,
+  "builds": {
+    "A": {
+      "structure": "arch",
+      "placed": 0,
+      "preplaced": 10,
+      "total": 11,
+      "completed_steps": 10,
+      "supports": [
+        {
+          "step": 10,
+          "requested": true,
+          "planned_feasible": true,
+          "executed": false,
+          "brace_infeasible": false,
+          "guard_stop": false,
+          "guard_frame": null,
+          "realised_grip_N": null,
+          "grip_samples": 0,
+          "contacted": [],
+          "gripped_bricks": [
+            "A_b_002",
+            "A_b_004"
+          ],
+          "max_F_N": {},
+          "max_M_Nm": {}
+        }
+      ],
+      "brace_search": [
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.124,
+            0.0224
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.1169, 0.0295]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1169, 0.0295]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1169, 0.0295]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1169, 0.0295]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1169, 0.0295]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1169, 0.0295]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.1169, 0.0295]: path clearance 1.00 mm at A_b_006 (sample 14/20); contact-full-sphere-filter goal [0.0, 0.1169, 0.0295]: path clearance 1.00 mm at A_b_006 (sample 14/20); contact-full-sphere-filter goal [0.0, 0.1169, 0.0295]: path clearance 1.00 mm at A_b_006 (sample 14/20)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.196,
+            0.0224
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: closed helper: path clearance 0.90 mm at A_b_001 (sample 0/0)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.196,
+            0.0224
+          ],
+          "tilt": [
+            -1.0472,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.196, 0.0224]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.196, 0.0224]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.196, 0.0224]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.196, 0.0224]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.196, 0.0224]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.196, 0.0224]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.196, 0.0224]: path clearance 1.11 mm at A_b_007 (sample 7/20); contact-full-sphere-filter goal [0.0, 0.196, 0.0224]: path clearance 1.11 mm at A_b_007 (sample 7/20); contact-full-sphere-filter goal [0.0, 0.196, 0.0224]: path clearance 1.11 mm at A_b_007 (sample 7/20)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.124,
+            0.0224
+          ],
+          "tilt": [
+            1.0472,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: closed helper: path clearance 0.90 mm at A_b_000 (sample 0/0)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.196,
+            0.0224
+          ],
+          "tilt": [
+            -1.309,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.2057, 0.025]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.2057, 0.025]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.2057, 0.025]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.2057, 0.025]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.2057, 0.025]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.2057, 0.025]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.2057, 0.025]: path clearance 1.18 mm at A_b_007 (sample 16/20); contact-full-sphere-filter goal [0.0, 0.2057, 0.025]: path clearance 1.18 mm at A_b_007 (sample 39/55); contact-full-sphere-filter goal [0.0, 0.2057, 0.025]: path clearance 1.18 mm at A_b_007 (sample 16/20)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.124,
+            0.0224
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.0757, 0.0353]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.0757, 0.0353]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.0757, 0.0353]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0757, 0.0353]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0757, 0.0353]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0757, 0.0353]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.0757, 0.0353]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.0757, 0.0353]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.0757, 0.0353]: cuRobo plan failed: no result (IK/start feasibility)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.196,
+            0.02
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: closed helper: path clearance 0.89 mm at A_b_001 (sample 0/0)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.124,
+            0.02
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.1169, 0.0271]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1169, 0.0271]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1169, 0.0271]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1169, 0.0271]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1169, 0.0271]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1169, 0.0271]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.1169, 0.0271]: path clearance 1.09 mm at A_b_006 (sample 14/20); contact-full-sphere-filter goal [0.0, 0.1169, 0.0271]: path clearance 1.09 mm at A_b_006 (sample 14/20); contact-full-sphere-filter goal [0.0, 0.1169, 0.0271]: path clearance 1.09 mm at A_b_006 (sample 14/20)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.196,
+            0.02
+          ],
+          "tilt": [
+            -1.0472,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.196, 0.02]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.196, 0.02]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.196, 0.02]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.196, 0.02]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.196, 0.02]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.196, 0.02]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.196, 0.02]: path clearance 1.17 mm at A_b_001 (sample 11/20); contact-full-sphere-filter goal [0.0, 0.196, 0.02]: path clearance 1.18 mm at A_b_001 (sample 11/20); contact-full-sphere-filter goal [0.0, 0.196, 0.02]: path clearance 1.17 mm at A_b_001 (sample 11/20)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.124,
+            0.02
+          ],
+          "tilt": [
+            1.0472,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.124, 0.02]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.124, 0.02]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.124, 0.02]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.124, 0.02]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.124, 0.02]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.124, 0.02]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.124, 0.02]: path clearance 1.11 mm at A_b_000 (sample 5/20); contact-full-sphere-filter goal [0.0, 0.124, 0.02]: path clearance 1.17 mm at A_b_006 (sample 9/20); contact-full-sphere-filter goal [0.0, 0.124, 0.02]: path clearance 1.17 mm at A_b_006 (sample 9/20)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.196,
+            0.02
+          ],
+          "tilt": [
+            -1.309,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.2057, 0.0226]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.2057, 0.0226]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.2057, 0.0226]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.2057, 0.0226]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.2057, 0.0226]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.2057, 0.0226]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.2057, 0.0226]: path clearance 0.28 mm at A_b_007 (sample 16/20); contact-full-sphere-filter goal [0.0, 0.2057, 0.0226]: path clearance 0.28 mm at A_b_007 (sample 16/20); contact-full-sphere-filter goal [0.0, 0.2057, 0.0226]: path clearance 0.28 mm at A_b_007 (sample 16/20)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.124,
+            0.02
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.0757, 0.0329]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.0757, 0.0329]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.0757, 0.0329]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0757, 0.0329]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0757, 0.0329]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0757, 0.0329]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.0757, 0.0329]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.0757, 0.0329]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.0757, 0.0329]: cuRobo plan failed: no result (IK/start feasibility)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.196,
+            0.0248
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: closed helper: path clearance 0.89 mm at A_b_007 (sample 0/0)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.124,
+            0.0248
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.1169, 0.0319]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1169, 0.0319]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1169, 0.0319]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1169, 0.0319]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1169, 0.0319]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1169, 0.0319]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.1169, 0.0319]: path clearance 1.06 mm at A_b_006 (sample 14/20); contact-full-sphere-filter goal [0.0, 0.1169, 0.0319]: path clearance 1.06 mm at A_b_006 (sample 14/20); contact-full-sphere-filter goal [0.0, 0.1169, 0.0319]: path clearance 1.06 mm at A_b_006 (sample 14/20)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.196,
+            0.0248
+          ],
+          "tilt": [
+            -1.0472,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: closed helper: path clearance 0.90 mm at A_b_007 (sample 0/0)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.124,
+            0.0248
+          ],
+          "tilt": [
+            1.0472,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: closed helper: path clearance 0.89 mm at A_b_006 (sample 0/0)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.196,
+            0.0248
+          ],
+          "tilt": [
+            -1.309,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: closed helper: path clearance 0.91 mm at A_b_007 (sample 0/0)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.124,
+            0.0248
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.0757, 0.0377]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.0757, 0.0377]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.0757, 0.0377]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0757, 0.0377]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0757, 0.0377]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0757, 0.0377]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.0757, 0.0377]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.0757, 0.0377]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.0757, 0.0377]: cuRobo plan failed: no result (IK/start feasibility)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.196,
+            0.0296
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: closed helper: path clearance 0.89 mm at A_b_003 (sample 0/0)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.124,
+            0.0296
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.1169, 0.0367]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1169, 0.0367]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1169, 0.0367]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1169, 0.0367]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1169, 0.0367]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1169, 0.0367]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.1169, 0.0367]: path clearance 1.10 mm at A_b_008 (sample 14/20); contact-full-sphere-filter goal [0.0, 0.1169, 0.0367]: path clearance 1.10 mm at A_b_008 (sample 14/20); contact-full-sphere-filter goal [0.0, 0.1169, 0.0367]: path clearance 1.10 mm at A_b_008 (sample 14/20)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.196,
+            0.0296
+          ],
+          "tilt": [
+            -1.0472,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: closed helper: path clearance 0.89 mm at A_b_003 (sample 0/0)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.124,
+            0.0296
+          ],
+          "tilt": [
+            1.0472,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: closed helper: path clearance 0.89 mm at A_b_002 (sample 0/0)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.196,
+            0.0296
+          ],
+          "tilt": [
+            -1.309,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: closed helper: path clearance 0.89 mm at A_b_003 (sample 0/0)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.124,
+            0.0296
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.0757, 0.0425]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.0757, 0.0425]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.0757, 0.0425]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0757, 0.0425]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0757, 0.0425]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0757, 0.0425]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.0757, 0.0425]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.0757, 0.0425]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.0757, 0.0425]: cuRobo plan failed: no result (IK/start feasibility)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.196,
+            0.0152
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.196, 0.0152]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.196, 0.0152]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.196, 0.0152]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.196, 0.0152]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.196, 0.0152]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.196, 0.0152]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.196, 0.0152]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.196, 0.0152]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.196, 0.0152]: cuRobo plan failed: no result (IK/start feasibility)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.124,
+            0.0152
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.1169, 0.0223]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1169, 0.0223]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1169, 0.0223]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1169, 0.0223]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1169, 0.0223]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1169, 0.0223]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.1169, 0.0223]: path clearance 1.12 mm at A_b_004 (sample 15/20); contact-full-sphere-filter goal [0.0, 0.1169, 0.0223]: path clearance 1.12 mm at A_b_004 (sample 15/20); contact-full-sphere-filter goal [0.0, 0.1169, 0.0223]: path clearance 1.12 mm at A_b_004 (sample 15/20)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.196,
+            0.0152
+          ],
+          "tilt": [
+            -1.0472,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.2047, 0.0202]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.2047, 0.0202]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.2047, 0.0202]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.2047, 0.0202]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.2047, 0.0202]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.2047, 0.0202]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.2047, 0.0202]: path clearance 1.14 mm at A_b_005 (sample 15/20); contact-full-sphere-filter goal [0.0, 0.2047, 0.0202]: path clearance 1.14 mm at A_b_005 (sample 15/20); contact-full-sphere-filter goal [0.0, 0.2047, 0.0202]: path clearance 1.14 mm at A_b_005 (sample 15/20)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.124,
+            0.0152
+          ],
+          "tilt": [
+            1.0472,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.1153, 0.0202]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1153, 0.0202]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1153, 0.0202]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1153, 0.0202]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1153, 0.0202]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1153, 0.0202]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.1153, 0.0202]: path clearance 1.15 mm at A_b_004 (sample 14/20); contact-full-sphere-filter goal [0.0, 0.1153, 0.0202]: path clearance 1.15 mm at A_b_004 (sample 14/20); contact-full-sphere-filter goal [0.0, 0.1153, 0.0202]: path clearance 1.02 mm at A_b_004 (sample 14/20)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.196,
+            0.0152
+          ],
+          "tilt": [
+            -1.309,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.2057, 0.0178]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.2057, 0.0178]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.2057, 0.0178]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.2057, 0.0178]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.2057, 0.0178]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.2057, 0.0178]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.2057, 0.0178]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.2057, 0.0178]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.2057, 0.0178]: cuRobo plan failed: no result (IK/start feasibility)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.124,
+            0.0152
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.0757, 0.0281]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.0757, 0.0281]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.0757, 0.0281]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0757, 0.0281]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0757, 0.0281]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0757, 0.0281]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.0757, 0.0281]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.0757, 0.0281]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.0757, 0.0281]: cuRobo plan failed: no result (IK/start feasibility)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.196,
+            0.032
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.196, 0.032]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.196, 0.032]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.196, 0.032]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.196, 0.032]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.196, 0.032]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.196, 0.032]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.196, 0.032]: path clearance 1.19 mm at A_b_009 (sample 8/20); contact-full-sphere-filter goal [0.0, 0.196, 0.032]: path clearance 1.19 mm at A_b_009 (sample 8/20); contact-full-sphere-filter goal [0.0, 0.196, 0.032]: path clearance 1.19 mm at A_b_009 (sample 8/20)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.124,
+            0.032
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.1169, 0.0391]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1169, 0.0391]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1169, 0.0391]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1169, 0.0391]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1169, 0.0391]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1169, 0.0391]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.1169, 0.0391]: path clearance 1.10 mm at A_b_008 (sample 14/20); contact-full-sphere-filter goal [0.0, 0.1169, 0.0391]: path clearance 1.10 mm at A_b_008 (sample 14/20); contact-full-sphere-filter goal [0.0, 0.1169, 0.0391]: path clearance 1.10 mm at A_b_008 (sample 14/20)"
+        }
+      ]
+    },
+    "B": {
+      "structure": "S3",
+      "placed": 0,
+      "preplaced": 11,
+      "total": 16,
+      "completed_steps": 11,
+      "supports": [],
+      "brace_search": []
+    }
+  },
+  "contacts": {},
+  "parallel_frames": 0,
+  "diagnostic": true,
+  "motion": {
+    "strict": true,
+    "workarounds": [],
+    "failures": [],
+    "plans": 3,
+    "plan_failures": 0,
+    "captures": 0,
+    "segments": 3,
+    "min_clearance_m": 0.13377600815147161,
+    "clearance_scope": "executed joints during planned playback; full spheres, measured fingers"
+  },
+  "reserved_parallel_frames": 3,
+  "initial_settling_xy_m": 1.1920928955078125e-06,
+  "ok": false,
+  "full_build": false
+}

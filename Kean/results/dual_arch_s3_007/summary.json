@@ -1,0 +1,98 @@
+{
+  "done": false,
+  "failure": "A:gate_miss",
+  "error": null,
+  "frames": 2945,
+  "builds": {
+    "A": {
+      "structure": "arch",
+      "placed": 1,
+      "preplaced": 0,
+      "total": 11,
+      "completed_steps": 1,
+      "supports": [],
+      "brace_search": []
+    },
+    "B": {
+      "structure": "S3",
+      "placed": 1,
+      "preplaced": 0,
+      "total": 16,
+      "completed_steps": 1,
+      "supports": [],
+      "brace_search": []
+    }
+  },
+  "contacts": {
+    "neighbour_rub": {
+      "count": 3,
+      "examples": [
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:A_b_000#28",
+          "phase": {
+            "A": "insert",
+            "B": "pre-insert"
+          },
+          "start_frame": 1019,
+          "max_pen_mm": -13.876,
+          "peak_force_n": 3.26,
+          "end_frame": 1141,
+          "duration_frames": 123,
+          "contact_frames": 123,
+          "fragments": 1
+        },
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:B_b_000#39",
+          "phase": {
+            "A": "insert",
+            "B": "insert"
+          },
+          "start_frame": 1242,
+          "max_pen_mm": -10.636,
+          "peak_force_n": 20.27,
+          "end_frame": 1298,
+          "duration_frames": 57,
+          "contact_frames": 55,
+          "fragments": 2
+        },
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:A_b_001#29",
+          "phase": {
+            "A": "insert",
+            "B": "transport"
+          },
+          "start_frame": 2788,
+          "max_pen_mm": -10.182,
+          "peak_force_n": 6.36,
+          "end_frame": 2945,
+          "duration_frames": 158,
+          "contact_frames": 150,
+          "fragments": 3
+        }
+      ]
+    }
+  },
+  "parallel_frames": 215,
+  "diagnostic": false,
+  "motion": {
+    "strict": true,
+    "workarounds": [],
+    "failures": [],
+    "plans": 17,
+    "plan_failures": 0,
+    "captures": 0,
+    "segments": 17,
+    "min_clearance_m": 0.026853382215555756,
+    "clearance_scope": "executed joints during planned playback; full spheres, measured fingers"
+  },
+  "reserved_parallel_frames": 233,
+  "initial_settling_xy_m": 7.450580596923828e-08,
+  "ok": false,
+  "full_build": false
+}

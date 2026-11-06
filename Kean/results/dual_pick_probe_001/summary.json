@@ -1,0 +1,100 @@
+{
+  "done": false,
+  "failure": "motion_obstacle_moved",
+  "error": null,
+  "frames": 1031,
+  "builds": {
+    "A": {
+      "structure": "arch",
+      "placed": 1,
+      "preplaced": 0,
+      "total": 11,
+      "completed_steps": 0,
+      "supports": [],
+      "brace_search": []
+    },
+    "B": {
+      "structure": "S3",
+      "placed": 1,
+      "preplaced": 0,
+      "total": 16,
+      "completed_steps": 0,
+      "supports": [],
+      "brace_search": []
+    }
+  },
+  "contacts": {
+    "displaced": {
+      "count": 1,
+      "examples": [
+        {
+          "brick": "B_b_015",
+          "class": "displaced",
+          "phase": {
+            "A": "park",
+            "B": "park"
+          },
+          "start_frame": 2,
+          "end_frame": 2,
+          "duration_frames": 1,
+          "contact_frames": 1,
+          "fragments": 1,
+          "path_mm": 1.1,
+          "max_move_mm": 1.1
+        }
+      ]
+    },
+    "neighbour_rub": {
+      "count": 2,
+      "examples": [
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:A_b_000#28",
+          "phase": {
+            "A": "insert",
+            "B": "pre-insert"
+          },
+          "start_frame": 774,
+          "max_pen_mm": -0.727,
+          "peak_force_n": 2.85,
+          "end_frame": 781,
+          "duration_frames": 8,
+          "contact_frames": 8,
+          "fragments": 1
+        },
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:B_b_000#39",
+          "phase": {
+            "A": "insert",
+            "B": "insert"
+          },
+          "start_frame": 845,
+          "max_pen_mm": -0.885,
+          "peak_force_n": 4.36,
+          "end_frame": 852,
+          "duration_frames": 8,
+          "contact_frames": 8,
+          "fragments": 1
+        }
+      ]
+    }
+  },
+  "parallel_frames": 348,
+  "diagnostic": true,
+  "motion": {
+    "strict": true,
+    "workarounds": [],
+    "failures": [],
+    "plans": 10,
+    "plan_failures": 0,
+    "captures": 0,
+    "segments": 10,
+    "min_clearance_m": 0.019987426978575782,
+    "clearance_scope": "executed joints during planned playback; full spheres, measured fingers"
+  },
+  "ok": false,
+  "full_build": false
+}

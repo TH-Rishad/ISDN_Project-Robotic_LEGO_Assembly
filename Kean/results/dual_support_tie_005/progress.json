@@ -1,0 +1,19 @@
+{
+  "frame": 840,
+  "sim_time": 15.000000000000325,
+  "phases": {
+    "A": "stage",
+    "B": "brace-guard"
+  },
+  "modes": {
+    "A": "idle",
+    "B": "idle"
+  },
+  "steps": {
+    "A": 10,
+    "B": 11
+  },
+  "pending": {
+    "B": 11
+  }
+}

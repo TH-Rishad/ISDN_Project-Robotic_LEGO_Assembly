@@ -1,0 +1,132 @@
+{
+  "done": false,
+  "failure": "command_clearance:B:A_b_004",
+  "error": null,
+  "frames": 605,
+  "builds": {
+    "A": {
+      "structure": "arch",
+      "placed": 0,
+      "preplaced": 10,
+      "total": 11,
+      "completed_steps": 10,
+      "supports": [
+        {
+          "step": 10,
+          "requested": true,
+          "planned_feasible": true,
+          "executed": false,
+          "brace_infeasible": false,
+          "guard_stop": false,
+          "guard_frame": null,
+          "realised_grip_N": null,
+          "grip_samples": 0,
+          "contacted": [],
+          "gripped_bricks": [
+            "A_b_002",
+            "A_b_004"
+          ],
+          "max_F_N": {},
+          "max_M_Nm": {}
+        }
+      ],
+      "brace_search": [
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.124,
+            0.0224
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "accepted": false
+        }
+      ]
+    },
+    "B": {
+      "structure": "S3",
+      "placed": 0,
+      "preplaced": 11,
+      "total": 16,
+      "completed_steps": 11,
+      "supports": [],
+      "brace_search": []
+    }
+  },
+  "contacts": {},
+  "parallel_frames": 0,
+  "diagnostic": true,
+  "motion": {
+    "strict": true,
+    "workarounds": [],
+    "failures": [
+      {
+        "error": "arm clearance 0.97 mm",
+        "step": 10,
+        "phases": {
+          "A builder": "stage",
+          "B builder": "brace-in"
+        },
+        "modes": {
+          "A builder": "idle",
+          "B builder": "idle"
+        },
+        "measured_q": [
+          0.7014917135238647,
+          0.23652131855487823,
+          0.47250181436538696,
+          -2.23891019821167,
+          -0.1702355444431305,
+          2.4485063552856445,
+          0.5073615312576294,
+          0.008000586181879044,
+          0.008000602945685387,
+          -0.047784481197595596,
+          0.46704503893852234,
+          -0.0022407807409763336,
+          -2.3606338500976562,
+          -1.3125959634780884,
+          2.3231711387634277,
+          0.3471003770828247,
+          0.009999655187129974,
+          0.01000034436583519
+        ],
+        "target_q": [
+          0.7015209794044495,
+          0.2362595647573471,
+          0.4725190997123718,
+          -2.238739252090454,
+          -0.1702386885881424,
+          2.4485645294189453,
+          0.5073714256286621,
+          0.006500000134110451,
+          0.006500000134110451,
+          -0.050968319177627563,
+          0.4766663908958435,
+          -0.00732254795730114,
+          -2.355397939682007,
+          -1.3237565755844116,
+          2.329702138900757,
+          0.3531893789768219,
+          0.009999999776482582,
+          0.009999999776482582
+        ],
+        "fraction": 0.0
+      }
+    ],
+    "plans": 3,
+    "plan_failures": 1,
+    "captures": 0,
+    "segments": 3,
+    "min_clearance_m": 0.13377600815147161,
+    "clearance_scope": "executed joints during planned playback; full spheres, measured fingers"
+  },
+  "reserved_parallel_frames": 3,
+  "initial_settling_xy_m": 1.1920928955078125e-06,
+  "ok": false,
+  "full_build": false
+}

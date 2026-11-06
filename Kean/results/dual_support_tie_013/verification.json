@@ -1,0 +1,25 @@
+{
+  "ok": false,
+  "full_build": false,
+  "errors": [
+    "recorded execution failure: command_clearance:B:B_b_008",
+    "B: incomplete/nonmonotonic own-build progress",
+    "unserved support request",
+    "contact monitor: penetration",
+    "execution did not finish cleanly"
+  ],
+  "recorded_parallel_frames": 0,
+  "grants": [
+    {
+      "arm": "A",
+      "step": 10,
+      "time": 1.1166666666666676
+    },
+    {
+      "arm": "B",
+      "step": 11,
+      "time": 30.466666666666217
+    }
+  ],
+  "frames": 2942
+}

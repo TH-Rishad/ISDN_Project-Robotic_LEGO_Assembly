@@ -1,0 +1,17 @@
+{
+  "frame": 2880,
+  "sim_time": 48.9999999999985,
+  "phases": {
+    "A": "hold",
+    "B": "insert"
+  },
+  "modes": {
+    "A": "idle",
+    "B": "idle"
+  },
+  "steps": {
+    "A": 11,
+    "B": 11
+  },
+  "pending": {}
+}

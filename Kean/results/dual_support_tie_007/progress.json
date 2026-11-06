@@ -1,0 +1,19 @@
+{
+  "frame": 360,
+  "sim_time": 6.9999999999999805,
+  "phases": {
+    "A": "lift",
+    "B": "park"
+  },
+  "modes": {
+    "A": "idle",
+    "B": "idle"
+  },
+  "steps": {
+    "A": 10,
+    "B": 11
+  },
+  "pending": {
+    "B": 11
+  }
+}

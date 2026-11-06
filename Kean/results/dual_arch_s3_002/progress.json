@@ -1,0 +1,17 @@
+{
+  "frame": 2160,
+  "sim_time": 36.99999999999918,
+  "phases": {
+    "A": "pre-insert",
+    "B": "grasp"
+  },
+  "modes": {
+    "A": "playing",
+    "B": "idle"
+  },
+  "steps": {
+    "A": 1,
+    "B": 1
+  },
+  "pending": {}
+}

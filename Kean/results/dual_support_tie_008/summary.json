@@ -1,0 +1,183 @@
+{
+  "done": false,
+  "failure": null,
+  "error": "KeyboardInterrupt: ",
+  "frames": 405,
+  "builds": {
+    "A": {
+      "structure": "arch",
+      "placed": 0,
+      "preplaced": 10,
+      "total": 11,
+      "completed_steps": 10,
+      "supports": [
+        {
+          "step": 10,
+          "requested": true,
+          "planned_feasible": true,
+          "executed": false,
+          "brace_infeasible": false,
+          "guard_stop": false,
+          "guard_frame": null,
+          "realised_grip_N": null,
+          "grip_samples": 0,
+          "contacted": [],
+          "gripped_bricks": [
+            "A_b_007",
+            "A_b_009"
+          ],
+          "max_F_N": {},
+          "max_M_Nm": {}
+        }
+      ],
+      "brace_search": [
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.124,
+            0.0224
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.1169, 0.0295]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1169, 0.0295]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1169, 0.0295]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1169, 0.0295]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1169, 0.0295]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1169, 0.0295]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.1169, 0.0295]: path clearance 1.00 mm at A_b_006 (sample 14/20); contact-full-sphere-filter goal [0.0, 0.1169, 0.0295]: path clearance 1.00 mm at A_b_006 (sample 14/20); contact-full-sphere-filter goal [0.0, 0.1169, 0.0295]: path clearance 1.00 mm at A_b_006 (sample 14/20)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.196,
+            0.044
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: closed helper: path clearance 0.94 mm at A_b_005 (sample 0/0)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.124,
+            0.044
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: closed helper: path clearance 0.94 mm at A_b_004 (sample 0/0)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.196,
+            0.044
+          ],
+          "tilt": [
+            -1.0472,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: closed helper: path clearance 1.00 mm at A_b_005 (sample 0/0)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.124,
+            0.044
+          ],
+          "tilt": [
+            1.0472,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: closed helper: path clearance 1.00 mm at A_b_004 (sample 0/0)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.196,
+            0.044
+          ],
+          "tilt": [
+            -1.309,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: closed helper: path clearance 1.10 mm at A_b_005 (sample 0/0)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.124,
+            0.044
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.0757, 0.0569]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.0757, 0.0569]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.0757, 0.0569]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0757, 0.0569]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0757, 0.0569]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0757, 0.0569]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.0757, 0.0569]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.0757, 0.0569]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.0757, 0.0569]: cuRobo plan failed: no result (IK/start feasibility)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.196,
+            0.0416
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "accepted": false
+        }
+      ]
+    },
+    "B": {
+      "structure": "S3",
+      "placed": 0,
+      "preplaced": 11,
+      "total": 16,
+      "completed_steps": 11,
+      "supports": [],
+      "brace_search": []
+    }
+  },
+  "contacts": {},
+  "parallel_frames": 0,
+  "diagnostic": true,
+  "motion": {
+    "strict": true,
+    "workarounds": [],
+    "failures": [],
+    "plans": 3,
+    "plan_failures": 0,
+    "captures": 0,
+    "segments": 3,
+    "min_clearance_m": 0.13377600815147161,
+    "clearance_scope": "executed joints during planned playback; full spheres, measured fingers"
+  },
+  "reserved_parallel_frames": 3,
+  "initial_settling_xy_m": 1.1920928955078125e-06,
+  "ok": false,
+  "full_build": false
+}

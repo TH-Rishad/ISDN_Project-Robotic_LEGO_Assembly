@@ -1,0 +1,1 @@
+{"run_id": "B_S3_weakest_joint", "structure": "B_S3", "brick_id": "B_b_005", "step": 5, "policy": "scripted_ik", "backend": "newton_mujoco", "joint_model": "weld_pool", "success": true, "final_error_mm": 0.96, "dz_mm": 0.85, "final_error_deg": 0.02, "tilt_deg": 1.51, "sim_time_s": 11.83, "brace_active": false, "brace_target": null, "failure_mode": null, "after_failure": false}

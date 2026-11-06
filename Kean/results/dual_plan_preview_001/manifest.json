@@ -1,0 +1,20 @@
+{
+  "mode": "dual_builder",
+  "names": {
+    "A": "arch",
+    "B": "S3"
+  },
+  "separation": 0.32,
+  "starts": {
+    "A": 0,
+    "B": 0
+  },
+  "step_limit": null,
+  "priority": "A",
+  "plans": {
+    "A": "plans/A.json",
+    "B": "plans/B.json"
+  },
+  "recording": "recording.npz",
+  "diagnostic": false
+}
