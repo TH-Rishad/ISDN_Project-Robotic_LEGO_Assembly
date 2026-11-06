@@ -50,6 +50,7 @@ on the same body pair.
 | Pyramid (A) + S3 (B) | `results/dual_pyramid_s3_004` | FAIL at pyramid step 6 (1x1 tips after drop); steps 0-5 seated |
 | Pyramid with layer 1 placed fewest studs first | `results/dual_pyramid_s3_005` | FAIL; A step 5 carried 1x1 0.98 mm from the lower-course 1x4 beside its support |
 | Pyramid (A) + S3 (B), complete | `results/dual_pyramid_s3_006` | PASS; verifier exit 0, pyramid 11/11, S3 16/16, 858 parallel frames |
+| Arch + S3 regression with resequencing code | `results/dual_arch_s3_015` | PASS; verifier exit 0, 1,175 parallel frames, orders unchanged |
 
 Diagnostic scenes pre-place earlier bricks and do not establish full-build
 completion. `dual_arch_s3_010` is the first accepted from-empty dual build
