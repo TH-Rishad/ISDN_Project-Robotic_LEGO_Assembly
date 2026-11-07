@@ -413,6 +413,7 @@ not kept; the code comments name them):
 | `dual_pyramid_s3_studfit_003` | FAIL: joint break, seated 1x2 pried by the single-weld hold of the 2x2 beside it |
 | `dual_pyramid_s3_studfit_004` | Pyramid 11/11 seated against stud resistance (3 drop-and-press, 3 side-gripped 1x1s, edge-gripped 1x2); S3 failed at step 11, the corbel pressed at its centre |
 | `dual_studfit_diag_014`-`017` | S3 steps 11-15, one fix each (centroid press, planner press point, settle, support stiffness) |
+| `dual_pyramid_s3_studfit_005` (full, live viewer) | Pyramid 11/11 again; S3 steps 0-12 seated, corbel at 0.01 mm; step 13 missed at dz -1.63 mm (gate 1.5 mm): the supported tower still leans under the 53 N press (it passed at -1.46 mm in diag 018) |
 | `dual_studfit_diag_018` (S3 steps 11-15) | Steps 11-14 seated (13 at -1.46 mm, 2.6 degrees: the tower still leans); step 15, which the plan leaves unsupported, broke B_b_014 on B_b_012 (a 2-stud bridge joint) at u 1.035 during the press ramp |
 
 `dual_studfit_diag_019` reruns 018 with `--after-failure 3` (keep simulating

@@ -1,0 +1,46 @@
+{
+  "ok": false,
+  "full_build": false,
+  "errors": [
+    "recorded execution failure: B:gate_miss",
+    "B: incomplete/nonmonotonic own-build progress",
+    "B step 13: no recorded mating",
+    "B step 14: no recorded mating",
+    "B step 14: no insertion frames",
+    "B step 14: no measured two-finger support force",
+    "B step 14: support was not requested before pickup",
+    "B step 15: no recorded mating",
+    "B step 15: no insertion frames",
+    "unserved support request",
+    "contact monitor: penetration",
+    "contact monitor: displaced",
+    "detailed contact evidence: penetration",
+    "detailed contact evidence: penetration",
+    "detailed contact evidence: penetration",
+    "detailed contact evidence: penetration",
+    "detailed contact evidence: penetration",
+    "detailed contact evidence: penetration",
+    "detailed contact evidence: penetration",
+    "detailed contact evidence: penetration",
+    "detailed contact evidence: penetration",
+    "detailed contact evidence: displaced",
+    "detailed contact evidence: displaced",
+    "detailed contact evidence: displaced",
+    "detailed contact evidence: displaced",
+    "execution did not finish cleanly"
+  ],
+  "recorded_parallel_frames": 2037,
+  "grants": [
+    {
+      "arm": "B",
+      "step": 11,
+      "time": 301.0333333333882
+    },
+    {
+      "arm": "B",
+      "step": 13,
+      "time": 349.633333333344
+    }
+  ],
+  "frames": 22785
+}
