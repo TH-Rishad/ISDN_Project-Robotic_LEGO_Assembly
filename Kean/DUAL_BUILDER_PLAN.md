@@ -375,5 +375,47 @@ runs are unchanged.
 needing 8.9 N, was held at dz 1.77 mm, peaked at 2.9 N of push and missed the
 gate (dz 1.76 mm). The builder's grip is FINGER_KE 1000 N/m x 1.5 mm = 1.5 N
 per finger, so the brick slips in the pads at about 3 N; a side grip cannot
-press a brick in. Pressing needs a stronger grip (A's 9500 N/m gives ~14 N per
-finger, enough for 1-2 studs) or a press on the brick's top.
+press a brick in.
+
+### Top press (chosen: every brick)
+
+Under `--stud-fit` every step keeps its insert (and wriggle) down to the stud
+tops, then releases, rises, closes and presses the brick's top with the closed
+tips (`drop_press.top_press`; drop-and-press steps keep their own splice).
+What it took, each found in a diagnostic run (003-012 were iterations and are
+not kept; the code comments name them):
+
+- Force: while the tips are on the held brick, a feed-forward hand force ramps
+  over 0.5 s to 1.3 x the push needed, only in the contact (seat, dwell) moves.
+  Position control alone gives ~4 N at the cell's 400 N m/rad joints.
+- Stiffness: the pressing arm's joints, and a supporting arm's, are 5x stiffer
+  while the force is on; soft, the hand skated off a 2x2 and a supported tower
+  leaned 4 degrees and stayed there.
+- Aim: the press is placed over the held brick less the arm's in-hand bias,
+  and the brick-aim servo is frozen in the press (it was steering a released
+  brick and winding the bias off it). The press point is the planner's grip
+  offset (`best_press_point`, which supports are sized for); a fallback edge
+  grip presses at the centroid of the studs it mates.
+- Hold and slide: all of the brick's clutch welds hold it, each against its
+  own support (one weld carried the press's moment into one brick and pried a
+  seated 1x2 off). At push-through they move straight down to a level seat at
+  the held x, y and yaw (a free slide twisted a 1x1 5 degrees; a held landing
+  tilt seated a dropped 1x4 6.7 degrees off). The seat dwell waits 0.25 s
+  for the structure to spring back, then snaps.
+- Support grip: a supporting hand grips at 2 x A_FINGER_KE (~28 N a finger;
+  a Franka Hand holds 70 N). At ~13 N, S3 step 13's support let a joint below
+  it break at u 1.00, under less than the press it was sized for.
+
+| Run | Result |
+|---|---|
+| `dual_studfit_diag_013` (2 steps each) | PASS: 1x1, 2x2, 2x4 seated at 9.2 / 37.8 / 71.7 N peak against 8.9 / 35.6 / 71.2 N |
+| `dual_pyramid_s3_studfit_001` | FAIL at pyramid step 8: closed-finger spheres 0.98 mm from a 1x1 two rows from the pressed 1x2 (press-phase permission now covers the pressed brick's course and the one below) |
+| `dual_pyramid_s3_studfit_003` | FAIL: joint break, seated 1x2 pried by the single-weld hold of the 2x2 beside it |
+| `dual_pyramid_s3_studfit_004` | Pyramid 11/11 seated against stud resistance (3 drop-and-press, 3 side-gripped 1x1s, edge-gripped 1x2); S3 failed at step 11, the corbel pressed at its centre |
+| `dual_studfit_diag_014`-`017` | S3 steps 11-15, one fix each (centroid press, planner press point, settle, support stiffness) |
+| `dual_studfit_diag_018` (S3 steps 11-15) | Steps 11-14 seated (13 at -1.46 mm, 2.6 degrees: the tower still leans); step 15, which the plan leaves unsupported, broke B_b_014 on B_b_012 (a 2-stud bridge joint) at u 1.035 during the press ramp |
+
+Open: S3's last step. The planner judges it safe unsupported at a 1.3 x
+press; the cell's joint model breaks its 2-stud bridge joint 3.5 % over
+capacity before the brick goes through. A full pyramid + S3 stud-fit build has
+not passed yet.

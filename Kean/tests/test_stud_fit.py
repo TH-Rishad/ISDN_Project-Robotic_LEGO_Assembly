@@ -30,11 +30,11 @@ class FakeWp:
 def cell(z, push, tcp=None):
     tcp = [1.] if tcp is None else tcp
     planned = 'planned'
-    step = dict(step=0, brick_id='b', mating_studs=[[None, 2]])     # 2 studs: 17.8 N to push through
+    step = dict(step=0, brick_id='b', mating_studs=[[None, 2]], grasp=dict(tcp_offset_m=[0., 0.]))     # 2 studs: 17.8 N to push through
     snapped = []
     arm = NS(phase='insert', cur=None, t=0., bias=np.array([.0005, .0002, 0.]), moves=[dict(phase='press', pos=np.array([0., 0., .02])),
                                              dict(phase='press', pos=np.zeros(3), dwell=1.5, wait=None)])
-    view = NS(active=True, b_step=0, owner='A', B=arm, plan=dict(sequence=[step], bricks=[dict(id='b', type='2x4', yaw_index=0)]), snap=lambda s: snapped.append(s['brick_id']))
+    view = NS(active=True, b_step=0, owner='A', B=arm, plan=dict(sequence=[step], bricks=[dict(id='b', type='2x4', yaw_index=0, grid_pos=[0, 0, 0])]), snap=lambda s: snapped.append(s['brick_id']))
     c = NS(views={'A': view}, welds={'b': [[0, None, planned, False]]}, body={'b': 0},
            target={'b': (np.zeros(3), 0., False)}, sim_time=0., n_arm_bodies=0, frame=0,
            model=NS(equality_constraint_relpose=Array([planned]), equality_constraint_enabled=Array([False])),
@@ -69,8 +69,8 @@ class StudFitTest(unittest.TestCase):
         # Through: the weld guides it straight down to the seat, keeping its x, y.
         self.assertTrue(c.model.equality_constraint_enabled.numpy()[0])
         np.testing.assert_allclose(c.model.equality_constraint_relpose.numpy()[0], [.001, 0., 0.])
-        self.assertFalse(dwell())                      # same frame: the slide has not been simulated
-        c.frame = 1
+        self.assertFalse(dwell())                      # the slide and spring-back have not been simulated
+        c.sim_time += .25
         self.assertTrue(dwell())                       # snap now
         view.snap(step)                                # the gate's clutch welds take over
         self.assertFalse(c.model.equality_constraint_enabled.numpy()[0])
@@ -85,6 +85,35 @@ class StudFitTest(unittest.TestCase):
         fit = StudFit(c, self.D(c, push))
         fit.update()
         self.assertAlmostEqual(float(c.model.equality_constraint_relpose.numpy()[0][2]), .0017)
+
+    def test_hold_uses_every_support_weld_and_sums_their_push(self):
+        z, push = [.0017], [0.]
+        c, view, step, _ = cell(z, push)
+        c.welds['b'].append([1, None, 'planned2', False])
+        c.model.equality_constraint_relpose = Array(['planned', 'planned2'])
+        c.model.equality_constraint_enabled = Array([False, False])
+        D = self.D(c, push)
+        D.weld_rows = lambda solver: {0: None, 1: None}
+        fit = StudFit(c, D)
+        fit.update()
+        self.assertEqual(list(c.model.equality_constraint_enabled.numpy()), [True, True])
+        push[0] = 9.                                   # 9 N on each weld: 18 N >= 2 x 8.9 N
+        fit.update()
+        self.assertNotIn('b', fit.held)
+        view.snap(step)
+        self.assertEqual(list(c.model.equality_constraint_relpose.numpy()), ['planned', 'planned2'])
+        self.assertEqual(list(c.model.equality_constraint_enabled.numpy()), [False, False])
+
+    def test_press_point_is_the_planners_unless_the_grip_fell_back(self):
+        from Kean.motion.stud_fit import press_offset
+        foot = lambda t, yaw: tuple(map(int, t.split('x')))[::-1] if yaw else tuple(map(int, t.split('x')))
+        corbel = dict(type='2x6', yaw_index=1, grid_pos=[0, 0, 5])          # 6 x 2 cells: i 0-5, j 0-1
+        below = [dict(type='2x4', yaw_index=1, grid_pos=[0, 0, 4])]         # i 0-3: 8 of 12 studs
+        planned = dict(tcp_offset_m=[-.0105, 0.])                           # the planner's press point
+        np.testing.assert_allclose(press_offset(planned, corbel, below + [corbel], foot, .008), [-.0105, 0.])
+        edge = dict(tcp_offset_m=[0., .007], grip_fallback='edge')            # where the pads fit, not a press point
+        np.testing.assert_allclose(press_offset(edge, corbel, below + [corbel], foot, .008), [-.008, 0.])
+        np.testing.assert_allclose(press_offset(edge, dict(corbel, grid_pos=[0, 0, 0]), [], foot, .008), [0., 0.])
 
     def test_first_course_needs_its_whole_footprint_pushed_through(self):
         from Kean.motion.stud_fit import needed
@@ -130,7 +159,7 @@ class StudFitTest(unittest.TestCase):
 
     @staticmethod
     def D(c, push):
-        return NS(wp=FakeWp, P=NS(footprint=lambda t, yaw: (2, 4), BRICK_H=.0096), ex=NS(STUD_HEIGHT=.0017),
+        return NS(wp=FakeWp, P=NS(footprint=lambda t, yaw: (2, 4), BRICK_H=.0096, PITCH=.008), ex=NS(STUD_HEIGHT=.0017),
                   EE=1, TIP_BELOW_TCP=.0089, newton=NS(solvers=NS(SolverNotifyFlags=NS(CONSTRAINT_PROPERTIES=1))),
                   weld_rows=lambda solver: {0: None},
                   brick_wrench=lambda solver, model, eq, row, body: (np.array([0., 0., push[0]]), None))

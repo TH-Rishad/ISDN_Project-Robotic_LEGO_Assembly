@@ -1,0 +1,347 @@
+[
+  {
+    "brick": "A_b_000",
+    "event": "held",
+    "time": 13.283,
+    "dz_mm": 1.76,
+    "needed_N": 8.9
+  },
+  {
+    "brick": "B_b_000",
+    "event": "held",
+    "time": 14.467,
+    "dz_mm": 1.68,
+    "needed_N": 35.6
+  },
+  {
+    "brick": "A_b_000",
+    "event": "pushed_through",
+    "time": 15.3,
+    "peak_N": 9.0,
+    "needed_N": 8.9,
+    "hand_N": 3.1
+  },
+  {
+    "brick": "B_b_000",
+    "event": "pushed_through",
+    "time": 16.533,
+    "peak_N": 36.4,
+    "needed_N": 35.6,
+    "hand_N": 17.0
+  },
+  {
+    "brick": "A_b_001",
+    "event": "held",
+    "time": 40.0,
+    "dz_mm": 1.74,
+    "needed_N": 71.2
+  },
+  {
+    "brick": "B_b_001",
+    "event": "held",
+    "time": 41.183,
+    "dz_mm": 1.75,
+    "needed_N": 35.6
+  },
+  {
+    "brick": "A_b_001",
+    "event": "pushed_through",
+    "time": 44.583,
+    "peak_N": 72.0,
+    "needed_N": 71.2,
+    "hand_N": 40.1
+  },
+  {
+    "brick": "B_b_001",
+    "event": "pushed_through",
+    "time": 45.533,
+    "peak_N": 38.1,
+    "needed_N": 35.6,
+    "hand_N": 17.0
+  },
+  {
+    "brick": "B_b_002",
+    "event": "held",
+    "time": 69.233,
+    "dz_mm": 1.82,
+    "needed_N": 35.6
+  },
+  {
+    "brick": "A_b_002",
+    "event": "held",
+    "time": 70.517,
+    "dz_mm": 1.33,
+    "needed_N": 35.6
+  },
+  {
+    "brick": "B_b_002",
+    "event": "pushed_through",
+    "time": 73.167,
+    "peak_N": 37.0,
+    "needed_N": 35.6,
+    "hand_N": 17.0
+  },
+  {
+    "brick": "A_b_002",
+    "event": "pushed_through",
+    "time": 74.017,
+    "peak_N": 36.4,
+    "needed_N": 35.6,
+    "hand_N": 20.1
+  },
+  {
+    "brick": "B_b_003",
+    "event": "held",
+    "time": 99.367,
+    "dz_mm": 1.7,
+    "needed_N": 35.6
+  },
+  {
+    "brick": "A_b_003",
+    "event": "held",
+    "time": 100.633,
+    "dz_mm": 1.74,
+    "needed_N": 71.2
+  },
+  {
+    "brick": "B_b_003",
+    "event": "pushed_through",
+    "time": 103.3,
+    "peak_N": 37.6,
+    "needed_N": 35.6,
+    "hand_N": 18.5
+  },
+  {
+    "brick": "A_b_003",
+    "event": "pushed_through",
+    "time": 104.15,
+    "peak_N": 72.5,
+    "needed_N": 71.2,
+    "hand_N": 40.1
+  },
+  {
+    "brick": "B_b_004",
+    "event": "held",
+    "time": 126.483,
+    "dz_mm": 1.75,
+    "needed_N": 35.6
+  },
+  {
+    "brick": "B_b_004",
+    "event": "pushed_through",
+    "time": 132.883,
+    "peak_N": 37.3,
+    "needed_N": 35.6,
+    "hand_N": 20.1
+  },
+  {
+    "brick": "A_b_004",
+    "event": "held",
+    "time": 133.433,
+    "dz_mm": 0.99,
+    "needed_N": 35.6
+  },
+  {
+    "brick": "A_b_004",
+    "event": "pushed_through",
+    "time": 138.3,
+    "peak_N": 38.7,
+    "needed_N": 35.6,
+    "hand_N": 18.5
+  },
+  {
+    "brick": "B_b_005",
+    "event": "held",
+    "time": 156.167,
+    "dz_mm": 1.77,
+    "needed_N": 35.6
+  },
+  {
+    "brick": "A_b_006",
+    "event": "held",
+    "time": 159.733,
+    "dz_mm": 1.87,
+    "needed_N": 8.9
+  },
+  {
+    "brick": "B_b_005",
+    "event": "pushed_through",
+    "time": 162.467,
+    "peak_N": 37.6,
+    "needed_N": 35.6,
+    "hand_N": 20.1
+  },
+  {
+    "brick": "A_b_006",
+    "event": "pushed_through",
+    "time": 163.783,
+    "peak_N": 9.0,
+    "needed_N": 8.9,
+    "hand_N": 2.3
+  },
+  {
+    "brick": "B_b_006",
+    "event": "held",
+    "time": 186.583,
+    "dz_mm": 1.77,
+    "needed_N": 35.6
+  },
+  {
+    "brick": "A_b_007",
+    "event": "held",
+    "time": 190.15,
+    "dz_mm": 1.81,
+    "needed_N": 8.9
+  },
+  {
+    "brick": "B_b_006",
+    "event": "pushed_through",
+    "time": 192.05,
+    "peak_N": 36.9,
+    "needed_N": 35.6,
+    "hand_N": 21.6
+  },
+  {
+    "brick": "A_b_007",
+    "event": "pushed_through",
+    "time": 192.4,
+    "peak_N": 9.9,
+    "needed_N": 8.9,
+    "hand_N": 3.1
+  },
+  {
+    "brick": "B_b_007",
+    "event": "held",
+    "time": 212.1,
+    "dz_mm": 1.75,
+    "needed_N": 35.6
+  },
+  {
+    "brick": "A_b_008",
+    "event": "held",
+    "time": 215.667,
+    "dz_mm": 1.77,
+    "needed_N": 8.9
+  },
+  {
+    "brick": "B_b_007",
+    "event": "pushed_through",
+    "time": 217.967,
+    "peak_N": 35.8,
+    "needed_N": 35.6,
+    "hand_N": 20.1
+  },
+  {
+    "brick": "A_b_008",
+    "event": "pushed_through",
+    "time": 218.883,
+    "peak_N": 9.2,
+    "needed_N": 8.9,
+    "hand_N": 3.1
+  },
+  {
+    "brick": "B_b_009",
+    "event": "held",
+    "time": 238.767,
+    "dz_mm": 1.97,
+    "needed_N": 35.6
+  },
+  {
+    "brick": "A_b_009",
+    "event": "held",
+    "time": 239.817,
+    "dz_mm": 1.7,
+    "needed_N": 17.8
+  },
+  {
+    "brick": "B_b_009",
+    "event": "pushed_through",
+    "time": 241.017,
+    "peak_N": 36.0,
+    "needed_N": 35.6,
+    "hand_N": 18.5
+  },
+  {
+    "brick": "A_b_009",
+    "event": "pushed_through",
+    "time": 242.05,
+    "peak_N": 17.9,
+    "needed_N": 17.8,
+    "hand_N": 6.9
+  },
+  {
+    "brick": "B_b_008",
+    "event": "held",
+    "time": 258.683,
+    "dz_mm": 1.74,
+    "needed_N": 35.6
+  },
+  {
+    "brick": "B_b_008",
+    "event": "pushed_through",
+    "time": 261.9,
+    "peak_N": 35.7,
+    "needed_N": 35.6,
+    "hand_N": 24.7
+  },
+  {
+    "brick": "A_b_005",
+    "event": "held",
+    "time": 270.4,
+    "dz_mm": 1.88,
+    "needed_N": 35.6
+  },
+  {
+    "brick": "A_b_005",
+    "event": "pushed_through",
+    "time": 272.017,
+    "peak_N": 39.2,
+    "needed_N": 35.6,
+    "hand_N": 15.4
+  },
+  {
+    "brick": "B_b_011",
+    "event": "held",
+    "time": 281.1,
+    "dz_mm": 1.99,
+    "needed_N": 35.6
+  },
+  {
+    "brick": "B_b_011",
+    "event": "pushed_through",
+    "time": 286.267,
+    "peak_N": 36.1,
+    "needed_N": 35.6,
+    "hand_N": 20.1
+  },
+  {
+    "brick": "A_b_010",
+    "event": "held",
+    "time": 295.217,
+    "dz_mm": 1.99,
+    "needed_N": 8.9
+  },
+  {
+    "brick": "A_b_010",
+    "event": "pushed_through",
+    "time": 297.367,
+    "peak_N": 9.5,
+    "needed_N": 8.9,
+    "hand_N": 1.9
+  },
+  {
+    "brick": "B_b_010",
+    "event": "held",
+    "time": 323.983,
+    "dz_mm": 1.83,
+    "needed_N": 71.2
+  },
+  {
+    "brick": "B_b_010",
+    "event": "pushed_through",
+    "time": 327.083,
+    "peak_N": 72.2,
+    "needed_N": 71.2,
+    "hand_N": 89.5
+  }
+]

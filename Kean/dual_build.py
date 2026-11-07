@@ -517,6 +517,9 @@ class DualExample(D.Example):
         index = 0 if arm == 'A' else 9
         ke, kd = self.model.joint_target_ke.numpy(), self.model.joint_target_kd.numpy()
         gain = D.A_FINGER_KE if support else D.FINGER_KE
+        if support and getattr(self, 'stud_fit', None) is not None:
+            from Kean.motion.stud_fit import SUPPORT_GRIP
+            gain *= SUPPORT_GRIP
         ke[index+7:index+9] = gain
         kd[index+7:index+9] = 2 * math.sqrt(gain * .1)
         self.model.joint_target_ke.assign(ke)
@@ -798,7 +801,11 @@ class DualExample(D.Example):
                 active = view.plan['sequence'][view.b_step]['brick_id']
                 permitted.add(active)
                 if self.arms[arm].phase == 'press':
-                    permitted.update(self.neighbours_of(active))
+                    # Closed tips on the brick's top: its course and the one below lie
+                    # just under the finger spheres (0.98 mm to a 1x1 two rows from a
+                    # pressed 1x2, dual_pyramid_s3_studfit_001). Contacts are still classified.
+                    k = next(b['grid_pos'][2] for b in view.plan['bricks'] if b['id'] == active)
+                    permitted.update(b['id'] for b in view.plan['bricks'] if b['grid_pos'][2] in (k, k - 1))
             elif self.roles[arm] == 'supporter' and self.arms[arm].phase in ('brace-in', 'brace-guard', 'close', 'hold', 'open', 'retract'):
                 brace = view.plan['sequence'][view.b_step]['brace']
                 permitted.update(brace.get('gripped_bricks') or [brace['target_brick_id']])

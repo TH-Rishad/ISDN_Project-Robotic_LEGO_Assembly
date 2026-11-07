@@ -1,0 +1,140 @@
+[
+  {
+    "event": "support_requested",
+    "arm": "B",
+    "step": 11,
+    "time": 1.1166666666666676
+  },
+  {
+    "event": "support_granted",
+    "arm": "B",
+    "step": 11,
+    "time": 1.1166666666666676,
+    "helper": "A"
+  },
+  {
+    "event": "helper_ready",
+    "arm": "B",
+    "step": 11,
+    "time": 1.1166666666666676,
+    "helper": "A"
+  },
+  {
+    "event": "support_held",
+    "arm": "B",
+    "step": 11,
+    "time": 19.36666666666685,
+    "helper": "A"
+  },
+  {
+    "event": "step_complete",
+    "arm": "B",
+    "step": 11,
+    "time": 36.6999999999992
+  },
+  {
+    "event": "support_released",
+    "arm": "B",
+    "step": 11,
+    "time": 36.6999999999992,
+    "helper": "A"
+  },
+  {
+    "event": "step_started",
+    "arm": "B",
+    "step": 12,
+    "time": 36.6999999999992
+  },
+  {
+    "event": "step_complete",
+    "arm": "B",
+    "step": 12,
+    "time": 54.13333333333154
+  },
+  {
+    "event": "support_requested",
+    "arm": "B",
+    "step": 13,
+    "time": 54.13333333333154
+  },
+  {
+    "event": "support_granted",
+    "arm": "B",
+    "step": 13,
+    "time": 54.13333333333154,
+    "helper": "A"
+  },
+  {
+    "event": "helper_ready",
+    "arm": "B",
+    "step": 13,
+    "time": 54.13333333333154,
+    "helper": "A"
+  },
+  {
+    "event": "support_held",
+    "arm": "B",
+    "step": 13,
+    "time": 72.41666666666384,
+    "helper": "A"
+  },
+  {
+    "event": "step_complete",
+    "arm": "B",
+    "step": 13,
+    "time": 89.78333333332952
+  },
+  {
+    "event": "support_released",
+    "arm": "B",
+    "step": 13,
+    "time": 89.78333333332952,
+    "helper": "A"
+  },
+  {
+    "event": "support_requested",
+    "arm": "B",
+    "step": 14,
+    "time": 89.78333333332952
+  },
+  {
+    "event": "support_granted",
+    "arm": "B",
+    "step": 14,
+    "time": 89.78333333332952,
+    "helper": "A"
+  },
+  {
+    "event": "helper_ready",
+    "arm": "B",
+    "step": 14,
+    "time": 89.78333333332952,
+    "helper": "A"
+  },
+  {
+    "event": "support_held",
+    "arm": "B",
+    "step": 14,
+    "time": 108.74999999999511,
+    "helper": "A"
+  },
+  {
+    "event": "step_complete",
+    "arm": "B",
+    "step": 14,
+    "time": 126.04999999999413
+  },
+  {
+    "event": "support_released",
+    "arm": "B",
+    "step": 14,
+    "time": 126.04999999999413,
+    "helper": "A"
+  },
+  {
+    "event": "step_started",
+    "arm": "B",
+    "step": 15,
+    "time": 126.04999999999413
+  }
+]
