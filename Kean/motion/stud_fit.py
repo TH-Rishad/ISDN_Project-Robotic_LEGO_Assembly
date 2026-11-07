@@ -30,7 +30,9 @@ press and its moment into that brick and pried a seated 1x2 off
 (dual_pyramid_s3_studfit_003). The recorder and joint breaker read only the
 clutch flags (w[3]), so a hold never counts as a placement.
 """
+from contextlib import contextmanager
 import json
+import math
 
 import numpy as np
 
@@ -46,8 +48,88 @@ SUPPORT_GRIP = 2.0  # x A_FINGER_KE for a supporting hand (~28 N a finger; a Fra
                     # it break at u 1.00 under less than the press it was sized for (_diag_015).
 SETTLE = 0.25       # s after the push-through before the snap: the press bent S3's supported
                     # corbel 2.4 mm down and a next-frame gate read it (_diag_016)
+HAND_KEEP_OUT = 0.020  # m, planner keep-out between the support grip and the pressed brick
 TOUCH = 0.002       # m: tips this close above the held brick's stud tops count as on them (contact
                     # measured 0.05-0.15 mm above nominal in dual_studfit_diag_008)
+
+
+def overhanging(P, brick, placed):
+    """True when `brick`, or any brick under it down to the baseplate, has a
+    stud cell with nothing beneath it: the press then loads a joint that ties
+    an overhang to the rest. S3 step 15 sits on the bridge from the overhang to
+    the column and broke that 2-stud joint at u 1.03-1.13 unsupported
+    (dual_studfit_diag_018/019); the planner's rigid model passed it."""
+    by_id = {b[0]: b for b in placed}
+    todo, seen = [brick], set()
+    while todo:
+        b = todo.pop()
+        if b[0] in seen:
+            continue
+        seen.add(b[0])
+        own, k = P.cells(b)
+        if k == 0:
+            continue
+        under = set()
+        for p in placed:
+            pc, pk = P.cells(p)
+            if pk == k - 1:
+                under |= own & pc
+        if under != own:
+            return True
+        todo.extend(by_id[sid] for sid in P.supports(b, placed))
+    return False
+
+
+def near_press_assign(P, BR, original):
+    """bracing.assign for --stud-fit plans. The same safety test, plus a support
+    forced where `overhanging`. Among grips that make the step safe, the one
+    nearest the press (the brick's bottom centre), not the lowest predicted
+    utilisation: S3 step 13's support gripped the pier 34 mm from the press and
+    the corbel under it sagged 1.6 mm (dual_pyramid_s3_studfit_005). With no
+    safe grip, the lowest utilisation as before."""
+    def assign(brick, placed, strategy, safety_factor=BR.ST.SAFETY_FACTOR, unbraced=None,
+               clearance=None, grip_N=BR.GRIP_N, mu=1.0, selector=None):
+        if strategy != 'weakest_joint' or not placed:
+            return original(brick, placed, strategy, safety_factor, unbraced, clearance, grip_N, mu, selector)
+        r0 = unbraced or BR.predicted(brick, placed)
+        forced = overhanging(P, brick, placed)
+        if r0.s * safety_factor < 1.0 and not forced:
+            return None
+        joint_bricks = {b for j, u in r0.util.items() if u * safety_factor >= 1.0 for b in j if b is not None}
+        cands = BR.candidates(brick, placed, clearance)
+        if not cands:
+            return BR._record(brick, placed, None, r0, strategy, 'no_feasible_grasp')
+        pool = [c for c in cands if set(BR.gripped(placed, *c)) & joint_bricks] or cands
+        _, py, pz = P.brick_pose(brick)
+        scored = []
+        for y, z in pool:
+            br = BR._brace_obj(placed, y, z, grip_N, mu)
+            r = BR.predicted(brick, placed, br)
+            scored.append((r.s, y, z, br, r))
+        safe = [c for c in scored if c[0] * safety_factor < 1.0]
+        pick = (min(safe, key=lambda c: (round(math.hypot(c[1] - py, c[2] - pz), 4), c[0])) if safe
+                else min(scored, key=lambda c: c[0]))
+        _, y, z, br, r = pick
+        return BR._record(brick, placed, (y, z, br, r), r0, strategy,
+                          'near_press_overhang' if forced else 'near_press')
+    return assign
+
+
+@contextmanager
+def planning(D):
+    """Plan with near_press_assign (the planner imports bracing at call time)."""
+    import bracing as BR
+    saved = BR.assign, BR.HAND_CLEARANCE_Y
+    BR.assign = near_press_assign(D.P, BR, saved[0])
+    # The top press is a closed fist over the brick, and the run checks the real
+    # hands for every support pose (brace_search), so the planner's 28 mm
+    # keep-out is relaxed: at 28 mm the nearest grip to S3 step 13's press was
+    # the pier, 32 mm away.
+    BR.HAND_CLEARANCE_Y = HAND_KEEP_OUT
+    try:
+        yield
+    finally:
+        BR.assign, BR.HAND_CLEARANCE_Y = saved
 
 
 def press_offset(grasp, brick, bricks, footprint, pitch):

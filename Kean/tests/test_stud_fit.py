@@ -115,6 +115,43 @@ class StudFitTest(unittest.TestCase):
         np.testing.assert_allclose(press_offset(edge, corbel, below + [corbel], foot, .008), [-.008, 0.])
         np.testing.assert_allclose(press_offset(edge, dict(corbel, grid_pos=[0, 0, 0]), [], foot, .008), [0., 0.])
 
+    def test_overhang_anywhere_under_the_brick_forces_a_support(self):
+        from Kean.motion.stud_fit import overhanging
+        foot = {'2x2': (2, 2), '2x6': (2, 6), '2x4': (2, 4)}
+
+        def cells(b):
+            nx, ny = foot[b[1]]
+            return {(b[2] + a, b[3] + c) for a in range(nx) for c in range(ny)}, b[4]
+
+        def supports(b, placed):
+            own, k = cells(b)
+            return {p[0]: len(own & cells(p)[0]) for p in placed if cells(p)[1] == k - 1 and own & cells(p)[0]}
+        P = NS(cells=cells, supports=supports)
+        pier = [('p0', '2x2', 0, 0, 0, 0), ('p1', '2x2', 0, 0, 1, 0)]
+        corbel = ('c', '2x6', 0, 0, 2, 0)                  # j 0-5 on a 2-wide pier: overhangs
+        on_corbel = ('t', '2x2', 0, 0, 3, 0)               # fully supported, but over the corbel
+        lone = [('q0', '2x2', 0, 8, 0, 0)]
+        self.assertFalse(overhanging(P, pier[1], pier[:1]))
+        self.assertTrue(overhanging(P, corbel, pier))
+        self.assertTrue(overhanging(P, on_corbel, pier + [corbel]))
+        self.assertFalse(overhanging(P, ('r', '2x2', 0, 8, 1, 0), lone))
+
+    def test_support_nearest_the_press_among_safe_grips(self):
+        from Kean.motion.stud_fit import near_press_assign
+        util = {-.20: .0, -.18: .1, -.17: .5, -.13: .0}           # grip y -> predicted utilisation
+        r0 = NS(s=1., util={('a', 'b'): 1.})
+        BR = NS(ST=NS(SAFETY_FACTOR=3.), GRIP_N=14.3,
+                predicted=lambda brick, placed, br=None: r0 if br is None else NS(s=util[br]),
+                candidates=lambda brick, placed, clearance: [(y, .05) for y in util],
+                gripped=lambda placed, y, z: ('a',), _brace_obj=lambda placed, y, z, g, mu: y,
+                _record=lambda brick, placed, choice, r0, strategy, why: (choice and choice[0], why))
+        P = NS(brick_pose=lambda b: (0., -.16, .05), cells=lambda b: ({(0, 0)}, 0), supports=lambda b, p: {})
+        assign = near_press_assign(P, BR, original=None)
+        # -0.17 is nearest but unsafe (0.5 x 3 >= 1); -0.18 is the nearest safe grip.
+        self.assertEqual(assign(('x',), [('a',)], 'weakest_joint'), (-.18, 'near_press'))
+        r0.s = .1                                                   # safe unsupported, no overhang: none
+        self.assertIsNone(assign(('x',), [('a',)], 'weakest_joint'))
+
     def test_first_course_needs_its_whole_footprint_pushed_through(self):
         from Kean.motion.stud_fit import needed
         foot = lambda t, yaw: (2, 4)

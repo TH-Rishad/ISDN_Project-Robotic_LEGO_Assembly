@@ -74,7 +74,7 @@ def main():
         parser.error('output exists; choose a fresh directory')
     names = dict(A=args.build_a, B=args.build_b)
     try:
-        plans, connections = plans_for(names, args.separation)
+        plans, connections = plans_for(names, args.separation, stud_fit=args.stud_fit)
     except (ValueError, KeyError) as exc:
         parser.error(str(exc))
     starts = dict(A=args.start_step_a, B=args.start_step_b)

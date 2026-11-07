@@ -1,5 +1,5 @@
 """Two build contexts sharing Kean's controller and one Newton physics world."""
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from copy import deepcopy
 import json
 import math
@@ -17,8 +17,12 @@ from Kean.dual_coordinator import Coordinator
 from Kean.motion.world import brick_boxes, plate_box, box_gap
 
 
-def plans_for(names, separation=.32):
-    """Generate plans in independent frames; keep grid/force data together."""
+def plans_for(names, separation=.32, stud_fit=False):
+    """Generate plans in independent frames; keep grid/force data together.
+
+    stud_fit: supports chosen near the press, and forced over overhangs
+    (motion/stud_fit.near_press_assign).
+    """
     if not np.isfinite(separation) or separation < .16 or separation > .6:
         raise ValueError('pad separation must be between 0.16 and 0.6 m')
     plans, connections = {}, []
@@ -34,15 +38,19 @@ def plans_for(names, separation=.32):
             ni = max(b[2] + D.P.footprint(b[1], b[5])[0] for b in bricks)
             nj = max(b[3] + D.P.footprint(b[1], b[5])[1] for b in bricks)
             D.P.VOXEL_ORIGIN = (-ni * D.P.PITCH / 2, sign * separation / 2 - nj * D.P.PITCH / 2, D.Z0)
-            plan = D.P.build_plan(internal, 'weakest_joint', brace_model='grasp_lp', brace_grip_N=D.BRACE_GRIP_N, brace_mu=1.)
-            order = small_first(plan, bricks)
-            if order:
-                sequence, D.P.sequence = D.P.sequence, lambda _: order
-                try:
-                    plan = D.P.build_plan(internal, 'weakest_joint', brace_model='grasp_lp',
-                                          brace_grip_N=D.BRACE_GRIP_N, brace_mu=1.)
-                finally:
-                    D.P.sequence = sequence
+            from Kean.motion.stud_fit import SUPPORT_GRIP, planning
+            # Stud-fit supports grip SUPPORT_GRIP x harder; size them for that grip.
+            grip = D.BRACE_GRIP_N * (SUPPORT_GRIP if stud_fit else 1.)
+            with planning(D) if stud_fit else nullcontext():
+                plan = D.P.build_plan(internal, 'weakest_joint', brace_model='grasp_lp', brace_grip_N=grip, brace_mu=1.)
+                order = small_first(plan, bricks)
+                if order:
+                    sequence, D.P.sequence = D.P.sequence, lambda _: order
+                    try:
+                        plan = D.P.build_plan(internal, 'weakest_joint', brace_model='grasp_lp',
+                                              brace_grip_N=grip, brace_mu=1.)
+                    finally:
+                        D.P.sequence = sequence
             plan.update(structure_id=name, context_name=internal, owner=arm)
             for step in plan['sequence']:
                 step['placer_arm'] = arm
