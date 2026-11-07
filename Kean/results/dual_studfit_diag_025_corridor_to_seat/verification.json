@@ -1,0 +1,35 @@
+{
+  "ok": false,
+  "full_build": false,
+  "errors": [
+    "recorded broken joint",
+    "recorded execution failure: joint_break",
+    "B: incomplete/nonmonotonic own-build progress",
+    "B step 15: no recorded mating",
+    "unserved support request",
+    "contact monitor: displaced",
+    "detailed contact evidence: displaced",
+    "detailed contact evidence: displaced",
+    "detailed contact evidence: displaced",
+    "execution did not finish cleanly"
+  ],
+  "recorded_parallel_frames": 0,
+  "grants": [
+    {
+      "arm": "B",
+      "step": 13,
+      "time": 1.1166666666666676
+    },
+    {
+      "arm": "B",
+      "step": 14,
+      "time": 36.73333333333253
+    },
+    {
+      "arm": "B",
+      "step": 15,
+      "time": 72.93333333333048
+    }
+  ],
+  "frames": 5996
+}

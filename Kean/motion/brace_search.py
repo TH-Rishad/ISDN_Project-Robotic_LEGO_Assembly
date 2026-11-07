@@ -34,6 +34,12 @@ def candidates(ex, n, original, D, limit=8):
     # The old target-first ordering exhausted all eight trials at y=-36 mm.
     ys = sorted({round(y, 8) for y, _ in positions},
                 key=lambda y: (-abs(y - pose[1]), y))
+    if getattr(ex, 'brace_near_first', False):
+        # --stud-fit: the planned column first (its other leans and heights), then
+        # far-first as before. Far-first sent S3 step 15's blocked bridge grip to the
+        # pier, 66 mm away, and the bridge joint broke (dual_studfit_diag_021); all
+        # columns nearest-first gave step 14 a grip above its brick that slipped (_023).
+        ys.sort(key=lambda y: abs(y - pose[1]) > .0025)
     height_key = (lambda yz: -yz[1]) if getattr(ex, 'brace_high_first', False) else (lambda yz: abs(yz[1] - pose[2]))
     columns = [sorted([(y, z) for y, z in positions if round(y, 8) == column],
                       key=height_key) for column in ys]

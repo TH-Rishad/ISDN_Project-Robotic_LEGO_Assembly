@@ -1,0 +1,34 @@
+{
+  "ok": false,
+  "full_build": false,
+  "errors": [
+    "recorded execution failure: B:brace_search_exhausted",
+    "B: incomplete/nonmonotonic own-build progress",
+    "B step 14: no recorded mating",
+    "B step 14: no insertion frames",
+    "B step 14: no measured two-finger support force",
+    "B step 15: no recorded mating",
+    "B step 15: no insertion frames",
+    "B step 15: no measured two-finger support force",
+    "B step 15: support was not requested before pickup",
+    "unserved support request",
+    "contact monitor: displaced",
+    "detailed contact evidence: displaced",
+    "detailed contact evidence: displaced",
+    "execution did not finish cleanly"
+  ],
+  "recorded_parallel_frames": 0,
+  "grants": [
+    {
+      "arm": "B",
+      "step": 13,
+      "time": 1.1166666666666676
+    },
+    {
+      "arm": "B",
+      "step": 14,
+      "time": 36.73333333333253
+    }
+  ],
+  "frames": 2702
+}

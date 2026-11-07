@@ -405,8 +405,16 @@ class Build:
         target, yaw, _ = self.target[bid]
         length, width = self.dims[bid]
         height = D.P.BRICK_H + .0018
-        return dict(name='insertion_' + bid, c=target + [0, 0, (height + .025)/2],
-                    dims=[length + .004, width + .004, height + .029], yaw=yaw)
+        top, bottom = height + .027, -.002
+        if self.stud_fit is not None:
+            # The carried brick stops on the stud tops; the closed tips press the last
+            # 1.7 mm straight down. To the seat, the corridor ran into the helper's
+            # fingers on the brick below and sent S3 step 15's support to the pier
+            # (dual_studfit_diag_025).
+            from Kean.motion.stud_fit import STUD_H
+            bottom = STUD_H
+        return dict(name='insertion_' + bid, c=target + [0, 0, (top + bottom) / 2],
+                    dims=[length + .004, width + .004, top - bottom], yaw=yaw)
 
     def check_insertion_clearance(self):
         from Kean.motion.plan_curobo import PlannerUnavailable
@@ -497,6 +505,12 @@ class DualExample(D.Example):
             from Kean.motion.stud_fit import StudFit
             self.press_body.assign(np.array([D.EE, D.EE + self.n_arm_bodies], dtype=np.int32))
             self.stud_fit = StudFit(self, D, self.out / 'stud_fit.json')
+            for view in self.views.values():
+                view.brace_near_first = True
+            # The run's support search uses the plan's keep-out (stud_fit.planning).
+            import bracing
+            from Kean.motion.stud_fit import HAND_KEEP_OUT
+            bracing.HAND_CLEARANCE_Y = HAND_KEEP_OUT
 
     def simulate(self):
         if getattr(self, 'press_w', None) is None:
@@ -707,6 +721,11 @@ class DualExample(D.Example):
         q, _ = self.measured_state()
         i = 0 if arm == 'A' else self.n_arm_bodies
         tcp, brick = q[D.EE+i], q[self.body[held]]
+        if np.linalg.norm(brick[:3] - tcp[:3]) > .04:
+            # Not in the hand (a held brick sits ~13 mm below the TCP). A step can start
+            # while the arm still waits in the last step's support hand-over ('stage'),
+            # its next brick on the feeder: dual_pyramid_s3_studfit_006 stopped on that.
+            return None
         rt, rb = Rotation.from_quat(tcp[3:]).as_matrix(), Rotation.from_quat(brick[3:]).as_matrix()
         h = D.P.BRICK_H + .0018
         center = rt.T @ (brick[:3] + rb @ np.array([0., 0., h/2]) - tcp[:3])

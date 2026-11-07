@@ -42,6 +42,8 @@ BAND = 0.0003       # m above the stud tops at which the hold engages
 LATERAL = 0.002     # m, same lateral window as the snap gate
 RAMP = 0.5          # s to full press force
 MARGIN = 1.3        # press force over the push needed (newton_fit.press_force)
+SUPPORT_STIFF = 20.0  # arm joint stiffness gain while holding a support (a position-held
+                      # Franka is far stiffer than the cell's 400 N m/rad)
 STIFF = 5.0         # arm joint stiffness gain while pressing (damping scales by its root)
 SUPPORT_GRIP = 2.0  # x A_FINGER_KE for a supporting hand (~28 N a finger; a Franka Hand holds 70 N).
                     # At the cell's ~13 N, S3 step 13's planned support let a joint below
@@ -179,7 +181,7 @@ class StudFit:
         self.press_t = {}    # bid -> time the tips reached its studs
         self.applied = {}    # bid -> largest hand press force applied, N
         self.wrench = np.zeros((2, 6))
-        self.stiff = [False, False]
+        self.stiff = [1., 1.]
         model = getattr(cell, 'model', None)
         self.gains = None if model is None or not hasattr(model, 'joint_target_ke') else (
             model.joint_target_ke.numpy().copy(), model.joint_target_kd.numpy().copy())
@@ -227,21 +229,23 @@ class StudFit:
         if hasattr(cell, 'press_w') and (wrench != self.wrench).any():
             self.wrench = wrench
             cell.press_w.assign(wrench.astype(np.float32))
-            # A supporting arm stiffens with the press it braces: at its soft gains the S3
-            # tower leaned 4 deg under a 53 N press and stayed there (_diag_017).
-            roles = getattr(cell, 'roles', {})
-            pressing = [bool(wrench[k, 2]) for k in range(2)]
-            self.stiffen([pressing[k] or (pressing[1 - k] and roles.get('AB'[k]) == 'supporter') for k in range(2)])
+        # A supporting arm is stiff for its whole hold: at the cell's gains (and at 5x
+        # during the press only) the S3 tower pushed the helper's hand 2.2 mm aside
+        # and held it there through the snap (_diag_017, _diag_020).
+        roles, arms = getattr(cell, 'roles', {}), getattr(cell, 'arms', {})
+        self.stiffen([STIFF if wrench[k, 2] else
+                      SUPPORT_STIFF if roles.get(a) == 'supporter' and getattr(arms.get(a), 'phase', None) in ('close', 'hold')
+                      else 1. for k, a in enumerate('AB')])
 
-    def stiffen(self, on):
-        if on == self.stiff or self.gains is None:
+    def stiffen(self, factors):
+        """Arm joint stiffness x factor per arm (damping x its root)."""
+        if factors == self.stiff or self.gains is None:
             return
-        self.stiff = on
+        self.stiff = factors
         ke, kd = (g.copy() for g in self.gains)
-        for k in range(2):
-            if on[k]:
-                ke[9*k:9*k+7] *= STIFF
-                kd[9*k:9*k+7] *= np.sqrt(STIFF)
+        for k, f in enumerate(factors):
+            ke[9*k:9*k+7] *= f
+            kd[9*k:9*k+7] *= np.sqrt(f)
         # Keep the current finger gains (set_grip_role changes them for supports).
         model = self.cell.model
         cur_ke, cur_kd = model.joint_target_ke.numpy(), model.joint_target_kd.numpy()

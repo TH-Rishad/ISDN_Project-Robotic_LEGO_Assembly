@@ -427,6 +427,30 @@ speed: `results/dual_studfit_diag_019/dual_studfit_diag_019_step15_halfspeed.mp4
 (`play_run.sh --start 125 --speed 0.5 --camera -0.30 -0.165 0.11 -8 0 --mp4 ...`;
 the break is at 0:29).
 
+### Supports near the press and over overhangs
+
+Stud-fit plans choose, among support grips the force model rates safe, the one
+nearest the press (`stud_fit.near_press_assign`), size them for the 2x support
+grip, use a 20 mm hand keep-out (also in the run's support search), and force a
+support wherever the brick or anything under it overhangs (S3 steps 9 and 15
+gain one). A supporting arm holds at 20x joint stiffness for its whole hold. The
+run's support search tries the planned column first, then far-first as before;
+a carried brick only counts as in the hand within 4 cm of it; the insertion
+corridor ends at the stud tops.
+
+| Run | Result |
+|---|---|
+| `dual_pyramid_s3_studfit_006` (full) | Pyramid 11/11, S3 0-9; stopped at the step 9 to 10 hand-over (a brick on the feeder counted as carried), fixed |
+| `dual_studfit_diag_020` (S3 9-15) | 9-12 seated; 13 missed at dz -2.34 mm: the helper's hand was pushed 2.2 mm aside |
+| `dual_studfit_diag_021` (S3 9-15) | 20x support hold: 9-14 seated, 13 at -0.53 mm / 0.97 deg; 15 broke the bridge joint (u 1.13) with its support sent to the pier |
+| `dual_studfit_diag_022`-`026` (S3 13-15) | Support-search ordering and corridor; 13 and 14 seat every time; 15 breaks (u 1.05-1.25) |
+
+Open: S3 step 15. Every grip beside the bridge puts the helper's fingers within
+0.5 mm of the new brick's path (`helper obstructs carried-brick insertion
+corridor`), and the search accepts alternatives only if the model rates them as
+strong as the planned grip (load 0.0), so it falls back to the pier, which does
+not protect the 2-stud bridge joint.
+
 Open: S3's last step. The planner judges it safe unsupported at a 1.3 x
 press; the cell's joint model breaks its 2-stud bridge joint 3.5 % over
 capacity before the brick goes through. A full pyramid + S3 stud-fit build has
