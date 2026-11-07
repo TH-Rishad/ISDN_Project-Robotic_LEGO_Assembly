@@ -59,6 +59,8 @@ def main():
     parser.add_argument('--start-step-a', type=int, default=0, help='diagnostic nominal start; earlier bricks are pre-placed')
     parser.add_argument('--start-step-b', type=int, default=0, help='diagnostic nominal start; earlier bricks are pre-placed')
     parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('--after-failure', type=float, default=0., metavar='S',
+                        help='diagnostic: keep simulating and recording S seconds past the first failure')
     parser.add_argument('--stud-fit', action='store_true',
                         help='studs resist insertion: n x 8.9 N push to seat (Kean/motion/stud_fit.py)')
     args = parser.parse_args()
@@ -85,7 +87,7 @@ def main():
         write(out / 'plans' / (a + '.json'), plans[a])
     feeders = feeders_for(plans, [pad_for(plans[a]) for a in 'AB'])
     manifest = dict(mode='dual_builder', names=names, separation=args.separation, starts=starts, feeders=feeders,
-                    step_limit=args.step_limit, stud_fit=args.stud_fit, priority='A', plans={a: 'plans/' + a + '.json' for a in 'AB'},
+                    step_limit=args.step_limit, stud_fit=args.stud_fit, after_failure_s=args.after_failure, priority='A', plans={a: 'plans/' + a + '.json' for a in 'AB'},
                     recording='recording.npz', contacts='contacts.json', diagnostic=bool(any(starts.values()) or args.step_limit))
     write(out / 'manifest.json', manifest)
     if args.dry_run:
@@ -124,7 +126,12 @@ def main():
         with Planner(CuroboBackend(world_capacity=len(example.body) + 80)) as planner:
             planner.warmup()
             example.configure(planner)
-            while not example.done and not example.failure and example.frame < args.max_frames:
+            failed_at = None
+            while not example.done and example.frame < args.max_frames:
+                if example.failure:
+                    failed_at = example.sim_time if failed_at is None else failed_at
+                    if example.sim_time >= failed_at + args.after_failure:
+                        break
                 if args.viewer != 'null' and not viewer.is_running():
                     break
                 example.step()

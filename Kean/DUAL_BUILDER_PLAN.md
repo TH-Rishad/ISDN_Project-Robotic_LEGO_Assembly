@@ -415,6 +415,17 @@ not kept; the code comments name them):
 | `dual_studfit_diag_014`-`017` | S3 steps 11-15, one fix each (centroid press, planner press point, settle, support stiffness) |
 | `dual_studfit_diag_018` (S3 steps 11-15) | Steps 11-14 seated (13 at -1.46 mm, 2.6 degrees: the tower still leans); step 15, which the plan leaves unsupported, broke B_b_014 on B_b_012 (a 2-stud bridge joint) at u 1.035 during the press ramp |
 
+`dual_studfit_diag_019` reruns 018 with `--after-failure 3` (keep simulating
+and recording 3 s past the first failure). The break (u 1.131 this time, at
+139.58 s, the press peak) is not visible: the structure has sagged at most
+0.5 mm and 1.1 degrees; 0.17 s later B_b_015 pushes through and seats (dz
+0.00 mm) and the tower springs back to within 0.02 mm, with B_b_014 still held
+by its 4-stud joint and contact. It is the joint model's load check over its
+limit for two samples, not a brick coming off. Close-up side view at half
+speed: `results/dual_studfit_diag_019/dual_studfit_diag_019_step15_halfspeed.mp4`
+(`play_run.sh --start 125 --speed 0.5 --camera -0.30 -0.165 0.11 -8 0 --mp4 ...`;
+the break is at 0:29).
+
 Open: S3's last step. The planner judges it safe unsupported at a 1.3 x
 press; the cell's joint model breaks its 2-stud bridge joint 3.5 % over
 capacity before the brick goes through. A full pyramid + S3 stud-fit build has

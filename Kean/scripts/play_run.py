@@ -101,7 +101,7 @@ def paused(viewer):
     return bool(getattr(viewer, "paused", False))
 
 
-def play(example, record, speed, loop, port=8080):
+def play(example, record, speed, loop, port=8080, start=0.):
     viewer = example.viewer
     n = len(record["frame"])
     example.frame_dt = (1.0 / 60.0) / speed
@@ -111,7 +111,8 @@ def play(example, record, speed, loop, port=8080):
         viewer.register_ui_callback(example.gui, position="side")
     print("playback: %d frames, %.0f s at 1x. Open http://localhost:%d" % (n, n / 60.0, port), flush=True)
     print("This is the saved recording, not a new simulation. Uncheck Pause if the scene is frozen.", flush=True)
-    index = 0
+    first = int(np.searchsorted(record["sim_time"], start)) if start else 0
+    index = first
     while getattr(viewer, "is_running", lambda: True)():
         show_frame(example, record, index)
         example.render()
@@ -119,20 +120,20 @@ def play(example, record, speed, loop, port=8080):
             continue
         index += 1
         if index == n:
-            index = 0
+            index = first
             print("playback: looping", flush=True)
 
 
-def write_mp4(example, record, speed, path, fps=30):
+def write_mp4(example, record, speed, path, fps=30, start=0., camera=None):
     """Render the saved recording offscreen at `speed`x into an MP4 file."""
     import cv2
     import warp as wp
     viewer = example.viewer
-    # ponytail: fixed overview of both pads/feeders; add --camera if other views are needed.
-    viewer.set_camera(pos=wp.vec3(*CAMERA[0]), pitch=CAMERA[1], yaw=CAMERA[2])
+    camera = camera or CAMERA
+    viewer.set_camera(pos=wp.vec3(*camera[0]), pitch=camera[1], yaw=camera[2])
     stride = max(1, round(60.0 * speed / fps))
     writer = None
-    frames = range(0, len(record["frame"]), stride)
+    frames = range(int(np.searchsorted(record["sim_time"], start)) if start else 0, len(record["frame"]), stride)
     for k, index in enumerate(frames):
         show_frame(example, record, index)
         example.render()
@@ -158,6 +159,9 @@ def main():
     parser.add_argument("--port", type=int, default=8080)
     parser.add_argument("--speed", type=float, default=1.0)
     parser.add_argument("--loop", action="store_true")
+    parser.add_argument("--start", type=float, default=0., help="start (and loop) from this sim time, s")
+    parser.add_argument("--camera", type=float, nargs=5, metavar=("X", "Y", "Z", "PITCH", "YAW"),
+                        help="MP4 camera position (m) and pitch/yaw (deg); default: both-pad overview")
     parser.add_argument("--mp4", type=Path, help="render offscreen to this MP4 file instead of serving Viser")
     args = parser.parse_args()
     if args.speed <= 0:
@@ -176,8 +180,9 @@ def main():
             raise SystemExit('recording brick order does not match the dual-build manifest')
         print('Dual playback:', manifest['names'], flush=True)
         if args.mp4 is not None:
-            return write_mp4(example, record, args.speed, args.mp4)
-        play(example, record, args.speed, args.loop, args.port)
+            camera = CAMERA if args.camera is None else (tuple(args.camera[:3]), args.camera[3], args.camera[4])
+            return write_mp4(example, record, args.speed, args.mp4, start=args.start, camera=camera)
+        play(example, record, args.speed, args.loop, args.port, args.start)
         return
     record_path = recording_file(run, args.shape)
     plan = plan_file(run, args.shape)
@@ -193,7 +198,7 @@ def main():
         raise SystemExit("recording brick order does not match the saved plan")
     if args.mp4 is not None:
         return write_mp4(example, record, args.speed, args.mp4)
-    play(example, record, args.speed, args.loop, args.port)
+    play(example, record, args.speed, args.loop, args.port, args.start)
 
 
 if __name__ == "__main__":
