@@ -89,7 +89,7 @@ view.drop_press = {}
 view.owner = 'A'
 step = dict(step=0, brick_id='A_b0', requires_brace=True)
 view.plan = dict(sequence=[step], voxel_origin=D.P.VOXEL_ORIGIN)
-view.cell = SimpleNamespace(feeder={'A_b0': np.zeros(3)}, parks={builder: np.array([-.15, 0., .35])})
+view.cell = SimpleNamespace(feeder={'A_b0': np.zeros(3)}, parks={builder: np.array([-.15, 0., .35])}, stud_fit=None)
 view.pickup_clearance = lambda step: np.zeros(3)
 def queue(step):
     builder.push('lift', [0., 0., .17], 0., .0065, 1., then=lambda: staged.add(0))

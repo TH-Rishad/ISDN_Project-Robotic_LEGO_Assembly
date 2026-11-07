@@ -1,0 +1,114 @@
+{
+  "done": true,
+  "failure": null,
+  "error": null,
+  "frames": 3106,
+  "builds": {
+    "A": {
+      "structure": "pyramid",
+      "placed": 2,
+      "preplaced": 0,
+      "total": 11,
+      "completed_steps": 2,
+      "supports": [],
+      "brace_search": []
+    },
+    "B": {
+      "structure": "S3",
+      "placed": 2,
+      "preplaced": 0,
+      "total": 16,
+      "completed_steps": 2,
+      "supports": [],
+      "brace_search": []
+    }
+  },
+  "contacts": {
+    "neighbour_rub": {
+      "count": 4,
+      "examples": [
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:A_b_000#28",
+          "phase": {
+            "A": "press",
+            "B": "press"
+          },
+          "start_frame": 859,
+          "max_pen_mm": -1.478,
+          "peak_force_n": 0.91,
+          "end_frame": 889,
+          "duration_frames": 31,
+          "contact_frames": 31,
+          "fragments": 1
+        },
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:B_b_000#39",
+          "phase": {
+            "A": "press",
+            "B": "press"
+          },
+          "start_frame": 933,
+          "max_pen_mm": -1.548,
+          "peak_force_n": 7.73,
+          "end_frame": 1022,
+          "duration_frames": 90,
+          "contact_frames": 90,
+          "fragments": 1
+        },
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:A_b_001#29",
+          "phase": {
+            "A": "press",
+            "B": "press"
+          },
+          "start_frame": 2616,
+          "max_pen_mm": -1.476,
+          "peak_force_n": 27.84,
+          "end_frame": 2700,
+          "duration_frames": 85,
+          "contact_frames": 85,
+          "fragments": 1
+        },
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:B_b_001#40",
+          "phase": {
+            "A": "press",
+            "B": "press"
+          },
+          "start_frame": 2672,
+          "max_pen_mm": -1.48,
+          "peak_force_n": 8.08,
+          "end_frame": 2702,
+          "duration_frames": 31,
+          "contact_frames": 31,
+          "fragments": 1
+        }
+      ]
+    }
+  },
+  "parallel_frames": 375,
+  "diagnostic": true,
+  "motion": {
+    "strict": true,
+    "workarounds": [],
+    "failures": [],
+    "plans": 27,
+    "plan_failures": 0,
+    "captures": 0,
+    "segments": 27,
+    "min_clearance_m": 0.01810190990394619,
+    "clearance_scope": "executed joints during planned playback; full spheres, measured fingers"
+  },
+  "reserved_parallel_frames": 650,
+  "initial_settling_xy_m": 1.9371509552001953e-07,
+  "ok": true,
+  "full_build": false
+}

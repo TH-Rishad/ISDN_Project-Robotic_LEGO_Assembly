@@ -4,7 +4,7 @@ import numpy as np
 
 from Kean.motion.contact_policy import stud_mating
 from Kean.motion.grasp_clearance import grip_candidates
-from Kean.motion.drop_press import placement_neighbours, splice
+from Kean.motion.drop_press import placement_neighbours, splice, top_press
 
 GEOM = dict(grasp_dz=.013, press=.001, tip_below_tcp=.0089, brick_h=.0096, stud_h=.0017)
 
@@ -43,6 +43,24 @@ class DropPressTest(unittest.TestCase):
         self.assertTrue(seat['contact'])
         self.assertIs(seat['then'], snap)
         self.assertIs(up['then'], placed)
+
+    def test_top_press_keeps_the_insert_and_snaps_after_the_press(self):
+        moves, snap, placed = queue()
+        splice_free = [m['pos'][2] for m in moves[:4]]
+        top_press(moves, np.array([.1, .2, .005]), grasp_offset=[0., 0.],
+                  **{k: v for k, v in GEOM.items() if k != 'grasp_dz'})
+        self.assertEqual([m['phase'] for m in moves],
+                         ['transport', 'pre-insert', 'insert', 'insert', 'release',
+                          'press', 'press', 'press', 'press', 'press', 'retract', 'clearance'])
+        self.assertEqual([m['pos'][2] for m in moves[:4]], splice_free)      # insert untouched
+        self.assertIsNone(moves[3]['then'])
+        self.assertIsNone(moves[4]['then'])
+        self.assertIsNone(moves[7]['then'])
+        # A short seat dwell that stud_fit extends until the brick is through (at most 1.5 s), then snap.
+        np.testing.assert_allclose(moves[8]['pos'], moves[7]['pos'])
+        self.assertEqual((moves[8]['dur'], moves[8]['dwell']), (.05, 1.5))
+        self.assertIs(moves[8]['then'], snap)
+        self.assertIs(moves[9]['then'], placed)
 
     def test_press_phase_stud_engagement_is_intentional(self):
         self.assertTrue(stud_mating('press', 'A_base', ['A_base'], -.0012, 6, 8, .01035))

@@ -11,6 +11,7 @@ import numpy as np
 DWELL = 0.4        # s at the release height so the brick-aim servo settles
 RISE_CLEAR = .003  # tips above the dropped brick's stud tops before closing
 PRESS_DUR = 1.0    # s, as the existing closed-tip legacy brace press
+PRESS_DWELL = 1.5  # s at most at the seat in a top press; stud_fit ends it once the brick is through
 
 
 def splice(moves, target, release_dz, *, grasp_dz, press, tip_below_tcp, brick_h, stud_h, grasp_offset):
@@ -26,28 +27,52 @@ def splice(moves, target, release_dz, *, grasp_dz, press, tip_below_tcp, brick_h
     snap = next(m['then'] for m in reversed(tail) if m['phase'] == 'insert' and m['then'])
     release = next(m for m in tail if m['phase'] == 'release')
     ref = tail[0]
-    yaw, tilt, shut = ref['yaw'], ref['tilt'], ref['grip']
+    drop = np.asarray(target, float) + [0, 0, grasp_dz - press + release_dz]
+
+    def move(phase, pos, grip, dur, then=None, contact=False):
+        return dict(phase=phase, pos=np.array(pos, float), yaw=ref['yaw'], grip=float(grip), dur=dur,
+                    wait=None, then=then, contact=contact, tilt=np.array(ref['tilt'], float), rel=None)
+
+    moves[first:end] = [
+        move('insert', drop, ref['grip'], 1.2, contact=True),
+        move('insert', drop, ref['grip'], DWELL, contact=True),
+        move('release', drop, release['grip'], .4, contact=True),
+    ] + press_moves(ref, target, release['grip'], snap, release['then'], press=press, tip_below_tcp=tip_below_tcp,
+                    brick_h=brick_h, stud_h=stud_h, grasp_offset=grasp_offset)
+
+
+def top_press(moves, target, *, press, tip_below_tcp, brick_h, stud_h, grasp_offset):
+    """Keep the queued insert (and any wriggle) and release; snap after a
+    closed-tip press on the brick's top instead of at the insert end
+    (--stud-fit: a side grip slips long before a stud's 8.9 N)."""
+    end = next(i for i, m in enumerate(moves) if m['phase'] == 'retract')
+    last = max(i for i, m in enumerate(moves[:end]) if m['phase'] == 'insert' and m['then'])
+    release = next(m for m in moves[last:end] if m['phase'] == 'release')
+    snap, moves[last]['then'] = moves[last]['then'], None
+    placed, release['then'] = release['then'], None
+    moves[end:end] = press_moves(moves[last], target, release['grip'], snap, placed, press=press,
+                                 tip_below_tcp=tip_below_tcp, brick_h=brick_h, stud_h=stud_h,
+                                 grasp_offset=grasp_offset, dwell=PRESS_DWELL)
+
+
+def press_moves(ref, target, open_grip, snap, placed, *, press, tip_below_tcp, brick_h, stud_h, grasp_offset, dwell=0.):
+    """Rise clear of the brick's studs, close, press its top 1 mm past seated
+    with the closed tips (snap), rise (placed)."""
     target = np.asarray(target, float)
-    drop = target + [0, 0, grasp_dz - press + release_dz]
     # The hand bias keeps the in-hand grasp offset after release; centre the tips on the brick.
     centre = target - [grasp_offset[0], grasp_offset[1], 0]
     hover = centre + [0, 0, brick_h + 2 * stud_h + RISE_CLEAR + tip_below_tcp]
     seat = centre + [0, 0, brick_h + stud_h - press + tip_below_tcp]
 
-    def move(phase, pos, grip, dur, then=None, contact=False):
-        return dict(phase=phase, pos=np.array(pos, float), yaw=yaw, grip=float(grip), dur=dur,
-                    wait=None, then=then, contact=contact, tilt=np.array(tilt, float), rel=None)
-
-    moves[first:end] = [
-        move('insert', drop, shut, 1.2, contact=True),
-        move('insert', drop, shut, DWELL, contact=True),
-        move('release', drop, release['grip'], .4, contact=True),
-        move('press', hover, release['grip'], .5),
-        move('press', hover, 0., .4),
-        move('press', seat, 0., PRESS_DUR, then=snap, contact=True),
-        move('press', hover, 0., .4, then=release['then']),
-    ]
-
+    def move(pos, grip, dur, then=None, contact=False):
+        return dict(phase='press', pos=np.array(pos, float), yaw=ref['yaw'], grip=float(grip), dur=dur,
+                    wait=None, then=then, contact=contact, tilt=np.array(ref['tilt'], float), rel=None)
+    # stud_fit sets the dwell's wait: snap as soon as the brick is through, before
+    # the closed tips can squeeze an unwelded 1x1 out (dual_studfit_diag_005).
+    tail = [dict(move(seat, 0., .05, then=snap, contact=True), dwell=dwell)] if dwell else []
+    return [move(hover, open_grip, .5), move(hover, 0., .4),
+            move(seat, 0., PRESS_DUR, then=None if dwell else snap, contact=True), *tail,
+            move(hover, 0., .4, then=placed)]
 
 def placement_neighbours(bricks, footprint):
     """{id: {ids}} of bricks in the same or the course below touching by a face or a corner.

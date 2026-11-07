@@ -27,16 +27,19 @@ class FakeWp:
     transform_multiply = staticmethod(lambda a, b: a + b)
 
 
-def cell(z, push):
+def cell(z, push, tcp=None):
+    tcp = [1.] if tcp is None else tcp
     planned = 'planned'
     step = dict(step=0, brick_id='b', mating_studs=[[None, 2]])     # 2 studs: 17.8 N to push through
     snapped = []
-    view = NS(active=True, b_step=0, plan=dict(sequence=[step], bricks=[dict(id='b', type='2x4', yaw_index=0)]), snap=lambda s: snapped.append(s['brick_id']))
+    arm = NS(phase='insert', cur=None, t=0., bias=np.array([.0005, .0002, 0.]), moves=[dict(phase='press', pos=np.array([0., 0., .02])),
+                                             dict(phase='press', pos=np.zeros(3), dwell=1.5, wait=None)])
+    view = NS(active=True, b_step=0, owner='A', B=arm, plan=dict(sequence=[step], bricks=[dict(id='b', type='2x4', yaw_index=0)]), snap=lambda s: snapped.append(s['brick_id']))
     c = NS(views={'A': view}, welds={'b': [[0, None, planned, False]]}, body={'b': 0},
-           target={'b': (np.zeros(3), 0., False)}, sim_time=0.,
+           target={'b': (np.zeros(3), 0., False)}, sim_time=0., n_arm_bodies=0, frame=0,
            model=NS(equality_constraint_relpose=Array([planned]), equality_constraint_enabled=Array([False])),
            solver=NS(notify_model_changed=lambda flags: None))
-    c.state_0 = NS(body_q=NS(numpy=lambda: np.array([[0., 0., z[0], 0, 0, 0, 1]])))
+    c.state_0 = NS(body_q=NS(numpy=lambda: np.array([[.001, 0., z[0], 0, 0, 0, 1], [0., 0., tcp[0], 0, 0, 0, 1]])))
     return c, view, step, snapped
 
 
@@ -52,12 +55,24 @@ class StudFitTest(unittest.TestCase):
         self.assertIn('b', fit.held)
         self.assertTrue(c.model.equality_constraint_enabled.numpy()[0])
         self.assertAlmostEqual(float(c.model.equality_constraint_relpose.numpy()[0][2]), .0018)
+        fit.update()
+        # Press centred on the held brick (x 1 mm), less the hand's in-hand bias.
+        np.testing.assert_allclose(view.B.moves[0]['pos'], [.0005, -.0002, .02])
+        dwell = view.B.moves[1]['wait']
+        self.assertFalse(dwell())                      # held: keep pressing
         push[0] = 17.
         fit.update()
         self.assertIn('b', fit.held)                   # 17 N < 2 x 8.9 N
         push[0] = 18.
         fit.update()
         self.assertNotIn('b', fit.held)
+        # Through: the weld guides it straight down to the seat, keeping its x, y.
+        self.assertTrue(c.model.equality_constraint_enabled.numpy()[0])
+        np.testing.assert_allclose(c.model.equality_constraint_relpose.numpy()[0], [.001, 0., 0.])
+        self.assertFalse(dwell())                      # same frame: the slide has not been simulated
+        c.frame = 1
+        self.assertTrue(dwell())                       # snap now
+        view.snap(step)                                # the gate's clutch welds take over
         self.assertFalse(c.model.equality_constraint_enabled.numpy()[0])
         self.assertEqual(c.model.equality_constraint_relpose.numpy()[0], 'planned')
         fit.update()                                   # pushed through once: never held again
@@ -77,6 +92,32 @@ class StudFitTest(unittest.TestCase):
         self.assertAlmostEqual(needed(dict(mating_studs=[]), dict(type='2x4', yaw_index=0), foot), 8 * 8.9)
         self.assertAlmostEqual(needed(dict(mating_studs=[['x', 2], ['y', 1]]), dict(type='2x4', yaw_index=0), foot), 3 * 8.9)
 
+    def test_closed_tips_on_the_held_brick_ramp_the_press_then_stop_when_through(self):
+        z, push, tcp = [.0017], [0.], [.05]
+        c, view, step, _ = cell(z, push, tcp)
+        c.press_w = Array([[0.] * 6] * 2)
+        fit = StudFit(c, self.D(c, push))
+        fit.update()                                   # held; the hand is still high
+        view.B.phase, view.B.cur = 'press', dict(phase='press', contact=True, pos=np.zeros(3))
+        fit.update()
+        self.assertEqual(float(c.press_w.numpy()[0][2]), 0.)    # pressing, but the tips are still 5 cm up
+        tcp[0] = .0017 + .0096 + .0017 + .0089        # tips on the held brick's stud tops
+        view.B.cur = dict(phase='press', contact=False, pos=np.zeros(3))
+        fit.update()
+        self.assertEqual(float(c.press_w.numpy()[0][2]), 0.)    # a hover or close move never presses
+        view.B.cur = dict(phase='press', contact=True, pos=np.zeros(3))
+        fit.update()                                   # t = 0: the ramp starts
+        c.sim_time = .25
+        fit.update()
+        self.assertAlmostEqual(float(c.press_w.numpy()[0][2]), -.5 * 1.3 * 17.8, places=4)
+        c.sim_time = 1.
+        fit.update()
+        self.assertAlmostEqual(float(c.press_w.numpy()[0][2]), -1.3 * 17.8, places=4)
+        push[0] = 20.                                  # through: no press force left on the hand
+        fit.update()
+        self.assertNotIn('b', fit.held)
+        self.assertEqual(float(c.press_w.numpy()[0][2]), 0.)
+
     def test_snap_while_held_releases_first_and_still_snaps(self):
         z, push = [.0017], [5.]
         c, view, step, snapped = cell(z, push)
@@ -89,7 +130,8 @@ class StudFitTest(unittest.TestCase):
 
     @staticmethod
     def D(c, push):
-        return NS(wp=FakeWp, P=NS(footprint=lambda t, yaw: (2, 4)), newton=NS(solvers=NS(SolverNotifyFlags=NS(CONSTRAINT_PROPERTIES=1))),
+        return NS(wp=FakeWp, P=NS(footprint=lambda t, yaw: (2, 4), BRICK_H=.0096), ex=NS(STUD_HEIGHT=.0017),
+                  EE=1, TIP_BELOW_TCP=.0089, newton=NS(solvers=NS(SolverNotifyFlags=NS(CONSTRAINT_PROPERTIES=1))),
                   weld_rows=lambda solver: {0: None},
                   brick_wrench=lambda solver, model, eq, row, body: (np.array([0., 0., push[0]]), None))
 

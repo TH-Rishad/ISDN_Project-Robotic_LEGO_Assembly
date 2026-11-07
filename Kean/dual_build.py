@@ -237,6 +237,11 @@ class Build:
                    tip_below_tcp=D.TIP_BELOW_TCP, brick_h=D.P.BRICK_H, stud_h=D.ex.STUD_HEIGHT,
                    grasp_offset=step['grasp'].get('tcp_offset_m', [0., 0.]))
             print('drop-and-press %s: release %.2f mm above the seat' % (bid, self.drop_press[n] * 1000), flush=True)
+        elif self.stud_fit is not None:
+            from Kean.motion.drop_press import top_press
+            top_press(self.B.moves, self.target[bid][0], press=D.PRESS, tip_below_tcp=D.TIP_BELOW_TCP,
+                      brick_h=D.P.BRICK_H, stud_h=D.ex.STUD_HEIGHT,
+                      grasp_offset=step['grasp'].get('tcp_offset_m', [0., 0.]))
 
     def finger_model(self):
         checker = self.cell.tick.clearance
@@ -448,6 +453,11 @@ class DualExample(D.Example):
         self.feeders = feeders if feeders is not None else feeders_for(plans, self.platforms)
         self.views = {}
         self.role_views = {}
+        if stud_fit:
+            # A feed-forward press on each hand (fr3_hand_tcp), allocated before
+            # the base class captures the graph; the hand indices are set after.
+            self.press_body = D.wp.zeros(2, dtype=D.wp.int32)
+            self.press_w = D.wp.zeros(2, dtype=D.wp.spatial_vector)
         super().__init__(viewer, args)
         self.arms = {'A': self.A, 'B': self.B}
         self.A.name, self.B.name = 'A builder', 'B builder'
@@ -477,7 +487,22 @@ class DualExample(D.Example):
         self.stud_fit = None
         if stud_fit:
             from Kean.motion.stud_fit import StudFit
+            self.press_body.assign(np.array([D.EE, D.EE + self.n_arm_bodies], dtype=np.int32))
             self.stud_fit = StudFit(self, D, self.out / 'stud_fit.json')
+
+    def simulate(self):
+        if getattr(self, 'press_w', None) is None:
+            return super().simulate()
+        # D.Example.simulate plus the --stud-fit press wrench (clear_forces() erases body_f every substep).
+        self.pipeline.collide(self.state_0, self.contacts)
+        for _ in range(self.substeps):
+            self.state_0.clear_forces()
+            self.viewer.apply_forces(self.state_0)
+            if self.fx:
+                D.wp.launch(D.add_fixture_wrench, dim=len(self.fx_body), inputs=[self.fx_body, self.fx_w, self.state_0.body_f])
+            D.wp.launch(D.add_fixture_wrench, dim=2, inputs=[self.press_body, self.press_w, self.state_0.body_f])
+            self.solver.step(self.state_0, self.state_1, self.control, self.contacts, self.sim_dt)
+            self.state_0, self.state_1 = self.state_1, self.state_0
 
     def plan_input(self, args):
         return self.combined, 'dual'
@@ -580,7 +605,10 @@ class DualExample(D.Example):
                 # Anti-windup: a frozen arm cannot act on the brick-aim
                 # integral, which would otherwise saturate into the next goal.
                 tick = getattr(self, 'tick', None)
-                if tick is None or not tick.slots[arm].paused:
+                # --stud-fit: after release the brick sits on the stud tops, held; aiming
+                # it would only wind the hand's bias off the brick under the top press.
+                pressing = self.stud_fit is not None and arm.phase == 'press'
+                if (tick is None or not tick.slots[arm].paused) and not pressing:
                     view.aim_brick(ee, body_q)
             else:
                 arm.bias[:] = 0.
