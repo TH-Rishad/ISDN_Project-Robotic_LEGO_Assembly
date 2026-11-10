@@ -152,6 +152,68 @@ class StudFitTest(unittest.TestCase):
         r0.s = .1                                                   # safe unsupported, no overhang: none
         self.assertIsNone(assign(('x',), [('a',)], 'weakest_joint'))
 
+    def test_support_grips_the_bridge_not_the_nearer_pier(self):
+        from Kean.motion.stud_fit import bridge_bricks, near_press_assign
+        foot = {'2x2': (2, 2), '2x4': (2, 4)}
+
+        def cells(b):
+            nx, ny = foot[b[1]]
+            return {(b[2] + a, b[3] + c) for a in range(nx) for c in range(ny)}, b[4]
+
+        def supports(b, placed):
+            own, k = cells(b)
+            return {p[0]: len(own & cells(p)[0]) for p in placed if cells(p)[1] == k - 1 and own & cells(p)[0]}
+
+        P = NS(cells=cells, supports=supports, brick_pose=lambda b: (0., -.16, .05))
+        corbel = ('cor', '2x4', 0, 3, 6, 0)          # j 3-6
+        column = ('col', '2x2', 0, 8, 6, 0)          # j 8-9
+        bridge = ('br', '2x4', 0, 6, 7, 0)           # j 6-9, nothing under j 7
+        crown = ('top', '2x4', 0, 6, 8, 0)
+        placed = [corbel, column, bridge]
+        self.assertEqual(bridge_bricks(P, crown, placed), {'br'})
+        util = {-.20: .0, -.04: .2}                  # pier is nearer the press and safer
+        r0 = NS(s=1., util={('col', None): 1.})
+        BR = NS(ST=NS(SAFETY_FACTOR=3.), GRIP_N=14.3,
+                predicted=lambda brick, placed, br=None: r0 if br is None else NS(s=util[br]),
+                candidates=lambda brick, placed, clearance: [(-.20, .05), (-.04, .05)],
+                gripped=lambda placed, y, z: ('col',) if y < -.1 else ('br',),
+                _brace_obj=lambda placed, y, z, g, mu: y,
+                _record=lambda brick, placed, choice, r0, strategy, why: (choice and choice[0], why))
+        assign = near_press_assign(P, BR, original=None)
+        self.assertEqual(assign(crown, placed, 'weakest_joint'), (-.04, 'near_press_bridge'))
+
+    def test_press_stops_at_the_grip_when_the_margin_would_overload_it(self):
+        from Kean.motion.stud_fit import press_cap
+        self.assertAlmostEqual(press_cap(17.8, None), 1.3 * 17.8)
+        self.assertAlmostEqual(press_cap(17.8, {'brace_force_N': 28.6, 'brace_mu': 1.}), 1.3 * 17.8)
+        # 10 N a finger: pads hold 20 N, between the insertion force and the 1.3 margin.
+        self.assertAlmostEqual(press_cap(17.8, {'brace_force_N': 10., 'brace_mu': 1.}), 20.)
+        # Pads hold less than the insertion force: still press that, or the studs never release.
+        self.assertAlmostEqual(press_cap(17.8, {'brace_force_N': 5., 'brace_mu': 1.}), 17.8)
+
+    def test_snap_gate_follows_the_bricks_underneath(self):
+        z, push = [-.00163], [0.]
+        c, view, step, _ = cell(z, push)
+        step['mating_studs'] = [['s', 2]]
+        c.body['s'] = 2
+        c.target['s'] = (np.array([0., 0., .0]), 0., False)
+        q = np.zeros((3, 7))
+        q[:, 6] = 1
+        q[0, 2] = -.00163
+        q[2, 2] = -.00160
+        c.state_0 = NS(body_q=NS(numpy=lambda: q))
+        view.gate = lambda bid: (q[0], 0.1, -1.63, 0.4, 2.9, False, False)
+        StudFit(c, self.D(c, push))
+        _, lateral, dz, _, _, ok, screen = view.gate('b')
+        self.assertAlmostEqual(dz, -0.03, places=2)
+        self.assertLess(lateral, 2.0)
+        self.assertTrue(ok)
+        self.assertTrue(screen)
+        q[0, 2] = 0.                               # brick did not follow the sag
+        _, _, dz, _, _, ok, _ = view.gate('b')
+        self.assertAlmostEqual(dz, 1.6, places=2)
+        self.assertFalse(ok)
+
     def test_first_course_needs_its_whole_footprint_pushed_through(self):
         from Kean.motion.stud_fit import needed
         foot = lambda t, yaw: (2, 4)

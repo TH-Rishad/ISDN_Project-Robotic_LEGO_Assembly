@@ -55,6 +55,34 @@ TOUCH = 0.002       # m: tips this close above the held brick's stud tops count 
                     # measured 0.05-0.15 mm above nominal in dual_studfit_diag_008)
 
 
+def bridge_bricks(P, brick, placed):
+    """Placed bricks on this press's load path that tie an overhang to a column.
+
+    A brick whose studs are only partly supported is the upper side of that
+    joint. S3's crown sits on that bridge and broke its 2-stud joint at
+    u 1.03-1.13 while the support held the pier (dual_studfit_diag_018/019)."""
+    by_id = {b[0]: b for b in placed}
+    out, todo, seen = set(), list(P.supports(brick, placed)), set()
+    while todo:
+        sid = todo.pop()
+        if sid in seen or sid not in by_id:
+            continue
+        seen.add(sid)
+        b = by_id[sid]
+        own, k = P.cells(b)
+        if k == 0:
+            continue
+        under = set()
+        for p in placed:
+            pc, pk = P.cells(p)
+            if pk == k - 1:
+                under |= own & pc
+        if under and under != own:
+            out.add(sid)
+        todo.extend(P.supports(b, placed))
+    return out
+
+
 def overhanging(P, brick, placed):
     """True when `brick`, or any brick under it down to the baseplate, has a
     stud cell with nothing beneath it: the press then loads a joint that ties
@@ -84,11 +112,11 @@ def overhanging(P, brick, placed):
 
 def near_press_assign(P, BR, original):
     """bracing.assign for --stud-fit plans. The same safety test, plus a support
-    forced where `overhanging`. Among grips that make the step safe, the one
-    nearest the press (the brick's bottom centre), not the lowest predicted
-    utilisation: S3 step 13's support gripped the pier 34 mm from the press and
-    the corbel under it sagged 1.6 mm (dual_pyramid_s3_studfit_005). With no
-    safe grip, the lowest utilisation as before."""
+    forced where `overhanging`. A grip on the bridge (bridge_bricks) wins over
+    a nearer pier: S3 step 13's support gripped the pier 34 mm from the press
+    and the corbel under it sagged 1.6 mm (dual_pyramid_s3_studfit_005). Among
+    the grips that remain, the one nearest the press, not the lowest predicted
+    utilisation. With no safe grip, the lowest utilisation as before."""
     def assign(brick, placed, strategy, safety_factor=BR.ST.SAFETY_FACTOR, unbraced=None,
                clearance=None, grip_N=BR.GRIP_N, mu=1.0, selector=None):
         if strategy != 'weakest_joint' or not placed:
@@ -102,6 +130,10 @@ def near_press_assign(P, BR, original):
         if not cands:
             return BR._record(brick, placed, None, r0, strategy, 'no_feasible_grasp')
         pool = [c for c in cands if set(BR.gripped(placed, *c)) & joint_bricks] or cands
+        bridges = bridge_bricks(P, brick, placed)
+        on_bridge = [c for c in cands if set(BR.gripped(placed, *c)) & bridges]
+        if on_bridge:
+            pool = on_bridge
         _, py, pz = P.brick_pose(brick)
         scored = []
         for y, z in pool:
@@ -113,6 +145,7 @@ def near_press_assign(P, BR, original):
                 else min(scored, key=lambda c: c[0]))
         _, y, z, br, r = pick
         return BR._record(brick, placed, (y, z, br, r), r0, strategy,
+                          'near_press_bridge' if on_bridge else
                           'near_press_overhang' if forced else 'near_press')
     return assign
 
@@ -162,6 +195,22 @@ def press_offset(grasp, brick, bricks, footprint, pitch):
     return (np.mean(sorted(mated), axis=0) - np.mean(sorted(own), axis=0)) * pitch
 
 
+def press_cap(needed_n, brace):
+    """Hand force the ramp may reach, N.
+
+    The 1.3 margin stays only while the support's pad friction (mu * 2 * grip)
+    can take the whole press. Past that the joint carries the extra, and a
+    2-stud bridge breaks a few percent over 1. Never below the insertion force,
+    or the studs do not release. No brace: the margin is unchanged."""
+    full = MARGIN * needed_n
+    if not brace or not brace.get('brace_force_N'):
+        return full
+    hold = float(brace.get('brace_mu', 1.0)) * 2.0 * float(brace['brace_force_N'])
+    if hold + 1e-9 >= full:
+        return full
+    return max(needed_n, hold)
+
+
 def needed(step, brick, footprint):
     """n x 8.9 N over the mating studs; a first-course brick mates its whole
     footprint with the baseplate, which the plan's mating_studs leaves out."""
@@ -187,6 +236,8 @@ class StudFit:
             model.joint_target_ke.numpy().copy(), model.joint_target_kd.numpy().copy())
         for view in cell.views.values():
             view.snap = self._wrap_snap(view.snap)
+            if callable(getattr(view, 'gate', None)):
+                view.gate = self._wrap_gate(view, view.gate)
 
     def _wrap_snap(self, snap):
         def wrapped(s):
@@ -277,7 +328,7 @@ class StudFit:
         if not tips_on or not (arm.cur or {}).get('contact'):
             return 0.
         t0 = self.press_t.setdefault(bid, self.cell.sim_time)
-        force = min(1., (self.cell.sim_time - t0) / RAMP) * MARGIN * self.held[bid][1]
+        force = min(1., (self.cell.sim_time - t0) / RAMP) * self._cap(bid)
         self.applied[bid] = max(self.applied.get(bid, 0.), force)
         return force
 
@@ -324,6 +375,63 @@ class StudFit:
         self.peak[bid] = max(self.peak[bid], push)
         if push >= force_needed:
             self.release(bid, 'pushed_through')
+
+    def _cap(self, bid):
+        step = self._step(bid)
+        brace = step.get('brace') if step and step.get('requires_brace') else None
+        return press_cap(self.held[bid][1], brace)
+
+    def _step(self, bid):
+        for view in self.cell.views.values():
+            for step in view.plan['sequence']:
+                if step['brick_id'] == bid:
+                    return step
+        return None
+
+    def support_shift(self, view, bid):
+        """Mean displacement of the bricks this one sits on, weighted by studs.
+        None when it mates the baseplate, or those bricks are not in the cell."""
+        step = next((s for s in view.plan['sequence'] if s['brick_id'] == bid), None)
+        mates = [(sid, int(n)) for sid, n in (step or {}).get('mating_studs') or []
+                 if sid and int(n) > 0]
+        if not mates:
+            return None
+        q = self.cell.state_0.body_q.numpy()
+        shifts, w = [], []
+        for sid, n in mates:
+            if sid not in self.cell.body or sid not in self.cell.target:
+                continue
+            p = np.asarray(q[self.cell.body[sid]][:3], float)
+            tgt = np.asarray(self.cell.target[sid][0][:3], float)
+            shifts.append(p - tgt)
+            w.append(n)
+        if not shifts:
+            return None
+        return np.average(shifts, axis=0, weights=w)
+
+    def _wrap_gate(self, view, gate):
+        """Score lateral and dz against the bricks underneath, not the world target.
+        A corbel that sags 1.6 mm seats a brick the world gate calls 1.63 mm low."""
+        limits = getattr(self.D, 'GATE', None) or {'lateral_mm': 2.0, 'dz_mm': 1.5, 'yaw_deg': 5.0}
+        screen = getattr(self.D, 'SCREEN', None) or {
+            'lateral_mm': 1.2, 'dz_mm': (-0.5, 0.3), 'tilt_deg': 4.0, 'yaw_deg': 5.0}
+
+        def wrapped(bid):
+            q, lateral, dz, dyaw, tilt, ok, screen_ok = gate(bid)
+            shift = self.support_shift(view, bid)
+            if shift is None:
+                return q, lateral, dz, dyaw, tilt, ok, screen_ok
+            tgt = np.asarray(self.cell.target[bid][0][:3], float)
+            err = np.asarray(q[:3], float) - tgt - shift
+            lateral = float(np.hypot(err[0], err[1])) * 1000
+            dz = float(err[2]) * 1000
+            ok = (lateral < limits['lateral_mm'] and abs(dz) < limits['dz_mm']
+                  and dyaw < limits['yaw_deg'] and tilt < limits['yaw_deg'])
+            lo, hi = screen['dz_mm']
+            screen_ok = (lateral < screen['lateral_mm'] and lo <= dz <= hi
+                         and tilt < screen['tilt_deg'] and dyaw < screen['yaw_deg'])
+            return q, lateral, dz, dyaw, tilt, ok, screen_ok
+        return wrapped
 
     def through(self, bid):
         """Pushed through, slid to the seat, and the structure has sprung back."""
