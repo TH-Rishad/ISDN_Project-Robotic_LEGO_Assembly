@@ -393,10 +393,12 @@ class Build:
             xyz[len(left):, 1] -= opening - probe.FINGER_LOCK
             fingers = np.c_[xyz @ world.T + goal['pos'], sp[ids, 3]]
             gap, who = probe.clearance_boxes(fingers, obstacles)
-            if gap < .0012:
+            from Kean.motion.stud_fit import finger_blocked
+            if finger_blocked(gap, self.stud_fit is not None):
                 raise PlannerUnavailable('closed finger geometry %.2f mm at %s' % (gap * 1000, who))
             gap, _ = probe.clearance_boxes(np.vstack([hand, fingers]), [insertion])
-            if gap < .0012:
+            from Kean.motion.stud_fit import corridor_blocked
+            if corridor_blocked(gap, self.stud_fit is not None):
                 raise PlannerUnavailable('helper obstructs carried-brick insertion corridor: %.2f mm' % (gap * 1000))
 
     def insertion_box(self):
@@ -426,7 +428,8 @@ class Build:
             q[7:] = opening
             spheres = checker.spheres(helper, q)
             gap, _ = checker.probe.clearance_boxes(spheres, [self.insertion_box()])
-            if gap < .0012:
+            from Kean.motion.stud_fit import corridor_blocked
+            if corridor_blocked(gap, self.stud_fit is not None):
                 raise PlannerUnavailable('measured helper obstructs insertion corridor: %.2f mm' % (gap * 1000))
 
     def brace_guard_stopped(self, arm):

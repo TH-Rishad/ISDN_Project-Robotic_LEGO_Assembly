@@ -39,3 +39,7 @@ todo-personal.md
 
 # Personal identity instructions (do not push)
 AGENTS.md
+
+# Local HPC agent skill and cluster config (do not push)
+.cursor/skills/hpc-slurm/
+config/hpc/

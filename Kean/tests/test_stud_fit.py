@@ -182,6 +182,35 @@ class StudFitTest(unittest.TestCase):
         assign = near_press_assign(P, BR, original=None)
         self.assertEqual(assign(crown, placed, 'weakest_joint'), (-.04, 'near_press_bridge'))
 
+    def test_retry_must_keep_the_upper_bridge_brick(self):
+        from Kean.motion.stud_fit import bridge_bricks, corridor_blocked, finger_blocked, required_bridge
+        foot = {'2x2': (2, 2), '2x4': (2, 4)}
+
+        def cells(b):
+            nx, ny = foot[b[1]]
+            return {(b[2] + a, b[3] + c) for a in range(nx) for c in range(ny)}, b[4]
+
+        def supports(b, placed):
+            own, k = cells(b)
+            return {p[0]: len(own & cells(p)[0]) for p in placed if cells(p)[1] == k - 1 and own & cells(p)[0]}
+
+        P = NS(cells=cells, supports=supports)
+        base = ('base', '2x2', 0, 3, 5, 0)          # j 3-4, so the corbel below is itself a bridge
+        lower = ('lo', '2x4', 0, 3, 6, 0)           # j 3-6
+        pier = ('pi', '2x2', 0, 8, 6, 0)            # j 8-9
+        upper = ('up', '2x4', 0, 6, 7, 0)           # j 6-9, nothing under j 7
+        crown = ('top', '2x4', 0, 6, 8, 0)
+        placed = [base, lower, pier, upper]
+        self.assertEqual(bridge_bricks(P, crown, placed), {'lo', 'up'})
+        self.assertEqual(required_bridge(P, crown, placed, {'lo', 'up'}), {'up'})
+        self.assertFalse({'lo', 'pi'} >= required_bridge(P, crown, placed, {'lo', 'up'}))
+        self.assertFalse(corridor_blocked(-0.00007, True))
+        self.assertTrue(corridor_blocked(-0.0011, True))
+        self.assertTrue(corridor_blocked(-0.00007, False))
+        self.assertFalse(finger_blocked(0.00094, True))
+        self.assertTrue(finger_blocked(0.0007, True))
+        self.assertTrue(finger_blocked(0.00094, False))
+
     def test_press_stops_at_the_grip_when_the_margin_would_overload_it(self):
         from Kean.motion.stud_fit import press_cap
         self.assertAlmostEqual(press_cap(17.8, None), 1.3 * 17.8)

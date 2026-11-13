@@ -47,8 +47,8 @@ def candidates(ex, n, original, D, limit=8):
                  for column in columns if i < len(column)]
     keep_bridge = set()
     if getattr(ex, 'brace_near_first', False):
-        from Kean.motion.stud_fit import bridge_bricks
-        keep_bridge = bridge_bricks(P, brick, placed) & set(original.get('gripped_bricks') or [])
+        from Kean.motion.stud_fit import required_bridge
+        keep_bridge = required_bridge(P, brick, placed, original.get('gripped_bricks'))
     yield deepcopy(original)
     seen = {tuple(np.round(pose + original['brace_tilt_rotvec'], 5))}
     count = 1
@@ -67,9 +67,9 @@ def candidates(ex, n, original, D, limit=8):
         # Do not trade the support's load capacity for motion clearance.
         if pick['predicted_util_braced'] > original['predicted_util_braced'] + 1e-4:
             continue
-        # --stud-fit: a clearance retry must not leave the bridge for a pier.
-        # Far-first did that on S3 step 15 and the 2-stud joint broke (_diag_021).
-        if keep_bridge and not (set(pick.get('gripped_bricks') or []) & keep_bridge):
+        # --stud-fit: a retry must still hold the upper bridge brick. Keeping only
+        # a lower brick on the same path sent S3 step 15 to the pier (_diag_027).
+        if keep_bridge and not keep_bridge <= set(pick.get('gripped_bricks') or []):
             continue
         key = tuple(np.round(pick['brace_pose'] + pick['brace_tilt_rotvec'], 5))
         if key in seen:

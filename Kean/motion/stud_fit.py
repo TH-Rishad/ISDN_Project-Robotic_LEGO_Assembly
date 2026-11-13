@@ -51,6 +51,10 @@ SUPPORT_GRIP = 2.0  # x A_FINGER_KE for a supporting hand (~28 N a finger; a Fra
 SETTLE = 0.25       # s after the push-through before the snap: the press bent S3's supported
                     # corbel 2.4 mm down and a next-frame gate read it (_diag_016)
 HAND_KEEP_OUT = 0.020  # m, planner keep-out between the support grip and the pressed brick
+CORRIDOR_CLEAR = 0.0012   # m, helper clearance from the insertion box without stud resistance
+CORRIDOR_OVERLAP = 0.001  # m, stud-fit sphere/box slop: diag_027's bridge grip was 0.07 mm in
+FINGER_CLEAR = 0.0012     # m, closed-finger clearance from a placed brick
+FINGER_CLEAR_STUD = 0.0008  # m: diag_028's planned bridge grip was 0.94 mm from B_b_010
 TOUCH = 0.002       # m: tips this close above the held brick's stud tops count as on them (contact
                     # measured 0.05-0.15 mm above nominal in dual_studfit_diag_008)
 
@@ -81,6 +85,40 @@ def bridge_bricks(P, brick, placed):
             out.add(sid)
         todo.extend(P.supports(b, placed))
     return out
+
+
+def required_bridge(P, brick, placed, gripped):
+    """Upper bridge bricks the plan holds. A retry must keep every one.
+
+    bridge_bricks also walks down the load path. S3 step 15's plan holds
+    B_b_014 and B_b_012; an any-intersection test let a pier grip that kept
+    only B_b_012 through, and that joint broke (dual_studfit_diag_027)."""
+    direct = set(P.supports(brick, placed))
+    return bridge_bricks(P, brick, placed) & direct & set(gripped or [])
+
+
+def corridor_blocked(gap, stud_fit):
+    """True when the helper is in the carried brick's insertion corridor.
+
+    Without stud resistance the hand must clear the box by 1.2 mm. With it,
+    the box already stops at the stud tops; requiring that clearance rejected
+    the planned bridge grip for 0.07 mm of sphere overlap and the search left
+    for the pier (dual_studfit_diag_027). An overlap under 1 mm is not a block."""
+    if stud_fit:
+        return gap < -CORRIDOR_OVERLAP
+    return gap < CORRIDOR_CLEAR
+
+
+def finger_blocked(gap, stud_fit):
+    """True when a closing finger is too close to a placed brick.
+
+    The 1.2 mm pad rejected the planned bridge grip at 0.94 mm from the pier
+    and the search then had no grip that still held the bridge
+    (dual_studfit_diag_028). Stud-fit allows 0.8 mm; that is still clearance,
+    not contact."""
+    if stud_fit:
+        return gap < FINGER_CLEAR_STUD
+    return gap < FINGER_CLEAR
 
 
 def overhanging(P, brick, placed):

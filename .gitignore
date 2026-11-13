@@ -9,6 +9,12 @@ __pycache__/
 # machine-local, not part of the shared repo
 Kean/kean.id
 Kean/AGENTS.md
+Kean/.cursor/
+Kean/config/hpc/
 
 # Kean run artifacts. JSON evidence stays; recorder dumps do not.
 Kean/results/**/*.npz
+
+# HPC skill scratch on the remote tree. Not part of the shared repo.
+/runs/
+/transfer-tests/
