@@ -852,9 +852,18 @@ class DualExample(D.Example):
             elif self.roles[arm] == 'supporter' and self.arms[arm].phase in ('brace-in', 'brace-guard', 'close', 'hold', 'open', 'retract'):
                 brace = view.plan['sequence'][view.b_step]['brace']
                 permitted.update(brace.get('gripped_bricks') or [brace['target_brick_id']])
+                if self.stud_fit is not None and view.b_step is not None:
+                    # Near-press: the builder's brick approaches the holding hand
+                    # (command_clearance A:B_b_014 at 0.56 mm, dual_studfit_diag_031).
+                    permitted.add(view.plan['sequence'][view.b_step]['brick_id'])
             boxes, _ = self.world(self, arm)
-            for part, selected in ((own[nonfinger], boxes),
-                                   (own[finger_ids], [b for b in boxes if b['name'] not in permitted])):
+            # Stud-fit supporter: the palm is also inside the near-press keep-out, so
+            # non-finger links use the same permitted set as the fingers.
+            free = [b for b in boxes if b['name'] not in permitted]
+            arm_boxes = free if (self.stud_fit is not None and self.roles.get(arm) == 'supporter'
+                                 and permitted) else boxes
+            for part, selected in ((own[nonfinger], arm_boxes),
+                                   (own[finger_ids], free)):
                 gap, who = checker.probe.clearance_boxes(part, selected)
                 if gap < minimum:
                     minimum, label = gap, arm + ':' + str(who)

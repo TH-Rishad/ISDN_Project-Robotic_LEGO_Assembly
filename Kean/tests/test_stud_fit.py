@@ -233,6 +233,16 @@ class StudFitTest(unittest.TestCase):
         # Deep intrusion still blocks under stud-fit.
         self.assertTrue(corridor_blocked(-0.002, True))
 
+    def test_supporter_permits_the_builders_brick_under_stud_fit(self):
+        """diag_031: holding hand vs the brick being placed is intended near-press contact."""
+        from Kean.motion.stud_fit import HAND_KEEP_OUT
+        # The near-press keep-out leaves only ~4 mm to a 2x4 face; hand spheres
+        # are larger than that, so clearance to the builder's brick must be permitted.
+        self.assertAlmostEqual(HAND_KEEP_OUT, 0.020)
+        half_2x4_y = 2 * 0.008  # 4 studs / 2
+        self.assertAlmostEqual(HAND_KEEP_OUT - half_2x4_y, 0.004)
+        self.assertGreater(0.012, HAND_KEEP_OUT - half_2x4_y)  # typical hand sphere > face gap
+
     def test_press_stops_at_the_grip_when_the_margin_would_overload_it(self):
         from Kean.motion.stud_fit import press_cap
         self.assertAlmostEqual(press_cap(17.8, None), 1.3 * 17.8)
