@@ -208,7 +208,8 @@ class StudFitTest(unittest.TestCase):
         self.assertTrue(corridor_blocked(-0.0011, True))
         self.assertTrue(corridor_blocked(-0.00007, False))
         self.assertFalse(finger_blocked(0.00094, True))
-        self.assertTrue(finger_blocked(0.0007, True))
+        self.assertFalse(finger_blocked(0.0, True))
+        self.assertTrue(finger_blocked(-0.0001, True))
         self.assertTrue(finger_blocked(0.00094, False))
 
     def test_press_stops_at_the_grip_when_the_margin_would_overload_it(self):

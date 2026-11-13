@@ -54,7 +54,7 @@ HAND_KEEP_OUT = 0.020  # m, planner keep-out between the support grip and the pr
 CORRIDOR_CLEAR = 0.0012   # m, helper clearance from the insertion box without stud resistance
 CORRIDOR_OVERLAP = 0.001  # m, stud-fit sphere/box slop: diag_027's bridge grip was 0.07 mm in
 FINGER_CLEAR = 0.0012     # m, closed-finger clearance from a placed brick
-FINGER_CLEAR_STUD = 0.0008  # m: diag_028's planned bridge grip was 0.94 mm from B_b_010
+FINGER_CLEAR_STUD = 0.0  # m: diag_028 rejected the bridge grip at 0.94 mm of clearance
 TOUCH = 0.002       # m: tips this close above the held brick's stud tops count as on them (contact
                     # measured 0.05-0.15 mm above nominal in dual_studfit_diag_008)
 
@@ -114,8 +114,8 @@ def finger_blocked(gap, stud_fit):
 
     The 1.2 mm pad rejected the planned bridge grip at 0.94 mm from the pier
     and the search then had no grip that still held the bridge
-    (dual_studfit_diag_028). Stud-fit allows 0.8 mm; that is still clearance,
-    not contact."""
+    (dual_studfit_diag_028). Stud-fit rejects only an overlap. The sphere
+    radius is already in the gap."""
     if stud_fit:
         return gap < FINGER_CLEAR_STUD
     return gap < FINGER_CLEAR

@@ -395,7 +395,7 @@ class Build:
             gap, who = probe.clearance_boxes(fingers, obstacles)
             from Kean.motion.stud_fit import finger_blocked
             if finger_blocked(gap, self.stud_fit is not None):
-                raise PlannerUnavailable('closed finger geometry %.2f mm at %s' % (gap * 1000, who))
+                raise PlannerUnavailable('closed finger geometry %.2f mm at %s (opening %.2f mm)' % (gap * 1000, who, opening * 1000))
             gap, _ = probe.clearance_boxes(np.vstack([hand, fingers]), [insertion])
             from Kean.motion.stud_fit import corridor_blocked
             if corridor_blocked(gap, self.stud_fit is not None):
