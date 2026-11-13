@@ -53,6 +53,8 @@ SETTLE = 0.25       # s after the push-through before the snap: the press bent S
 HAND_KEEP_OUT = 0.020  # m, planner keep-out between the support grip and the pressed brick
 CORRIDOR_CLEAR = 0.0012   # m, helper clearance from the insertion box without stud resistance
 CORRIDOR_OVERLAP = 0.001  # m, stud-fit sphere/box slop: diag_027's bridge grip was 0.07 mm in
+CORRIDOR_PAD = 0.004      # m, insertion-box xy pad without stud resistance (wriggle room)
+CORRIDOR_PAD_STUD = 0.001  # m: diag_029's fingers sat 1.02 mm into the +4 mm box; stud-fit wriggle is 0.1 mm
 FINGER_CLEAR = 0.0012     # m, closed-finger clearance from a placed brick
 FINGER_CLEAR_STUD = 0.0  # m: diag_028 rejected the bridge grip at 0.94 mm of clearance
 TOUCH = 0.002       # m: tips this close above the held brick's stud tops count as on them (contact
@@ -97,6 +99,20 @@ def required_bridge(P, brick, placed, gripped):
     return bridge_bricks(P, brick, placed) & direct & set(gripped or [])
 
 
+def corridor_offender(hand_gap, finger_gap, stud_fit=False):
+    """Closest helper body to the insertion corridor, and its gap.
+
+    diag_029 reported a combined -1.02 mm on the planned bridge grip. Under
+    stud-fit the palm sits at HAND_KEEP_OUT by design and its spheres are up to
+    32 mm; only the fingers can truly block the carried brick (they move with
+    the closing sweep). Non-stud-fit still scores the worse of hand and fingers."""
+    if stud_fit:
+        return finger_gap, 'fingers'
+    if hand_gap <= finger_gap:
+        return hand_gap, 'hand'
+    return finger_gap, 'fingers'
+
+
 def corridor_blocked(gap, stud_fit):
     """True when the helper is in the carried brick's insertion corridor.
 
@@ -107,6 +123,13 @@ def corridor_blocked(gap, stud_fit):
     if stud_fit:
         return gap < -CORRIDOR_OVERLAP
     return gap < CORRIDOR_CLEAR
+
+
+def corridor_pad(stud_fit):
+    """xy pad on the insertion box. Stud-fit wriggle is 0.1 mm; the 4 mm pad
+    put diag_029's bridge-grip fingers 1.02 mm into a box the carried brick
+    never sweeps (dual_studfit_diag_029)."""
+    return CORRIDOR_PAD_STUD if stud_fit else CORRIDOR_PAD
 
 
 def finger_blocked(gap, stud_fit):

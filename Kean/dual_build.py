@@ -393,13 +393,16 @@ class Build:
             xyz[len(left):, 1] -= opening - probe.FINGER_LOCK
             fingers = np.c_[xyz @ world.T + goal['pos'], sp[ids, 3]]
             gap, who = probe.clearance_boxes(fingers, obstacles)
-            from Kean.motion.stud_fit import finger_blocked
-            if finger_blocked(gap, self.stud_fit is not None):
+            stud = self.stud_fit is not None
+            from Kean.motion.stud_fit import corridor_blocked, corridor_offender, finger_blocked
+            if finger_blocked(gap, stud):
                 raise PlannerUnavailable('closed finger geometry %.2f mm at %s (opening %.2f mm)' % (gap * 1000, who, opening * 1000))
-            gap, _ = probe.clearance_boxes(np.vstack([hand, fingers]), [insertion])
-            from Kean.motion.stud_fit import corridor_blocked
-            if corridor_blocked(gap, self.stud_fit is not None):
-                raise PlannerUnavailable('helper obstructs carried-brick insertion corridor: %.2f mm' % (gap * 1000))
+            hand_gap, _ = probe.clearance_boxes(hand, [insertion])
+            finger_gap, _ = probe.clearance_boxes(fingers, [insertion])
+            gap, body = corridor_offender(hand_gap, finger_gap, stud)
+            if corridor_blocked(gap, stud):
+                raise PlannerUnavailable(
+                    'helper obstructs carried-brick insertion corridor: %.2f mm (%s)' % (gap * 1000, body))
 
     def insertion_box(self):
         """Enclose the seated brick and its guided/wriggle insertion sweep."""
@@ -408,7 +411,10 @@ class Build:
         length, width = self.dims[bid]
         height = D.P.BRICK_H + .0018
         top, bottom = height + .027, -.002
-        if self.stud_fit is not None:
+        stud = self.stud_fit is not None
+        from Kean.motion.stud_fit import corridor_pad
+        pad = corridor_pad(stud)
+        if stud:
             # The carried brick stops on the stud tops; the closed tips press the last
             # 1.7 mm straight down. To the seat, the corridor ran into the helper's
             # fingers on the brick below and sent S3 step 15's support to the pier
@@ -416,7 +422,7 @@ class Build:
             from Kean.motion.stud_fit import STUD_H
             bottom = STUD_H
         return dict(name='insertion_' + bid, c=target + [0, 0, (top + bottom) / 2],
-                    dims=[length + .004, width + .004, top - bottom], yaw=yaw)
+                    dims=[length + pad, width + pad, top - bottom], yaw=yaw)
 
     def check_insertion_clearance(self):
         from Kean.motion.plan_curobo import PlannerUnavailable
@@ -424,13 +430,20 @@ class Build:
         helper = self.A.name[0]
         i = 0 if helper == 'A' else 9
         q = self.state_0.joint_q.numpy()[i:i+9].copy()
+        insertion = self.insertion_box()
+        stud = self.stud_fit is not None
+        hand_ids = np.r_[checker.slices['fr3_hand'], checker.slices['fr3_link7']]
+        finger_ids = np.r_[checker.slices['fr3_leftfinger'], checker.slices['fr3_rightfinger']]
         for opening in (D.BRACE_HALF_W + D.BRACE_CLEAR, D.BRACE_HALF_W - D.BRACE_SQUEEZE):
             q[7:] = opening
             spheres = checker.spheres(helper, q)
-            gap, _ = checker.probe.clearance_boxes(spheres, [self.insertion_box()])
-            from Kean.motion.stud_fit import corridor_blocked
-            if corridor_blocked(gap, self.stud_fit is not None):
-                raise PlannerUnavailable('measured helper obstructs insertion corridor: %.2f mm' % (gap * 1000))
+            from Kean.motion.stud_fit import corridor_blocked, corridor_offender
+            hand_gap, _ = checker.probe.clearance_boxes(spheres[hand_ids], [insertion])
+            finger_gap, _ = checker.probe.clearance_boxes(spheres[finger_ids], [insertion])
+            gap, body = corridor_offender(hand_gap, finger_gap, stud)
+            if corridor_blocked(gap, stud):
+                raise PlannerUnavailable(
+                    'measured helper obstructs insertion corridor: %.2f mm (%s)' % (gap * 1000, body))
 
     def brace_guard_stopped(self, arm):
         self.cell.tick.cancel_at_measured(arm)

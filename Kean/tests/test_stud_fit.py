@@ -212,6 +212,28 @@ class StudFitTest(unittest.TestCase):
         self.assertTrue(finger_blocked(-0.0001, True))
         self.assertTrue(finger_blocked(0.00094, False))
 
+    def test_corridor_names_the_body_and_shrinks_the_stud_fit_pad(self):
+        """diag_029: measure hand vs fingers before changing the corridor."""
+        from Kean.motion.stud_fit import (
+            CORRIDOR_PAD, CORRIDOR_PAD_STUD, corridor_blocked, corridor_offender, corridor_pad)
+
+        # A fat palm 1.02 mm into the box must not hide a clear finger under stud-fit.
+        self.assertEqual(corridor_offender(-0.00102, 0.0005, True), (0.0005, 'fingers'))
+        self.assertFalse(corridor_blocked(0.0005, True))
+        # Non-stud-fit still rejects the worse body (the hand) at the 1.2 mm pad.
+        self.assertEqual(corridor_offender(-0.00102, 0.0005, False), (-0.00102, 'hand'))
+        self.assertTrue(corridor_blocked(-0.00102, False))
+        # Fingers 1.02 mm into the old +4 mm box: shrinking the pad by 1.5 mm/side clears them.
+        old = -0.00102
+        cleared = old + 0.5 * (CORRIDOR_PAD - CORRIDOR_PAD_STUD)
+        self.assertEqual(corridor_pad(True), CORRIDOR_PAD_STUD)
+        self.assertEqual(corridor_pad(False), CORRIDOR_PAD)
+        self.assertFalse(corridor_blocked(cleared, True))
+        self.assertTrue(corridor_blocked(old, True))
+        # Deep finger intrusion still blocks under stud-fit.
+        self.assertEqual(corridor_offender(0.01, -0.002, True), (-0.002, 'fingers'))
+        self.assertTrue(corridor_blocked(-0.002, True))
+
     def test_press_stops_at_the_grip_when_the_margin_would_overload_it(self):
         from Kean.motion.stud_fit import press_cap
         self.assertAlmostEqual(press_cap(17.8, None), 1.3 * 17.8)
