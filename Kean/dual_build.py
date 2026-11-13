@@ -863,10 +863,22 @@ class DualExample(D.Example):
             i = 0 if other == 'A' else 9
             other_spheres = spheres[other] if spheres is not None else checker.spheres(other, joints[i:i+9])
             gap, who = checker.probe.clearance_boxes(other_spheres, [carried])
-            if gap < minimum:
-                minimum, label = gap, arm + ':carried/arm_' + other
             view = self.views[arm]
             phase = self.arms[arm].phase
+            # Near-press stud-fit supports sit at HAND_KEEP_OUT. During insert the
+            # carried brick approaches that hand (0.89 mm with A holding, dual_studfit_diag_030);
+            # the insertion corridor already cleared the grip. Reject only an overlap.
+            near_support = (
+                self.stud_fit is not None
+                and phase in ('pre-insert', 'insert', 'press')
+                and self.roles.get(other) == 'supporter'
+                and self.arms[other].phase in ('brace-in', 'brace-guard', 'close', 'hold'))
+            if near_support:
+                from Kean.motion.stud_fit import corridor_blocked
+                if corridor_blocked(gap, True) and gap < minimum:
+                    minimum, label = gap, arm + ':carried/arm_' + other
+            elif gap < minimum:
+                minimum, label = gap, arm + ':carried/arm_' + other
             allowed = {b['name'] for b in predicted.values()}
             if phase == 'lift':
                 allowed.add('table')  # intended pick-up surface contact

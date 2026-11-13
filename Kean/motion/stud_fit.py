@@ -102,12 +102,11 @@ def required_bridge(P, brick, placed, gripped):
 def corridor_offender(hand_gap, finger_gap, stud_fit=False):
     """Closest helper body to the insertion corridor, and its gap.
 
-    diag_029 reported a combined -1.02 mm on the planned bridge grip. Under
-    stud-fit the palm sits at HAND_KEEP_OUT by design and its spheres are up to
-    32 mm; only the fingers can truly block the carried brick (they move with
-    the closing sweep). Non-stud-fit still scores the worse of hand and fingers."""
-    if stud_fit:
-        return finger_gap, 'fingers'
+    diag_029 reported a combined -1.02 mm on the planned bridge grip. Naming
+    the body (hand vs fingers) decides the fix: a fat palm sphere vs a finger
+    that moves with the closing sweep. `stud_fit` is accepted for call-site
+    symmetry; both bodies still score."""
+    del stud_fit
     if hand_gap <= finger_gap:
         return hand_gap, 'hand'
     return finger_gap, 'fingers'
