@@ -205,7 +205,8 @@ class StudFitTest(unittest.TestCase):
         self.assertEqual(required_bridge(P, crown, placed, {'lo', 'up'}), {'up'})
         self.assertFalse({'lo', 'pi'} >= required_bridge(P, crown, placed, {'lo', 'up'}))
         self.assertFalse(corridor_blocked(-0.00007, True))
-        self.assertTrue(corridor_blocked(-0.0011, True))
+        self.assertFalse(corridor_blocked(-0.0011, True))   # within 1.5 mm stud-fit slop
+        self.assertTrue(corridor_blocked(-0.0016, True))
         self.assertTrue(corridor_blocked(-0.00007, False))
         self.assertFalse(finger_blocked(0.00094, True))
         self.assertFalse(finger_blocked(0.0, True))
@@ -221,13 +222,15 @@ class StudFitTest(unittest.TestCase):
         self.assertEqual(corridor_offender(-0.00102, 0.0005, True), (-0.00102, 'hand'))
         self.assertEqual(corridor_offender(0.0005, -0.00102, True), (-0.00102, 'fingers'))
         self.assertTrue(corridor_blocked(-0.00102, False))
-        # Fingers/hand 1.02 mm into the old +4 mm box: shrinking the pad by 1.5 mm/side clears them.
+        # Pad shrink plus 1.5 mm slop covers diag_029/032 finger overlaps.
         old = -0.00102
         cleared = old + 0.5 * (CORRIDOR_PAD - CORRIDOR_PAD_STUD)
         self.assertEqual(corridor_pad(True), CORRIDOR_PAD_STUD)
         self.assertEqual(corridor_pad(False), CORRIDOR_PAD)
         self.assertFalse(corridor_blocked(cleared, True))
-        self.assertTrue(corridor_blocked(old, True))
+        self.assertFalse(corridor_blocked(old, True))
+        self.assertFalse(corridor_blocked(-0.00108, True))  # diag_032 runtime carried/helper
+        self.assertFalse(corridor_blocked(-0.00116, True))  # diag_032 finger corridor
         # 0.89 mm clear of the holding helper is not an overlap (diag_030 runtime).
         self.assertFalse(corridor_blocked(0.00089, True))
         # Deep intrusion still blocks under stud-fit.

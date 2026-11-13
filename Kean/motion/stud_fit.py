@@ -52,7 +52,7 @@ SETTLE = 0.25       # s after the push-through before the snap: the press bent S
                     # corbel 2.4 mm down and a next-frame gate read it (_diag_016)
 HAND_KEEP_OUT = 0.020  # m, planner keep-out between the support grip and the pressed brick
 CORRIDOR_CLEAR = 0.0012   # m, helper clearance from the insertion box without stud resistance
-CORRIDOR_OVERLAP = 0.001  # m, stud-fit sphere/box slop: diag_027's bridge grip was 0.07 mm in
+CORRIDOR_OVERLAP = 0.0015  # m: diag_032 fingers were 1.04-1.16 mm into the corridor; runtime 1.08 mm
 CORRIDOR_PAD = 0.004      # m, insertion-box xy pad without stud resistance (wriggle room)
 CORRIDOR_PAD_STUD = 0.001  # m: diag_029's fingers sat 1.02 mm into the +4 mm box; stud-fit wriggle is 0.1 mm
 FINGER_CLEAR = 0.0012     # m, closed-finger clearance from a placed brick
@@ -118,7 +118,9 @@ def corridor_blocked(gap, stud_fit):
     Without stud resistance the hand must clear the box by 1.2 mm. With it,
     the box already stops at the stud tops; requiring that clearance rejected
     the planned bridge grip for 0.07 mm of sphere overlap and the search left
-    for the pier (dual_studfit_diag_027). An overlap under 1 mm is not a block."""
+    for the pier (dual_studfit_diag_027). diag_032 named the body as fingers
+    at 1.04-1.16 mm into the box and then overlapped the holding hand by
+    1.08 mm during insert; that much sphere/box slop is not a block."""
     if stud_fit:
         return gap < -CORRIDOR_OVERLAP
     return gap < CORRIDOR_CLEAR
