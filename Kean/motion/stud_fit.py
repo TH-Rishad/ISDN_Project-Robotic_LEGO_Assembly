@@ -61,11 +61,12 @@ FINGER_CLEAR_STUD = -0.00065  # m: diag_028 rejected clearance 0.94 mm; 0.0/-0.3
                     # bridge. Allow 0.65 mm sphere overlap so that low-tilt grip can run.
 TOUCH = 0.002       # m: tips this close above the held brick's stud tops count as on them (contact
                     # measured 0.05-0.15 mm above nominal in dual_studfit_diag_008)
-BRACE_HAND = 1.02   # supported hand / needed. Planner util was 0 for step 15 but the cell
-                    # still broke near needed (diag_036/037); keep a tiny overshoot only.
-BRACE_PUSH = 0.95   # supported release fraction of needed so push-through wins the race
-                    # against raw JointBreaker samples (diag_037: break at u 1.016 then through)
-BRACE_RAMP = 1.5    # s: slower supported press; RAMP alone spiked the bridge (diag_037)
+BRACE_HAND = 0.97   # supported hand / needed. diag_040 aimed ~1.02x (72.6 N) and broke at
+                    # u 1.020 before push-through; hand→weld eff ~0.89 so 0.97x still clears
+                    # BRACE_PUSH while cutting peak joint load.
+BRACE_PUSH = 0.85   # supported release fraction of needed (diag_040: 0.95x never released
+                    # the crown before JointBreaker at u 1.020)
+BRACE_RAMP = 2.0    # s: slower supported press
 
 
 def bridge_bricks(P, brick, placed):
