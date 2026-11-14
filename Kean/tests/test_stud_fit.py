@@ -210,7 +210,8 @@ class StudFitTest(unittest.TestCase):
         self.assertTrue(corridor_blocked(-0.00007, False))
         self.assertFalse(finger_blocked(0.00094, True))
         self.assertFalse(finger_blocked(0.0, True))
-        self.assertTrue(finger_blocked(-0.0001, True))
+        self.assertFalse(finger_blocked(-0.00027, True))  # diag_036 preferred bridge grip
+        self.assertTrue(finger_blocked(-0.0004, True))
         self.assertTrue(finger_blocked(0.00094, False))
 
     def test_corridor_names_the_body_and_shrinks_the_stud_fit_pad(self):
@@ -256,13 +257,15 @@ class StudFitTest(unittest.TestCase):
         self.assertFalse(near_support_press({'A': 'builder', 'B': 'builder'}, arms))
 
     def test_press_stops_at_the_grip_when_the_margin_would_overload_it(self):
-        from Kean.motion.stud_fit import press_cap
+        from Kean.motion.stud_fit import BRACE_HAND, BRACE_PUSH, brace_release, press_cap
         self.assertAlmostEqual(press_cap(17.8, None), 1.3 * 17.8)
         self.assertAlmostEqual(press_cap(17.8, {'brace_force_N': 28.6, 'brace_mu': 1.}), 1.3 * 17.8)
-        # Pads hold between needed and the 1.3 margin: no partial margin (diag_035).
-        self.assertAlmostEqual(press_cap(17.8, {'brace_force_N': 10., 'brace_mu': 1.}), 17.8)
-        # Pads hold less than the insertion force: still press that, or the studs never release.
-        self.assertAlmostEqual(press_cap(17.8, {'brace_force_N': 5., 'brace_mu': 1.}), 17.8)
+        # Pads hold between needed and the 1.3 margin: small hand overshoot, not full margin.
+        self.assertAlmostEqual(press_cap(17.8, {'brace_force_N': 10., 'brace_mu': 1.}), BRACE_HAND * 17.8)
+        self.assertAlmostEqual(press_cap(17.8, {'brace_force_N': 5., 'brace_mu': 1.}), BRACE_HAND * 17.8)
+        self.assertAlmostEqual(brace_release(17.8, None), 17.8)
+        self.assertAlmostEqual(brace_release(17.8, {'brace_force_N': 28.6, 'brace_mu': 1.}), 17.8)
+        self.assertAlmostEqual(brace_release(17.8, {'brace_force_N': 10., 'brace_mu': 1.}), BRACE_PUSH * 17.8)
 
     def test_snap_gate_follows_the_bricks_underneath(self):
         z, push = [-.00163], [0.]

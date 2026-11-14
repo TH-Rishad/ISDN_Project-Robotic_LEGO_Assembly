@@ -55,9 +55,17 @@ CORRIDOR_OVERLAP = 0.0015  # m: diag_032 fingers were 1.04-1.16 mm into the corr
 CORRIDOR_PAD = 0.004      # m, insertion-box xy pad without stud resistance (wriggle room)
 CORRIDOR_PAD_STUD = 0.001  # m: diag_029's fingers sat 1.02 mm into the +4 mm box; stud-fit wriggle is 0.1 mm
 FINGER_CLEAR = 0.0012     # m, closed-finger clearance from a placed brick
-FINGER_CLEAR_STUD = 0.0  # m: diag_028 rejected the bridge grip at 0.94 mm of clearance
+FINGER_CLEAR_STUD = -0.0003  # m: diag_028 rejected clearance 0.94 mm; 0.0 then rejected the
+                    # planned 0.7854 rad bridge grip at -0.27 mm into B_b_010 (opening 8.09 mm)
+                    # and the search fell to tilt 1.309, which still broke the bridge at u 1.006
+                    # before push-through (dual_studfit_diag_036). Allow 0.3 mm sphere overlap.
 TOUCH = 0.002       # m: tips this close above the held brick's stud tops count as on them (contact
                     # measured 0.05-0.15 mm above nominal in dual_studfit_diag_008)
+BRACE_HAND = 1.05   # brace-limited hand / needed: diag_035 needed hand ~80 N to measure a 71.5 N
+                    # weld peak (eff ~0.89); 1.05 is a small overshoot so the weld can reach needed
+                    # without returning to the 1.3 margin that hit u 1.043
+BRACE_PUSH = 0.98   # brace-limited release fraction of needed: raw u samples raced the weld peak
+                    # at u 1.006 while hand stayed at needed (dual_studfit_diag_036)
 
 
 def bridge_bricks(P, brick, placed):
@@ -164,8 +172,9 @@ def finger_blocked(gap, stud_fit):
 
     The 1.2 mm pad rejected the planned bridge grip at 0.94 mm from the pier
     and the search then had no grip that still held the bridge
-    (dual_studfit_diag_028). Stud-fit rejects only an overlap. The sphere
-    radius is already in the gap."""
+    (dual_studfit_diag_028). Stud-fit allows a small sphere overlap so the
+    planned low-tilt bridge grip is not discarded for a 0.27 mm probe hit
+    (dual_studfit_diag_036). The sphere radius is already in the gap."""
     if stud_fit:
         return gap < FINGER_CLEAR_STUD
     return gap < FINGER_CLEAR
@@ -289,14 +298,29 @@ def press_cap(needed_n, brace):
     The 1.3 margin stays only while the support's pad friction (mu * 2 * grip)
     can take the whole press. A partial margin (hold between needed and full)
     still loads the joint: diag_035 pressed to 80 N on a 71 N crown and broke
-    B_b_014 on B_b_012 at u 1.043. Then press only the insertion force.
-    Never below that, or the studs do not release. No brace: full margin."""
+    B_b_014 on B_b_012 at u 1.043. Brace-limited presses use BRACE_HAND x
+    needed so the weld peak can still reach the insertion force (hand→weld
+    eff ~0.89 in diag_035) without restoring the full margin. No brace: full
+    margin."""
     full = MARGIN * needed_n
     if not brace or not brace.get('brace_force_N'):
         return full
     hold = float(brace.get('brace_mu', 1.0)) * 2.0 * float(brace['brace_force_N'])
     if hold + 1e-9 >= full:
         return full
+    return BRACE_HAND * needed_n
+
+
+def brace_release(needed_n, brace):
+    """Weld push that frees a stud-fit hold, N.
+
+    Brace-limited presses race raw JointBreaker samples (diag_036: u 1.006
+    before push hit needed). Release a little under needed then; unbraced
+    keeps the full insertion force."""
+    if brace and brace.get('brace_force_N'):
+        hold = float(brace.get('brace_mu', 1.0)) * 2.0 * float(brace['brace_force_N'])
+        if hold + 1e-9 < MARGIN * needed_n:
+            return BRACE_PUSH * needed_n
     return needed_n
 
 
@@ -462,13 +486,18 @@ class StudFit:
         push = sum(float(self.D.brick_wrench(self.cell.solver, self.cell.model, w[0], rows[w[0]],
                                              self.cell.body[bid])[0][2]) for w in welds)
         self.peak[bid] = max(self.peak[bid], push)
-        if push >= force_needed:
+        if push >= self._release(bid, force_needed):
             self.release(bid, 'pushed_through')
 
-    def _cap(self, bid):
+    def _brace(self, bid):
         step = self._step(bid)
-        brace = step.get('brace') if step and step.get('requires_brace') else None
-        return press_cap(self.held[bid][1], brace)
+        return step.get('brace') if step and step.get('requires_brace') else None
+
+    def _cap(self, bid):
+        return press_cap(self.held[bid][1], self._brace(bid))
+
+    def _release(self, bid, force_needed):
+        return brace_release(force_needed, self._brace(bid))
 
     def _step(self, bid):
         for view in self.cell.views.values():
