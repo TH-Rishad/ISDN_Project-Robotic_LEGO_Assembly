@@ -61,9 +61,10 @@ FINGER_CLEAR_STUD = -0.00065  # m: diag_028 rejected clearance 0.94 mm; 0.0/-0.3
                     # bridge. Allow 0.65 mm sphere overlap so that low-tilt grip can run.
 TOUCH = 0.002       # m: tips this close above the held brick's stud tops count as on them (contact
                     # measured 0.05-0.15 mm above nominal in dual_studfit_diag_008)
-BRACE_HAND = 0.85   # supported hand / needed. diag_042 pushed through at 57 N / hand 64 N
-                    # but still broke first at u 1.005; one more cut under the threshold.
-BRACE_PUSH = 0.75   # supported release fraction of needed (diag_042 still lost the race at 0.80)
+BRACE_HAND = 0.88   # supported hand / needed. diag_043 released mid-ramp (hand 45 N) then the
+                    # seat snap spiked the bridge to u 3.22; keep through early but with more
+                    # hand still on for the slide.
+BRACE_PUSH = 0.80   # supported release fraction of needed
 BRACE_RAMP = 2.0    # s: slower supported press
 
 
@@ -340,6 +341,7 @@ class StudFit:
         self.applied = {}    # bid -> largest hand press force applied, N
         self.wrench = np.zeros((2, 6))
         self.stiff = [1., 1.]
+        self._breaker_off = False
         model = getattr(cell, 'model', None)
         self.gains = None if model is None or not hasattr(model, 'joint_target_ke') else (
             model.joint_target_ke.numpy().copy(), model.joint_target_kd.numpy().copy())
@@ -347,6 +349,23 @@ class StudFit:
             view.snap = self._wrap_snap(view.snap)
             if callable(getattr(view, 'gate', None)):
                 view.gate = self._wrap_gate(view, view.gate)
+
+    def _pause_breaker_while_seating(self):
+        """Hold JointBreaker off during the guided stud→seat snap.
+
+        diag_043 pushed the crown through under a soft supported press, then the
+        instant seat weld jump spiked B_b_014 on B_b_012 to u 3.22. The support
+        still holds the bridge for SETTLE; clutch welds take over at snap."""
+        br = getattr(self.cell, 'breaker', None)
+        if br is None:
+            return
+        if self.seating:
+            if br.enabled:
+                br.enabled = False
+                self._breaker_off = True
+        elif self._breaker_off:
+            br.enabled = True
+            self._breaker_off = False
 
     def _wrap_snap(self, snap):
         def wrapped(s):
@@ -356,10 +375,12 @@ class StudFit:
             if bid in self.seating:
                 welds, _ = self.seating.pop(bid)
                 self._set([(w, w[2]) for w in welds], False)   # the gate's clutch welds take over
+            self._pause_breaker_while_seating()
             return snap(s)
         return wrapped
 
     def update(self):
+        self._pause_breaker_while_seating()
         cell, q = self.cell, self.cell.state_0.body_q.numpy()
         wrench = np.zeros((2, 6))
         for view in cell.views.values():
@@ -556,6 +577,7 @@ class StudFit:
         if outcome == 'pushed_through':
             self._set(self.seat[bid], True)
             self.seating[bid] = (welds, self.cell.sim_time)
+            self._pause_breaker_while_seating()
         else:
             self._set([(w, w[2]) for w in welds], False)
         self.log(bid, outcome, peak_N=round(self.peak[bid], 1), needed_N=round(force_needed, 1),
