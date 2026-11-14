@@ -43,6 +43,15 @@ class BraceSearchTest(unittest.TestCase):
             wider = list(candidates(ex, step['step'], step['brace'], SimpleNamespace(P=P)))
             self.assertGreater(wider[1]['brace_pose'][1], high[1]['brace_pose'][1])
             self.assertAlmostEqual(abs(wider[1]['brace_tilt_rotvec'][0]), np.deg2rad(75), places=4)
+            # --stud-fit order: after the planned 45 deg grip, prefer other 45/60
+            # poses before a 75 deg lean that aims into the insertion corridor.
+            ex.brace_leans = (45., 60., 75.)
+            ex.brace_high_first = False
+            mild = list(candidates(ex, step['step'], step['brace'], SimpleNamespace(P=P), limit=6))
+            tilts = [abs(p['brace_tilt_rotvec'][0]) for p in mild[1:]]
+            self.assertTrue(any(abs(t - np.deg2rad(45)) < 1e-3 for t in tilts[:3])
+                            or any(abs(t - np.deg2rad(60)) < 1e-3 for t in tilts[:3]))
+            self.assertTrue(all(t <= np.deg2rad(60) + 1e-3 for t in tilts[:2]))
             for pick in wider:
                 self.assertLessEqual(pick['predicted_util_braced'], step['brace']['predicted_util_braced'] + 1e-4)
             ex.A = SimpleNamespace(base=((-0.45, 0., 0.), 0.))

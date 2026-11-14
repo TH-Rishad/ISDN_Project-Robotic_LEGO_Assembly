@@ -523,6 +523,13 @@ class DualExample(D.Example):
             self.stud_fit = StudFit(self, D, self.out / 'stud_fit.json')
             for view in self.views.values():
                 view.brace_near_first = True
+                # Default (75,60,45)+high_first jumps to a 75 deg lean when the
+                # planned 45 deg bridge grip clips a neighbour (diag_047 step 15:
+                # B_b_010 by 0.91 mm). At 75 deg the tool aims almost +Y into the
+                # crown corridor; helper fingers then hit B_b_015 during insert.
+                # Mild lean and pose-near height first; keep required_bridge.
+                view.brace_leans = (45., 60., 75.)
+                view.brace_high_first = False
             # The run's support search uses the plan's keep-out (stud_fit.planning).
             import bracing
             from Kean.motion.stud_fit import HAND_KEEP_OUT

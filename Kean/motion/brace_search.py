@@ -52,10 +52,12 @@ def candidates(ex, n, original, D, limit=8):
     yield deepcopy(original)
     seen = {tuple(np.round(pose + original['brace_tilt_rotvec'], 5))}
     count = 1
-    # Try 45/60/75 degrees at each column's nearest height before moving
-    # to another height, interleaving columns within each tilt round.
+    # Try leans at each column's nearest height before moving to another
+    # height, interleaving columns within each tilt round.
     # Opposite lean / early yaw-flip of the original burned the budget and
     # pushed step 14 off the planned grip (dual_studfit_diag_038/039).
+    # Stud-fit sets brace_leans=(45,60,75): after a blocked 45 deg plan,
+    # 75-first aimed fingers into the crown (dual_studfit_diag_047).
     width = max(1, len(columns))
     schedule = [(y, z, lean) for i in range(0, len(positions), width)
                 for lean in getattr(ex, 'brace_leans', (45., 60., 75.)) for y, z in positions[i:i + width]]
