@@ -46,7 +46,7 @@ class BraceSearchTest(unittest.TestCase):
             # --stud-fit order: after the planned 45 deg grip, prefer other 45/60
             # poses before a 75 deg lean that aims into the insertion corridor.
             ex.brace_leans = (45., 60., 75.)
-            ex.brace_high_first = False
+            ex.brace_high_first = True
             mild = list(candidates(ex, step['step'], step['brace'], SimpleNamespace(P=P), limit=6))
             tilts = [abs(p['brace_tilt_rotvec'][0]) for p in mild[1:]]
             self.assertTrue(any(abs(t - np.deg2rad(45)) < 1e-3 for t in tilts[:3])
