@@ -61,10 +61,9 @@ FINGER_CLEAR_STUD = -0.00065  # m: diag_028 rejected clearance 0.94 mm; 0.0/-0.3
                     # bridge. Allow 0.65 mm sphere overlap so that low-tilt grip can run.
 TOUCH = 0.002       # m: tips this close above the held brick's stud tops count as on them (contact
                     # measured 0.05-0.15 mm above nominal in dual_studfit_diag_008)
-BRACE_HAND = 0.90   # supported hand / needed. diag_041 released the crown (peak 60.7 N) but
-                    # still broke first at u 1.010 under ~69 N hand; drop peak ~10%.
-BRACE_PUSH = 0.80   # supported release fraction of needed so push-through precedes the
-                    # two-sample JointBreaker race (diag_041 broke then pushed through)
+BRACE_HAND = 0.85   # supported hand / needed. diag_042 pushed through at 57 N / hand 64 N
+                    # but still broke first at u 1.005; one more cut under the threshold.
+BRACE_PUSH = 0.75   # supported release fraction of needed (diag_042 still lost the race at 0.80)
 BRACE_RAMP = 2.0    # s: slower supported press
 
 
