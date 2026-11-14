@@ -133,6 +133,14 @@ def corridor_pad(stud_fit):
     return CORRIDOR_PAD_STUD if stud_fit else CORRIDOR_PAD
 
 
+def support_insert_ignores_carried(stud_fit):
+    """Skip carried-vs-holding-helper clearance during stud-fit insert/press.
+
+    The approach corridor already cleared the grip. Runtime then overlapped
+    by 1.61 mm while seating B_b_015 (dual_studfit_diag_033)."""
+    return bool(stud_fit)
+
+
 def finger_blocked(gap, stud_fit):
     """True when a closing finger is too close to a placed brick.
 

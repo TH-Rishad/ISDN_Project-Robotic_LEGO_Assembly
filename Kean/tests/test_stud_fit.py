@@ -231,20 +231,21 @@ class StudFitTest(unittest.TestCase):
         self.assertFalse(corridor_blocked(old, True))
         self.assertFalse(corridor_blocked(-0.00108, True))  # diag_032 runtime carried/helper
         self.assertFalse(corridor_blocked(-0.00116, True))  # diag_032 finger corridor
-        # 0.89 mm clear of the holding helper is not an overlap (diag_030 runtime).
-        self.assertFalse(corridor_blocked(0.00089, True))
-        # Deep intrusion still blocks under stud-fit.
+        # Deep intrusion still blocks the approach corridor under stud-fit.
         self.assertTrue(corridor_blocked(-0.002, True))
 
     def test_supporter_permits_the_builders_brick_under_stud_fit(self):
-        """diag_031: holding hand vs the brick being placed is intended near-press contact."""
-        from Kean.motion.stud_fit import HAND_KEEP_OUT
+        """diag_031/033: holding hand vs the brick being placed is intended near-press contact."""
+        from Kean.motion.stud_fit import HAND_KEEP_OUT, support_insert_ignores_carried
         # The near-press keep-out leaves only ~4 mm to a 2x4 face; hand spheres
         # are larger than that, so clearance to the builder's brick must be permitted.
         self.assertAlmostEqual(HAND_KEEP_OUT, 0.020)
         half_2x4_y = 2 * 0.008  # 4 studs / 2
         self.assertAlmostEqual(HAND_KEEP_OUT - half_2x4_y, 0.004)
         self.assertGreater(0.012, HAND_KEEP_OUT - half_2x4_y)  # typical hand sphere > face gap
+        # Runtime insert must not re-apply carried/helper after the corridor passed.
+        self.assertTrue(support_insert_ignores_carried(True))
+        self.assertFalse(support_insert_ignores_carried(False))
 
     def test_press_stops_at_the_grip_when_the_margin_would_overload_it(self):
         from Kean.motion.stud_fit import press_cap

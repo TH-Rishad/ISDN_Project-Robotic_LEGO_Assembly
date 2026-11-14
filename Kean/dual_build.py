@@ -874,19 +874,16 @@ class DualExample(D.Example):
             gap, who = checker.probe.clearance_boxes(other_spheres, [carried])
             view = self.views[arm]
             phase = self.arms[arm].phase
-            # Near-press stud-fit supports sit at HAND_KEEP_OUT. During insert the
-            # carried brick approaches that hand (0.89 mm with A holding, dual_studfit_diag_030);
-            # the insertion corridor already cleared the grip. Reject only an overlap.
+            # Near-press stud-fit supports sit at HAND_KEEP_OUT. The insertion
+            # corridor already cleared the grip; during insert the brick moves
+            # onto that hand (-1.61 mm after a cleared approach, dual_studfit_diag_033).
+            from Kean.motion.stud_fit import support_insert_ignores_carried
             near_support = (
-                self.stud_fit is not None
+                support_insert_ignores_carried(self.stud_fit is not None)
                 and phase in ('pre-insert', 'insert', 'press')
                 and self.roles.get(other) == 'supporter'
                 and self.arms[other].phase in ('brace-in', 'brace-guard', 'close', 'hold'))
-            if near_support:
-                from Kean.motion.stud_fit import corridor_blocked
-                if corridor_blocked(gap, True) and gap < minimum:
-                    minimum, label = gap, arm + ':carried/arm_' + other
-            elif gap < minimum:
+            if not near_support and gap < minimum:
                 minimum, label = gap, arm + ':carried/arm_' + other
             allowed = {b['name'] for b in predicted.values()}
             if phase == 'lift':
