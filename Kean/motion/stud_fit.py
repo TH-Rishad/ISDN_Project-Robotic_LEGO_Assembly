@@ -61,11 +61,11 @@ FINGER_CLEAR_STUD = -0.00065  # m: diag_028 rejected clearance 0.94 mm; 0.0/-0.3
                     # bridge. Allow 0.65 mm sphere overlap so that low-tilt grip can run.
 TOUCH = 0.002       # m: tips this close above the held brick's stud tops count as on them (contact
                     # measured 0.05-0.15 mm above nominal in dual_studfit_diag_008)
-BRACE_HAND = 1.05   # brace-limited hand / needed: diag_035 needed hand ~80 N to measure a 71.5 N
-                    # weld peak (eff ~0.89); 1.05 is a small overshoot so the weld can reach needed
-                    # without returning to the 1.3 margin that hit u 1.043
-BRACE_PUSH = 0.98   # brace-limited release fraction of needed: raw u samples raced the weld peak
-                    # at u 1.006 while hand stayed at needed (dual_studfit_diag_036)
+BRACE_HAND = 1.02   # supported hand / needed. Planner util was 0 for step 15 but the cell
+                    # still broke near needed (diag_036/037); keep a tiny overshoot only.
+BRACE_PUSH = 0.95   # supported release fraction of needed so push-through wins the race
+                    # against raw JointBreaker samples (diag_037: break at u 1.016 then through)
+BRACE_RAMP = 1.5    # s: slower supported press; RAMP alone spiked the bridge (diag_037)
 
 
 def bridge_bricks(P, brick, placed):
@@ -295,33 +295,30 @@ def press_offset(grasp, brick, bricks, footprint, pitch):
 def press_cap(needed_n, brace):
     """Hand force the ramp may reach, N.
 
-    The 1.3 margin stays only while the support's pad friction (mu * 2 * grip)
-    can take the whole press. A partial margin (hold between needed and full)
-    still loads the joint: diag_035 pressed to 80 N on a 71 N crown and broke
-    B_b_014 on B_b_012 at u 1.043. Brace-limited presses use BRACE_HAND x
-    needed so the weld peak can still reach the insertion force (hand→weld
-    eff ~0.89 in diag_035) without restoring the full margin. No brace: full
+    Any support press stays near needed (BRACE_HAND), not the 1.3 margin: the
+    grasp LP rated S3 step 15 at util 0 braced, yet 1.3x and even partial
+    margin still broke B_b_014 on B_b_012 (diag_035-037). No brace: full
     margin."""
-    full = MARGIN * needed_n
-    if not brace or not brace.get('brace_force_N'):
-        return full
-    hold = float(brace.get('brace_mu', 1.0)) * 2.0 * float(brace['brace_force_N'])
-    if hold + 1e-9 >= full:
-        return full
-    return BRACE_HAND * needed_n
+    if brace and brace.get('brace_force_N'):
+        return BRACE_HAND * needed_n
+    return MARGIN * needed_n
 
 
 def brace_release(needed_n, brace):
     """Weld push that frees a stud-fit hold, N.
 
-    Brace-limited presses race raw JointBreaker samples (diag_036: u 1.006
-    before push hit needed). Release a little under needed then; unbraced
-    keeps the full insertion force."""
+    Supported presses release under needed so push-through wins against raw
+    JointBreaker samples (diag_037). Unbraced keeps the full insertion force."""
     if brace and brace.get('brace_force_N'):
-        hold = float(brace.get('brace_mu', 1.0)) * 2.0 * float(brace['brace_force_N'])
-        if hold + 1e-9 < MARGIN * needed_n:
-            return BRACE_PUSH * needed_n
+        return BRACE_PUSH * needed_n
     return needed_n
+
+
+def press_ramp(brace):
+    """Seconds to full press. Supported presses rise slower (BRACE_RAMP)."""
+    if brace and brace.get('brace_force_N'):
+        return BRACE_RAMP
+    return RAMP
 
 
 def needed(step, brick, footprint):
@@ -441,7 +438,7 @@ class StudFit:
         if not tips_on or not (arm.cur or {}).get('contact'):
             return 0.
         t0 = self.press_t.setdefault(bid, self.cell.sim_time)
-        force = min(1., (self.cell.sim_time - t0) / RAMP) * self._cap(bid)
+        force = min(1., (self.cell.sim_time - t0) / press_ramp(self._brace(bid))) * self._cap(bid)
         self.applied[bid] = max(self.applied.get(bid, 0.), force)
         return force
 

@@ -523,10 +523,6 @@ class DualExample(D.Example):
             self.stud_fit = StudFit(self, D, self.out / 'stud_fit.json')
             for view in self.views.values():
                 view.brace_near_first = True
-                # Prefer planned 45 deg, then the steep tilt that cleared step 13
-                # before (1.309 rad). Mid 60 deg after. Avoid burning the budget
-                # on every 45 deg lateral (dual_studfit_diag_038 exhausted).
-                view.brace_leans = (45., 75., 60.)
             # The run's support search uses the plan's keep-out (stud_fit.planning).
             import bracing
             from Kean.motion.stud_fit import HAND_KEEP_OUT

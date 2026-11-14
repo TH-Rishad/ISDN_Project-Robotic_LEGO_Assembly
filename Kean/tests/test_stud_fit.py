@@ -258,15 +258,15 @@ class StudFitTest(unittest.TestCase):
         self.assertFalse(near_support_press({'A': 'builder', 'B': 'builder'}, arms))
 
     def test_press_stops_at_the_grip_when_the_margin_would_overload_it(self):
-        from Kean.motion.stud_fit import BRACE_HAND, BRACE_PUSH, brace_release, press_cap
+        from Kean.motion.stud_fit import BRACE_HAND, BRACE_PUSH, BRACE_RAMP, brace_release, press_cap, press_ramp
         self.assertAlmostEqual(press_cap(17.8, None), 1.3 * 17.8)
-        self.assertAlmostEqual(press_cap(17.8, {'brace_force_N': 28.6, 'brace_mu': 1.}), 1.3 * 17.8)
-        # Pads hold between needed and the 1.3 margin: small hand overshoot, not full margin.
+        # Any support press stays near needed; planner util 0 still broke the bridge.
+        self.assertAlmostEqual(press_cap(17.8, {'brace_force_N': 28.6, 'brace_mu': 1.}), BRACE_HAND * 17.8)
         self.assertAlmostEqual(press_cap(17.8, {'brace_force_N': 10., 'brace_mu': 1.}), BRACE_HAND * 17.8)
-        self.assertAlmostEqual(press_cap(17.8, {'brace_force_N': 5., 'brace_mu': 1.}), BRACE_HAND * 17.8)
         self.assertAlmostEqual(brace_release(17.8, None), 17.8)
-        self.assertAlmostEqual(brace_release(17.8, {'brace_force_N': 28.6, 'brace_mu': 1.}), 17.8)
         self.assertAlmostEqual(brace_release(17.8, {'brace_force_N': 10., 'brace_mu': 1.}), BRACE_PUSH * 17.8)
+        self.assertEqual(press_ramp(None), 0.5)
+        self.assertEqual(press_ramp({'brace_force_N': 10.}), BRACE_RAMP)
 
     def test_snap_gate_follows_the_bricks_underneath(self):
         z, push = [-.00163], [0.]

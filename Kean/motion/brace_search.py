@@ -49,52 +49,13 @@ def candidates(ex, n, original, D, limit=8):
     if getattr(ex, 'brace_near_first', False):
         from Kean.motion.stud_fit import required_bridge
         keep_bridge = required_bridge(P, brick, placed, original.get('gripped_bricks'))
-    def yaw_flip(pick):
-        # Parallel jaws can grip along the same axis with the wrist turned 180
-        # degrees. The nearer wrist choice can be unreachable for a strongly
-        # tilted helper, so test the other orientation too.
-        alternate = deepcopy(pick)
-        ax = pick.get('brace_axis') or [1., 0., 0.]
-        yaw = np.arctan2(ax[0], ax[1])
-        base = ex.A.base[1]
-        alternate['helper_yaw'] = float(base + resolve_wrap(D)(yaw - base, np.pi) + np.pi)
-        return alternate
-
+    yield deepcopy(original)
     seen = {tuple(np.round(pose + original['brace_tilt_rotvec'], 5))}
     count = 1
-    yield deepcopy(original)
-    # Planned grip: other wrist yaw, then opposite lean (other approach side).
-    # diag_037 never ran these for the original; diag_038 tried opposite lean on
-    # every lateral and exhausted the budget at step 13 before tilt 1.309.
-    if getattr(ex, 'brace_yaw_alternatives', False):
-        yield yaw_flip(original)
-        count += 1
-        if count >= limit:
-            return
-    if keep_bridge:
-        tilt0 = float(original['brace_tilt_rotvec'][0])
-        lean0 = abs(np.degrees(tilt0)) or 45.
-        sign0 = np.sign(tilt0) or 1.
-        opp = bracing.brace_at(brick, placed, pose[1], pose[2], -sign0 * lean0,
-                               grip_N=original['brace_force_N'], mu=original.get('brace_mu', 1.),
-                               strategy=original.get('strategy', 'weakest_joint'))
-        if (opp.get('feasible')
-                and opp['predicted_util_braced'] <= original['predicted_util_braced'] + 1e-4
-                and keep_bridge <= set(opp.get('gripped_bricks') or [])):
-            key = tuple(np.round(opp['brace_pose'] + opp['brace_tilt_rotvec'], 5))
-            if key not in seen:
-                seen.add(key)
-                yield opp
-                count += 1
-                if count >= limit:
-                    return
-                if getattr(ex, 'brace_yaw_alternatives', False):
-                    yield yaw_flip(opp)
-                    count += 1
-                    if count >= limit:
-                        return
-    # Try leans at each column's nearest height before moving to another height,
-    # interleaving columns within each tilt round. Same-sign lean only here.
+    # Try 45/60/75 degrees at each column's nearest height before moving
+    # to another height, interleaving columns within each tilt round.
+    # Opposite lean / early yaw-flip of the original burned the budget and
+    # pushed step 14 off the planned grip (dual_studfit_diag_038/039).
     width = max(1, len(columns))
     schedule = [(y, z, lean) for i in range(0, len(positions), width)
                 for lean in getattr(ex, 'brace_leans', (45., 60., 75.)) for y, z in positions[i:i + width]]
@@ -120,10 +81,16 @@ def candidates(ex, n, original, D, limit=8):
         count += 1
         if count >= limit:
             return
-        # Per-pick yaw flips are useful, but on bridge searches they burned the
-        # 32-trial budget before the working steep tilt (dual_studfit_diag_038).
-        if getattr(ex, 'brace_yaw_alternatives', False) and not keep_bridge:
-            yield yaw_flip(pick)
+        if getattr(ex, 'brace_yaw_alternatives', False):
+            # Parallel jaws can grip along the same axis with the wrist
+            # turned 180 degrees. The nearer wrist choice can be unreachable
+            # for a strongly tilted helper, so test the other orientation too.
+            alternate = deepcopy(pick)
+            ax = pick.get('brace_axis') or [1., 0., 0.]
+            yaw = np.arctan2(ax[0], ax[1])
+            base = ex.A.base[1]
+            alternate['helper_yaw'] = float(base + resolve_wrap(D)(yaw - base, np.pi) + np.pi)
+            yield alternate
             count += 1
             if count >= limit:
                 return
