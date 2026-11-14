@@ -269,13 +269,15 @@ class StudFitTest(unittest.TestCase):
         self.assertEqual(press_ramp({'brace_force_N': 10.}), BRACE_RAMP)
 
     def test_joint_breaker_pauses_for_a_braced_stud_fit_press(self):
-        """diag_043-045: pause through hold, seat, and a post-snap grace."""
+        """diag_043-046: pause through hold, seat, post-snap, and support release."""
         from Kean.motion.stud_fit import POST_SNAP
         z, push = [.0017], [0.]
         c, view, step, _ = cell(z, push)
         step['requires_brace'] = True
         step['brace'] = {'brace_force_N': 20.}
-        c.breaker = NS(enabled=True)
+        c.breaker = NS(enabled=True, count={}, u_prev={})
+        c.roles = {'A': 'supporter', 'B': 'builder'}
+        c.arms = {'A': NS(phase='hold'), 'B': NS(phase='press')}
         fit = StudFit(c, self.D(c, push))
         fit.update()
         self.assertIn('b', fit.held)
@@ -284,9 +286,12 @@ class StudFitTest(unittest.TestCase):
         fit.update()                                   # into seating
         self.assertIn('b', fit.seating)
         self.assertFalse(c.breaker.enabled)
-        view.snap(step)                                # clutch handoff + post-snap grace
+        view.snap(step)                                # clutch handoff
         self.assertFalse(c.breaker.enabled)
-        c.sim_time = fit._breaker_until + 0.01
+        c.sim_time = fit._breaker_until + 0.01         # grace done, support still holding
+        fit.update()
+        self.assertFalse(c.breaker.enabled)
+        c.arms['A'].phase = 'park'                     # helper released
         fit.update()
         self.assertTrue(c.breaker.enabled)
         self.assertGreater(POST_SNAP, 0.)
