@@ -523,10 +523,10 @@ class DualExample(D.Example):
             self.stud_fit = StudFit(self, D, self.out / 'stud_fit.json')
             for view in self.views.values():
                 view.brace_near_first = True
-                # Prefer the planned low-tilt bridge grip. High-first (75/60/45)
-                # accepted tilt 1.309 right after rejecting 0.7854 and still
-                # broke B_b_014 on B_b_012 (dual_studfit_diag_037).
-                view.brace_leans = (45., 60., 75.)
+                # Prefer planned 45 deg, then the steep tilt that cleared step 13
+                # before (1.309 rad). Mid 60 deg after. Avoid burning the budget
+                # on every 45 deg lateral (dual_studfit_diag_038 exhausted).
+                view.brace_leans = (45., 75., 60.)
             # The run's support search uses the plan's keep-out (stud_fit.planning).
             import bracing
             from Kean.motion.stud_fit import HAND_KEEP_OUT

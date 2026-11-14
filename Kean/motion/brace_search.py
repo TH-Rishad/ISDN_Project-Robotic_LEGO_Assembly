@@ -60,53 +60,73 @@ def candidates(ex, n, original, D, limit=8):
         alternate['helper_yaw'] = float(base + resolve_wrap(D)(yaw - base, np.pi) + np.pi)
         return alternate
 
-    yield deepcopy(original)
     seen = {tuple(np.round(pose + original['brace_tilt_rotvec'], 5))}
     count = 1
-    # Try the planned grip's other wrist yaw before any steeper lean. diag_037
-    # rejected the 45 deg bridge grip then accepted tilt 1.309 on the next try
-    # and still broke the joint; the yaw flip never ran for the original.
+    yield deepcopy(original)
+    # Planned grip: other wrist yaw, then opposite lean (other approach side).
+    # diag_037 never ran these for the original; diag_038 tried opposite lean on
+    # every lateral and exhausted the budget at step 13 before tilt 1.309.
     if getattr(ex, 'brace_yaw_alternatives', False):
         yield yaw_flip(original)
         count += 1
         if count >= limit:
             return
-    # Try 45/60/75 degrees at each column's nearest height before moving
-    # to another height, interleaving columns within each tilt round.
+    if keep_bridge:
+        tilt0 = float(original['brace_tilt_rotvec'][0])
+        lean0 = abs(np.degrees(tilt0)) or 45.
+        sign0 = np.sign(tilt0) or 1.
+        opp = bracing.brace_at(brick, placed, pose[1], pose[2], -sign0 * lean0,
+                               grip_N=original['brace_force_N'], mu=original.get('brace_mu', 1.),
+                               strategy=original.get('strategy', 'weakest_joint'))
+        if (opp.get('feasible')
+                and opp['predicted_util_braced'] <= original['predicted_util_braced'] + 1e-4
+                and keep_bridge <= set(opp.get('gripped_bricks') or [])):
+            key = tuple(np.round(opp['brace_pose'] + opp['brace_tilt_rotvec'], 5))
+            if key not in seen:
+                seen.add(key)
+                yield opp
+                count += 1
+                if count >= limit:
+                    return
+                if getattr(ex, 'brace_yaw_alternatives', False):
+                    yield yaw_flip(opp)
+                    count += 1
+                    if count >= limit:
+                        return
+    # Try leans at each column's nearest height before moving to another height,
+    # interleaving columns within each tilt round. Same-sign lean only here.
     width = max(1, len(columns))
     schedule = [(y, z, lean) for i in range(0, len(positions), width)
                 for lean in getattr(ex, 'brace_leans', (45., 60., 75.)) for y, z in positions[i:i + width]]
     for y, z, lean in schedule:
         sign = np.sign(bracing.lean_for(brick, y)[0]) or 1
-        # Bridge grips: also try the opposite lean (hand housing on the other
-        # side of the grip axis). Same column, other approach direction.
-        leans = (sign * lean, -sign * lean) if keep_bridge else (sign * lean,)
-        for lean_signed in leans:
-            pick = bracing.brace_at(brick, placed, y, z, lean_signed,
-                                    grip_N=original['brace_force_N'], mu=original.get('brace_mu', 1.),
-                                    strategy=original.get('strategy', 'weakest_joint'))
-            if not pick.get('feasible'):
-                continue
-            # Do not trade the support's load capacity for motion clearance.
-            if pick['predicted_util_braced'] > original['predicted_util_braced'] + 1e-4:
-                continue
-            # --stud-fit: a retry must still hold the upper bridge brick. Keeping only
-            # a lower brick on the same path sent S3 step 15 to the pier (_diag_027).
-            if keep_bridge and not keep_bridge <= set(pick.get('gripped_bricks') or []):
-                continue
-            key = tuple(np.round(pick['brace_pose'] + pick['brace_tilt_rotvec'], 5))
-            if key in seen:
-                continue
-            seen.add(key)
-            yield pick
+        pick = bracing.brace_at(brick, placed, y, z, sign * lean,
+                                grip_N=original['brace_force_N'], mu=original.get('brace_mu', 1.),
+                                strategy=original.get('strategy', 'weakest_joint'))
+        if not pick.get('feasible'):
+            continue
+        # Do not trade the support's load capacity for motion clearance.
+        if pick['predicted_util_braced'] > original['predicted_util_braced'] + 1e-4:
+            continue
+        # --stud-fit: a retry must still hold the upper bridge brick. Keeping only
+        # a lower brick on the same path sent S3 step 15 to the pier (_diag_027).
+        if keep_bridge and not keep_bridge <= set(pick.get('gripped_bricks') or []):
+            continue
+        key = tuple(np.round(pick['brace_pose'] + pick['brace_tilt_rotvec'], 5))
+        if key in seen:
+            continue
+        seen.add(key)
+        yield pick
+        count += 1
+        if count >= limit:
+            return
+        # Per-pick yaw flips are useful, but on bridge searches they burned the
+        # 32-trial budget before the working steep tilt (dual_studfit_diag_038).
+        if getattr(ex, 'brace_yaw_alternatives', False) and not keep_bridge:
+            yield yaw_flip(pick)
             count += 1
             if count >= limit:
                 return
-            if getattr(ex, 'brace_yaw_alternatives', False):
-                yield yaw_flip(pick)
-                count += 1
-                if count >= limit:
-                    return
 
 
 def check_approach(ex, planner, world, carried, D):
