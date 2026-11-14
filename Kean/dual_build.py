@@ -523,17 +523,10 @@ class DualExample(D.Example):
             self.stud_fit = StudFit(self, D, self.out / 'stud_fit.json')
             for view in self.views.values():
                 view.brace_near_first = True
-                # Default (75,60,45) jumps to a 75 deg lean when the planned 45
-                # deg bridge grip clips a neighbour (diag_047 step 15: B_b_010).
-                # At 75 deg the tool aims almost +Y into the crown corridor.
-                # Mild leans + high_first: diag_048 with low-first burned the
-                # budget on 45/60 laterals at z=0.0536 and never reached step
-                # 13's working 75 deg at z=0.0556. Drop yaw doubles so the
-                # first height band still reaches 75 deg inside the limit.
-                view.brace_leans = (45., 60., 75.)
-                view.brace_high_first = True
-                view.brace_yaw_alternatives = False
             # The run's support search uses the plan's keep-out (stud_fit.planning).
+            # Do not reorder leans globally for the crown (diag_048/049): mild-first
+            # exhausted step 13 or accepted a 60 deg grip that then hit B_b_006.
+
             import bracing
             from Kean.motion.stud_fit import HAND_KEEP_OUT
             bracing.HAND_CLEARANCE_Y = HAND_KEEP_OUT
