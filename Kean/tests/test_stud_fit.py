@@ -246,6 +246,14 @@ class StudFitTest(unittest.TestCase):
         # Runtime insert must not re-apply carried/helper after the corridor passed.
         self.assertTrue(support_insert_ignores_carried(True))
         self.assertFalse(support_insert_ignores_carried(False))
+        from Kean.motion.stud_fit import SUPPORT_GRIP, near_support_press, support_motion_floor
+        # 3x grip: pad hold 2*42.9 N covers the 71 N crown that broke the bridge at 2x.
+        self.assertGreaterEqual(2.0 * 14.3 * SUPPORT_GRIP, 71.2)
+        self.assertEqual(support_motion_floor(True), -0.0015)
+        self.assertEqual(support_motion_floor(False), 0.001)
+        arms = {'A': NS(phase='hold'), 'B': NS(phase='press')}
+        self.assertTrue(near_support_press({'A': 'supporter', 'B': 'builder'}, arms))
+        self.assertFalse(near_support_press({'A': 'builder', 'B': 'builder'}, arms))
 
     def test_press_stops_at_the_grip_when_the_margin_would_overload_it(self):
         from Kean.motion.stud_fit import press_cap

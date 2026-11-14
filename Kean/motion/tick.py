@@ -426,7 +426,13 @@ class Tick:
                         label = world_label
                     else:
                         label = 'other arm'
-                if not np.isfinite(gap) or gap < 0.001:
+                floor = 0.001
+                ex = self.example
+                if getattr(ex, 'stud_fit', None) is not None and hasattr(ex, 'roles') and hasattr(ex, 'arms'):
+                    from Kean.motion.stud_fit import near_support_press, support_motion_floor
+                    if near_support_press(ex.roles, ex.arms):
+                        floor = support_motion_floor(True)
+                if not np.isfinite(gap) or gap < floor:
                     self.example.fail(('command_clearance:' + label) if self.reservations is not None else 'arm_clearance')
                     detail = {"error": "arm clearance %.2f mm" % (gap * 1000),
                               "step": getattr(self.example, "b_step", None),

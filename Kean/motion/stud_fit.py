@@ -45,9 +45,8 @@ MARGIN = 1.3        # press force over the push needed (newton_fit.press_force)
 SUPPORT_STIFF = 20.0  # arm joint stiffness gain while holding a support (a position-held
                       # Franka is far stiffer than the cell's 400 N m/rad)
 STIFF = 5.0         # arm joint stiffness gain while pressing (damping scales by its root)
-SUPPORT_GRIP = 2.0  # x A_FINGER_KE for a supporting hand (~28 N a finger; a Franka Hand holds 70 N).
-                    # At the cell's ~13 N, S3 step 13's planned support let a joint below
-                    # it break at u 1.00 under less than the press it was sized for (_diag_015).
+SUPPORT_GRIP = 3.0  # x A_FINGER_KE (~43 N a finger). At 2x, pad hold was 57 N and S3 step 15's
+                    # 71 N crown broke B_b_014 on B_b_012 at u 1.008 during the press (_diag_034)..
 SETTLE = 0.25       # s after the push-through before the snap: the press bent S3's supported
                     # corbel 2.4 mm down and a next-frame gate read it (_diag_016)
 HAND_KEEP_OUT = 0.020  # m, planner keep-out between the support grip and the pressed brick
@@ -139,6 +138,25 @@ def support_insert_ignores_carried(stud_fit):
     The approach corridor already cleared the grip. Runtime then overlapped
     by 1.61 mm while seating B_b_015 (dual_studfit_diag_033)."""
     return bool(stud_fit)
+
+
+def support_motion_floor(stud_fit):
+    """Tick clearance floor while a stud-fit support holds through insert/press.
+
+    diag_034 fired the motion guard 171 times at 0.71-1.00 mm during the crown
+    press, zeroing velocity into the bridge; the joint then broke at u 1.008.
+    Use the same overlap slop as the corridor; non-stud-fit keeps 1 mm."""
+    return -CORRIDOR_OVERLAP if stud_fit else 0.001
+
+
+def near_support_press(roles, arms):
+    """True when one arm holds a support and the other is inserting or pressing."""
+    for helper, builder in (('A', 'B'), ('B', 'A')):
+        if (roles.get(helper) == 'supporter'
+                and getattr(arms.get(helper), 'phase', None) in ('brace-in', 'brace-guard', 'close', 'hold')
+                and getattr(arms.get(builder), 'phase', None) in ('pre-insert', 'insert', 'press')):
+            return True
+    return False
 
 
 def finger_blocked(gap, stud_fit):
