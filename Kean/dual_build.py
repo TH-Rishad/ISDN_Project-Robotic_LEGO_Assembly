@@ -819,15 +819,22 @@ class DualExample(D.Example):
             if self.stud_fit is not None:
                 from Kean.motion.stud_fit import STUD_FIT_MATING
                 stud_h = STUD_FIT_MATING  # interference hold seats slightly past STUD_H (diag_051)
-            if stud_mating(self.arms[arm].phase, lower, monitor.supports.get(bid, ()),
-                           depth, st, tt, z, D.P.BRICK_H, stud_h, D.ex.COLLIDER_INSET,
-                           contact_local=local, dims=self.dims[lower]):
+            mates = monitor.supports.get(bid, ())
+            phase = self.arms[arm].phase
+            if stud_mating(phase, lower, mates, depth, st, tt, z, D.P.BRICK_H, stud_h,
+                           D.ex.COLLIDER_INSET, contact_local=local, dims=self.dims[lower]):
                 evidence = dict(upper=bid, lower=lower, stud_shape=int(stud),
                                 upper_shape=int(top), stud_type=st, upper_type=tt, stud_local_z=z)
                 if local is not None:
                     evidence.update(contact_frame=int(self.frame), contact_world=np.asarray(point).tolist(),
                                     contact_local=local.tolist(), lower_dims=list(self.dims[lower]))
                 return 'stud_mating', evidence
+            # Stud-fit press also rubs the shell beside the studs. Those deep
+            # contacts were logged as penetration next to valid stud_mating on
+            # the same pairs (diag_052); score them as neighbour_rub instead.
+            if (self.stud_fit is not None and phase in ('insert', 'release', 'press')
+                    and (lower in mates or lower in self.neighbours_of(bid))):
+                return 'neighbour_rub', None
         return 'penetration', None
 
     def command_clearance(self, checker, joints, spheres=None):
