@@ -213,7 +213,8 @@ class StudFitTest(unittest.TestCase):
         self.assertFalse(finger_blocked(-0.00027, True))  # diag_036 preferred bridge grip
         self.assertFalse(finger_blocked(-0.00059, True))  # diag_037 preferred bridge grip
         self.assertFalse(finger_blocked(-0.00091, True))  # diag_047/048 planned 45 deg bridge
-        self.assertTrue(finger_blocked(-0.0011, True))
+        self.assertFalse(finger_blocked(-0.00123, True))  # diag_050 sweep sample
+        self.assertTrue(finger_blocked(-0.0013, True))
         self.assertTrue(finger_blocked(0.00094, False))
 
     def test_corridor_names_the_body_and_shrinks_the_stud_fit_pad(self):
@@ -249,6 +250,17 @@ class StudFitTest(unittest.TestCase):
         # Runtime insert must not re-apply carried/helper after the corridor passed.
         self.assertTrue(support_insert_ignores_carried(True))
         self.assertFalse(support_insert_ignores_carried(False))
+        # Contact monitor must match command_clearance (diag_047/050 unintended).
+        from Kean.motion.stud_fit import helper_brace_finger_ok
+        gripped = ['B_b_012', 'B_b_014']
+        self.assertTrue(helper_brace_finger_ok(
+            {'A_finger', 'brick:B_b_015'}, 'A', gripped, 'B_b_015', True))
+        self.assertTrue(helper_brace_finger_ok(
+            {'A_finger', 'brick:B_b_014'}, 'A', gripped, 'B_b_015', True))
+        self.assertFalse(helper_brace_finger_ok(
+            {'A_finger', 'brick:B_b_010'}, 'A', gripped, 'B_b_015', True))
+        self.assertFalse(helper_brace_finger_ok(
+            {'A_finger', 'brick:B_b_015'}, 'A', gripped, 'B_b_015', False))
         from Kean.motion.stud_fit import SUPPORT_GRIP, near_support_press, support_motion_floor
         # 3x grip: pad hold 2*42.9 N covers the 71 N crown that broke the bridge at 2x.
         self.assertGreaterEqual(2.0 * 14.3 * SUPPORT_GRIP, 71.2)

@@ -57,10 +57,9 @@ CORRIDOR_OVERLAP = 0.0015  # m: diag_032 fingers were 1.04-1.16 mm into the corr
 CORRIDOR_PAD = 0.004      # m, insertion-box xy pad without stud resistance (wriggle room)
 CORRIDOR_PAD_STUD = 0.001  # m: diag_029's fingers sat 1.02 mm into the +4 mm box; stud-fit wriggle is 0.1 mm
 FINGER_CLEAR = 0.0012     # m, closed-finger clearance from a placed brick
-FINGER_CLEAR_STUD = -0.0010  # m: diag_028 rejected 0.94 mm; _036/_037 needed 0.65 mm for the
-                    # planned 45 deg bridge. Step 13/15 still reject that grip at -0.91 mm
-                    # and fall to 75 deg, which aims fingers into the crown (diag_047) or
-                    # burns the search (diag_048/049). Allow 1.0 mm so the low-tilt plan runs.
+FINGER_CLEAR_STUD = -0.00125  # m: diag_050's planned 45 deg bridge still failed at -1.23 mm
+                    # (opening 7.14 mm) and fell to 75 deg into the crown. Allow 1.25 mm so
+                    # that low-tilt plan runs; deeper than that still blocks.
 TOUCH = 0.002       # m: tips this close above the held brick's stud tops count as on them (contact
                     # measured 0.05-0.15 mm above nominal in dual_studfit_diag_008)
 BRACE_HAND = 0.90   # supported hand / needed
@@ -178,6 +177,18 @@ def finger_blocked(gap, stud_fit):
     if stud_fit:
         return gap < FINGER_CLEAR_STUD
     return gap < FINGER_CLEAR
+
+
+def helper_brace_finger_ok(pair, helper, gripped, active, stud_fit):
+    """True when a helper finger contact is an intended brace/near-press touch.
+
+    Gripped bricks are always allowed. Under stud-fit the builder's brick also
+    approaches the holding hand (command_clearance diag_031); the contact
+    monitor must match or crown inserts fail as unintended (diag_047/050)."""
+    finger = helper + '_finger'
+    if any(pair == {finger, 'brick:' + bid} for bid in gripped):
+        return True
+    return bool(stud_fit and active and pair == {finger, 'brick:' + active})
 
 
 def overhanging(P, brick, placed):

@@ -789,8 +789,12 @@ class DualExample(D.Example):
         if owner is not None:
             view = self.views[owner]
             if view.A.phase in view.brace_contact_phases:
+                from Kean.motion.stud_fit import helper_brace_finger_ok
                 brace = view.plan['sequence'][view.b_step]['brace']
-                if any(pair == {view.A.name[0] + '_finger', 'brick:' + bid} for bid in brace.get('gripped_bricks', [brace['target_brick_id']])):
+                gripped = brace.get('gripped_bricks') or [brace['target_brick_id']]
+                active = view.plan['sequence'][view.b_step]['brick_id']
+                if helper_brace_finger_ok(pair, view.A.name[0], gripped, active,
+                                          self.stud_fit is not None):
                     return None
         return 'unintended'
 
