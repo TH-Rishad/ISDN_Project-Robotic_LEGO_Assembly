@@ -269,7 +269,8 @@ class StudFitTest(unittest.TestCase):
         self.assertEqual(press_ramp({'brace_force_N': 10.}), BRACE_RAMP)
 
     def test_joint_breaker_pauses_for_a_braced_stud_fit_press(self):
-        """diag_043/044: pause breaker for supported hold and seat, not only seating."""
+        """diag_043-045: pause through hold, seat, and a post-snap grace."""
+        from Kean.motion.stud_fit import POST_SNAP
         z, push = [.0017], [0.]
         c, view, step, _ = cell(z, push)
         step['requires_brace'] = True
@@ -283,9 +284,12 @@ class StudFitTest(unittest.TestCase):
         fit.update()                                   # into seating
         self.assertIn('b', fit.seating)
         self.assertFalse(c.breaker.enabled)
-        fit.seating.clear()
+        view.snap(step)                                # clutch handoff + post-snap grace
+        self.assertFalse(c.breaker.enabled)
+        c.sim_time = fit._breaker_until + 0.01
         fit.update()
         self.assertTrue(c.breaker.enabled)
+        self.assertGreater(POST_SNAP, 0.)
 
     def test_snap_gate_follows_the_bricks_underneath(self):
         z, push = [-.00163], [0.]

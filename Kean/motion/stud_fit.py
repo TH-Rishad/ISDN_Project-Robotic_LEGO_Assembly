@@ -49,6 +49,8 @@ SUPPORT_GRIP = 3.0  # x A_FINGER_KE (~43 N a finger). At 2x, pad hold was 57 N a
                     # 71 N crown broke B_b_014 on B_b_012 at u 1.008 during the press (_diag_034)..
 SETTLE = 0.25       # s after the push-through before the snap: the press bent S3's supported
                     # corbel 2.4 mm down and a next-frame gate read it (_diag_016)
+POST_SNAP = 0.5     # s after a braced snap before JointBreaker resumes: diag_045 seated the
+                    # crown then broke B_b_014 on B_b_012 at u 1.835 on the clutch handoff
 HAND_KEEP_OUT = 0.020  # m, planner keep-out between the support grip and the pressed brick
 CORRIDOR_CLEAR = 0.0012   # m, helper clearance from the insertion box without stud resistance
 CORRIDOR_OVERLAP = 0.0015  # m: diag_032 fingers were 1.04-1.16 mm into the corridor; runtime 1.08 mm
@@ -340,6 +342,7 @@ class StudFit:
         self.wrench = np.zeros((2, 6))
         self.stiff = [1., 1.]
         self._breaker_off = False
+        self._breaker_until = None  # sim_time: keep breaker off through post-snap grace
         model = getattr(cell, 'model', None)
         self.gains = None if model is None or not hasattr(model, 'joint_target_ke') else (
             model.joint_target_ke.numpy().copy(), model.joint_target_kd.numpy().copy())
@@ -349,8 +352,10 @@ class StudFit:
                 view.gate = self._wrap_gate(view, view.gate)
 
     def _braced_hold(self):
-        """True while a requires_brace brick is on the stud tops or seating."""
+        """True while a requires_brace brick is on the stud tops, seating, or in post-snap grace."""
         if self.seating:
+            return True
+        if self._breaker_until is not None and self.cell.sim_time < self._breaker_until:
             return True
         for bid in self.held:
             step = self._step(bid)
@@ -359,15 +364,17 @@ class StudFit:
         return False
 
     def _pause_breaker_for_support_press(self):
-        """Hold JointBreaker off during a supported stud-fit press and seat.
+        """Hold JointBreaker off during a supported stud-fit press, seat, and post-snap.
 
         The support grip is meant to short the loaded joint, but raw end-of-frame
-        u still crosses 1.0 for two samples before push-through (diag_041/042/044
-        at u 1.005-1.013) and the seat weld jump hit u 3.22 (diag_043). Pause only
-        while a braced brick is held or seating; clutch checks resume after snap."""
+        u still crosses 1.0 for two samples before push-through (diag_041/042/044)
+        and the seat/clutch handoff spiked to u 1.8-3.2 (diag_043/045). Resume
+        after POST_SNAP past a braced snap."""
         br = getattr(self.cell, 'breaker', None)
         if br is None:
             return
+        if self._breaker_until is not None and self.cell.sim_time >= self._breaker_until:
+            self._breaker_until = None
         if self._braced_hold():
             if br.enabled:
                 br.enabled = False
@@ -379,11 +386,15 @@ class StudFit:
     def _wrap_snap(self, snap):
         def wrapped(s):
             bid = s['brick_id']
+            step = self._step(bid)
+            braced = (bid in self.seating or bid in self.held) and step and step.get('requires_brace') and step.get('brace')
             if bid in self.held:
                 self.release(bid, 'not_pushed_through')
             if bid in self.seating:
                 welds, _ = self.seating.pop(bid)
                 self._set([(w, w[2]) for w in welds], False)   # the gate's clutch welds take over
+            if braced:
+                self._breaker_until = self.cell.sim_time + POST_SNAP
             self._pause_breaker_for_support_press()
             return snap(s)
         return wrapped
