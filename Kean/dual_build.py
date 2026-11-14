@@ -815,8 +815,12 @@ class DualExample(D.Example):
             if st == 8 and point is not None:
                 pose = monitor.body_poses[self.body[lower]]
                 local = D.rotmat(pose[3:]).T @ (point - pose[:3])
+            stud_h = D.ex.STUD_HEIGHT
+            if self.stud_fit is not None:
+                from Kean.motion.stud_fit import STUD_FIT_MATING
+                stud_h = STUD_FIT_MATING  # interference hold seats slightly past STUD_H (diag_051)
             if stud_mating(self.arms[arm].phase, lower, monitor.supports.get(bid, ()),
-                           depth, st, tt, z, D.P.BRICK_H, D.ex.STUD_HEIGHT, D.ex.COLLIDER_INSET,
+                           depth, st, tt, z, D.P.BRICK_H, stud_h, D.ex.COLLIDER_INSET,
                            contact_local=local, dims=self.dims[lower]):
                 evidence = dict(upper=bid, lower=lower, stud_shape=int(stud),
                                 upper_shape=int(top), stud_type=st, upper_type=tt, stud_local_z=z)

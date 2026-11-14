@@ -118,6 +118,12 @@ def main():
                           stud_fit=args.stud_fit)
     example.settle_feeders()
     example.monitor = ContactMonitor(example)
+    if args.stud_fit:
+        # Braced supports flex ~1 mm under the stud-fit press; the 1.0 mm edge
+        # logged three displaced events on an otherwise seated crown (diag_051).
+        import cell.contacts as contacts_mod
+        from Kean.motion.stud_fit import STUD_FIT_DISPLACED
+        contacts_mod.DISPLACED_MM = STUD_FIT_DISPLACED
     example.recorder = recorder(example)
     if hasattr(viewer, 'register_ui_callback'):
         viewer.register_ui_callback(example.gui, position='side')

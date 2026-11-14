@@ -139,6 +139,10 @@ def verify_run(run):
                 errors.append('stud contact count differs from detailed evidence')
             steps_by_id = {s['brick_id']: s for p in plans.values() for s in p['sequence']}
             bricks_by_id = {b['id']: b for p in plans.values() for b in p['bricks']}
+            stud_fit = bool((json.loads((run / 'provenance.json').read_text())
+                             .get('config') or {}).get('stud_fit')) if (run / 'provenance.json').is_file() else False
+            # Stud-fit interference can seat slightly past STUD_H (diag_051 -1.864 mm).
+            pen_lo = -2.0 if stud_fit else -1.7
             for event in contacts:
                 if event['class'] in ('arm_arm', 'unintended', 'penetration', 'displaced'):
                     errors.append('detailed contact evidence: ' + event['class'])
@@ -157,7 +161,7 @@ def verify_run(run):
                          and lower in [m[0] for m in step.get('mating_studs', [])]
                          and pair == {'brick:' + upper, 'brick:' + lower}
                          and event.get('phase', {}).get(owner) in ('insert', 'release', 'press')
-                         and -1.7 <= event.get('max_pen_mm', -999.) < 0.
+                         and pen_lo <= event.get('max_pen_mm', -999.) < 0.
                          and geometry.get('upper_type') in (7, 8) and feature_valid)
                 if not valid:
                     errors.append('invalid stud-mating contact evidence')

@@ -216,6 +216,17 @@ class StudFitTest(unittest.TestCase):
         self.assertFalse(finger_blocked(-0.00123, True))  # diag_050 sweep sample
         self.assertTrue(finger_blocked(-0.0013, True))
         self.assertTrue(finger_blocked(0.00094, False))
+        from Kean.motion.stud_fit import STUD_FIT_DISPLACED, STUD_FIT_MATING
+        from Kean.motion.contact_policy import stud_mating
+        self.assertAlmostEqual(STUD_FIT_MATING, 0.002)
+        self.assertAlmostEqual(STUD_FIT_DISPLACED, 1.5)
+        # diag_051 crown press at -1.864 mm is stud mating under stud-fit, not penetration.
+        self.assertTrue(stud_mating('press', 'lo', ('lo',), -0.001864, 8, 8, 0.01035,
+                                    stud_height=STUD_FIT_MATING, contact_local=(0., 0., 0.0105),
+                                    dims=(0.032, 0.016)))
+        self.assertFalse(stud_mating('press', 'lo', ('lo',), -0.001864, 8, 8, 0.01035,
+                                     stud_height=0.0017, contact_local=(0., 0., 0.0105),
+                                     dims=(0.032, 0.016)))
 
     def test_corridor_names_the_body_and_shrinks_the_stud_fit_pad(self):
         """diag_029: measure hand vs fingers before changing the corridor."""

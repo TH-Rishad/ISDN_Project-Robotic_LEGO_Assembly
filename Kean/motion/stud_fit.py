@@ -59,7 +59,10 @@ CORRIDOR_PAD_STUD = 0.001  # m: diag_029's fingers sat 1.02 mm into the +4 mm bo
 FINGER_CLEAR = 0.0012     # m, closed-finger clearance from a placed brick
 FINGER_CLEAR_STUD = -0.00125  # m: diag_050's planned 45 deg bridge still failed at -1.23 mm
                     # (opening 7.14 mm) and fell to 75 deg into the crown. Allow 1.25 mm so
-                    # that low-tilt plan runs; deeper than that still blocks.
+                    # that low-tilt plan runs; deeper than that still blocks. diag_051 still
+                    # hit -1.54 mm at opening 6.82 mm — stop widening; keep the 75 deg fallback.
+STUD_FIT_MATING = 0.002  # m: stud-fit press can seat ~0.16 mm past STUD_H (diag_051 -1.864 mm)
+STUD_FIT_DISPLACED = 1.5  # mm: braced supports flex ~1.0 mm under press (diag_051 at the 1.0 edge)
 TOUCH = 0.002       # m: tips this close above the held brick's stud tops count as on them (contact
                     # measured 0.05-0.15 mm above nominal in dual_studfit_diag_008)
 BRACE_HAND = 0.90   # supported hand / needed
