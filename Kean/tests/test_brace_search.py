@@ -48,9 +48,12 @@ class BraceSearchTest(unittest.TestCase):
             ex.A = SimpleNamespace(base=((-0.45, 0., 0.), 0.))
             ex.brace_yaw_alternatives = True
             flipped = list(candidates(ex, step['step'], step['brace'], SimpleNamespace(P=P), limit=3))
-            self.assertAlmostEqual(flipped[2]['helper_yaw'], 3 * np.pi / 2)
-            self.assertEqual(flipped[1]['brace_pose'], flipped[2]['brace_pose'])
-            self.assertEqual(flipped[1]['predicted_util_braced'], flipped[2]['predicted_util_braced'])
+            # Original, then its 180 deg wrist yaw, then the first lean retry.
+            self.assertIsNone(flipped[0].get('helper_yaw'))
+            self.assertAlmostEqual(flipped[1]['helper_yaw'], 3 * np.pi / 2)
+            self.assertEqual(flipped[0]['brace_pose'], flipped[1]['brace_pose'])
+            self.assertEqual(flipped[0]['predicted_util_braced'], flipped[1]['predicted_util_braced'])
+            self.assertAlmostEqual(abs(flipped[2]['brace_tilt_rotvec'][0]), np.deg2rad(75), places=4)
 
     def setup_search(self, choices):
         ex = Ex()

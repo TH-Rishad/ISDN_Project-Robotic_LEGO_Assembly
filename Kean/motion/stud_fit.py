@@ -55,10 +55,10 @@ CORRIDOR_OVERLAP = 0.0015  # m: diag_032 fingers were 1.04-1.16 mm into the corr
 CORRIDOR_PAD = 0.004      # m, insertion-box xy pad without stud resistance (wriggle room)
 CORRIDOR_PAD_STUD = 0.001  # m: diag_029's fingers sat 1.02 mm into the +4 mm box; stud-fit wriggle is 0.1 mm
 FINGER_CLEAR = 0.0012     # m, closed-finger clearance from a placed brick
-FINGER_CLEAR_STUD = -0.0003  # m: diag_028 rejected clearance 0.94 mm; 0.0 then rejected the
-                    # planned 0.7854 rad bridge grip at -0.27 mm into B_b_010 (opening 8.09 mm)
-                    # and the search fell to tilt 1.309, which still broke the bridge at u 1.006
-                    # before push-through (dual_studfit_diag_036). Allow 0.3 mm sphere overlap.
+FINGER_CLEAR_STUD = -0.00065  # m: diag_028 rejected clearance 0.94 mm; 0.0/-0.3 mm still
+                    # rejected the planned 0.7854 rad bridge grip (-0.27 mm in _036, -0.59 mm
+                    # at opening 7.77 mm in _037) and fell to tilt 1.309, which broke the
+                    # bridge. Allow 0.65 mm sphere overlap so that low-tilt grip can run.
 TOUCH = 0.002       # m: tips this close above the held brick's stud tops count as on them (contact
                     # measured 0.05-0.15 mm above nominal in dual_studfit_diag_008)
 BRACE_HAND = 1.05   # brace-limited hand / needed: diag_035 needed hand ~80 N to measure a 71.5 N

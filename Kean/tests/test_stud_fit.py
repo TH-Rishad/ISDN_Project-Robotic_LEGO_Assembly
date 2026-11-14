@@ -211,7 +211,8 @@ class StudFitTest(unittest.TestCase):
         self.assertFalse(finger_blocked(0.00094, True))
         self.assertFalse(finger_blocked(0.0, True))
         self.assertFalse(finger_blocked(-0.00027, True))  # diag_036 preferred bridge grip
-        self.assertTrue(finger_blocked(-0.0004, True))
+        self.assertFalse(finger_blocked(-0.00059, True))  # diag_037 preferred bridge grip
+        self.assertTrue(finger_blocked(-0.0007, True))
         self.assertTrue(finger_blocked(0.00094, False))
 
     def test_corridor_names_the_body_and_shrinks_the_stud_fit_pad(self):
