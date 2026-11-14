@@ -185,6 +185,19 @@ class Tick:
             request.allowed_finger_contacts = getattr(self.example, 'allowed_finger_contacts', lambda *a: ())(slot.name, move['phase'])
             if getattr(self.example, 'roles', {}).get(slot.name) == 'supporter':
                 request.proposal_build = self.example.task_builds[slot.name]
+            # Runtime near-support already uses support_motion_floor; planning still
+            # demanded 1 mm and rejected a 0.97 mm path at the holding arm
+            # (dual_pyramid_s3_studfit_007 B step 14 pre-insert).
+            ex = self.example
+            if getattr(ex, 'stud_fit', None) is not None and hasattr(ex, 'roles') and hasattr(ex, 'arms'):
+                from Kean.motion.stud_fit import near_support_press, support_motion_floor
+                if near_support_press(ex.roles, ex.arms) or (
+                        move.get('phase') in ('pre-insert', 'insert', 'press')
+                        and any(ex.roles.get(h) == 'supporter'
+                                and getattr(ex.arms.get(h), 'phase', None)
+                                in ('brace-in', 'brace-guard', 'close', 'hold')
+                                for h in ('A', 'B') if h != slot.name)):
+                    request.clearance = support_motion_floor(True)
         slot.other_q = None if other_q is None else np.asarray(other_q[:7], float).copy()
         cached = move.pop('preplanned', None)
         if cached is not None:
