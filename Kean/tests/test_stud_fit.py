@@ -268,18 +268,21 @@ class StudFitTest(unittest.TestCase):
         self.assertEqual(press_ramp(None), 0.5)
         self.assertEqual(press_ramp({'brace_force_N': 10.}), BRACE_RAMP)
 
-    def test_joint_breaker_pauses_while_a_brick_is_seating(self):
-        """diag_043: seat weld jump spiked the bridge; hold breaker off for SETTLE."""
-        z, push = [.0017], [20.]
+    def test_joint_breaker_pauses_for_a_braced_stud_fit_press(self):
+        """diag_043/044: pause breaker for supported hold and seat, not only seating."""
+        z, push = [.0017], [0.]
         c, view, step, _ = cell(z, push)
+        step['requires_brace'] = True
+        step['brace'] = {'brace_force_N': 20.}
         c.breaker = NS(enabled=True)
         fit = StudFit(c, self.D(c, push))
         fit.update()
-        self.assertTrue(c.breaker.enabled)
-        fit.update()                                   # push through into seating
+        self.assertIn('b', fit.held)
+        self.assertFalse(c.breaker.enabled)            # braced hold
+        push[0] = 20.
+        fit.update()                                   # into seating
         self.assertIn('b', fit.seating)
         self.assertFalse(c.breaker.enabled)
-        c.sim_time = fit.seating['b'][1] + 0.3
         fit.seating.clear()
         fit.update()
         self.assertTrue(c.breaker.enabled)

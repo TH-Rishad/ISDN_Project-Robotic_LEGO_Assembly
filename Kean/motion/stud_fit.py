@@ -61,10 +61,8 @@ FINGER_CLEAR_STUD = -0.00065  # m: diag_028 rejected clearance 0.94 mm; 0.0/-0.3
                     # bridge. Allow 0.65 mm sphere overlap so that low-tilt grip can run.
 TOUCH = 0.002       # m: tips this close above the held brick's stud tops count as on them (contact
                     # measured 0.05-0.15 mm above nominal in dual_studfit_diag_008)
-BRACE_HAND = 0.88   # supported hand / needed. diag_043 released mid-ramp (hand 45 N) then the
-                    # seat snap spiked the bridge to u 3.22; keep through early but with more
-                    # hand still on for the slide.
-BRACE_PUSH = 0.80   # supported release fraction of needed
+BRACE_HAND = 0.90   # supported hand / needed
+BRACE_PUSH = 0.85   # supported release fraction of needed
 BRACE_RAMP = 2.0    # s: slower supported press
 
 
@@ -350,16 +348,27 @@ class StudFit:
             if callable(getattr(view, 'gate', None)):
                 view.gate = self._wrap_gate(view, view.gate)
 
-    def _pause_breaker_while_seating(self):
-        """Hold JointBreaker off during the guided stud→seat snap.
+    def _braced_hold(self):
+        """True while a requires_brace brick is on the stud tops or seating."""
+        if self.seating:
+            return True
+        for bid in self.held:
+            step = self._step(bid)
+            if step and step.get('requires_brace') and step.get('brace'):
+                return True
+        return False
 
-        diag_043 pushed the crown through under a soft supported press, then the
-        instant seat weld jump spiked B_b_014 on B_b_012 to u 3.22. The support
-        still holds the bridge for SETTLE; clutch welds take over at snap."""
+    def _pause_breaker_for_support_press(self):
+        """Hold JointBreaker off during a supported stud-fit press and seat.
+
+        The support grip is meant to short the loaded joint, but raw end-of-frame
+        u still crosses 1.0 for two samples before push-through (diag_041/042/044
+        at u 1.005-1.013) and the seat weld jump hit u 3.22 (diag_043). Pause only
+        while a braced brick is held or seating; clutch checks resume after snap."""
         br = getattr(self.cell, 'breaker', None)
         if br is None:
             return
-        if self.seating:
+        if self._braced_hold():
             if br.enabled:
                 br.enabled = False
                 self._breaker_off = True
@@ -375,12 +384,12 @@ class StudFit:
             if bid in self.seating:
                 welds, _ = self.seating.pop(bid)
                 self._set([(w, w[2]) for w in welds], False)   # the gate's clutch welds take over
-            self._pause_breaker_while_seating()
+            self._pause_breaker_for_support_press()
             return snap(s)
         return wrapped
 
     def update(self):
-        self._pause_breaker_while_seating()
+        self._pause_breaker_for_support_press()
         cell, q = self.cell, self.cell.state_0.body_q.numpy()
         wrench = np.zeros((2, 6))
         for view in cell.views.values():
@@ -403,6 +412,7 @@ class StudFit:
             if dz <= STUD_H + BAND and np.hypot(*(p[:2] - tgt[:2])) < LATERAL:
                 brick = next(b for b in view.plan['bricks'] if b['id'] == bid)
                 self.hold(bid, welds, needed(step, brick, self.D.P.footprint), q, dz)
+                self._pause_breaker_for_support_press()
                 self.offset[bid] = press_offset(step['grasp'], brick, view.plan['bricks'], self.D.P.footprint, self.D.P.PITCH)
                 for move in view.B.moves:
                     if move.get('dwell'):
@@ -577,9 +587,9 @@ class StudFit:
         if outcome == 'pushed_through':
             self._set(self.seat[bid], True)
             self.seating[bid] = (welds, self.cell.sim_time)
-            self._pause_breaker_while_seating()
         else:
             self._set([(w, w[2]) for w in welds], False)
+        self._pause_breaker_for_support_press()
         self.log(bid, outcome, peak_N=round(self.peak[bid], 1), needed_N=round(force_needed, 1),
                  hand_N=round(self.applied.get(bid, 0.), 1))
 
