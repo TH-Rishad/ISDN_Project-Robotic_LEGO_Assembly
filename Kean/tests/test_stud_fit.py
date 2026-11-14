@@ -259,8 +259,8 @@ class StudFitTest(unittest.TestCase):
         from Kean.motion.stud_fit import press_cap
         self.assertAlmostEqual(press_cap(17.8, None), 1.3 * 17.8)
         self.assertAlmostEqual(press_cap(17.8, {'brace_force_N': 28.6, 'brace_mu': 1.}), 1.3 * 17.8)
-        # 10 N a finger: pads hold 20 N, between the insertion force and the 1.3 margin.
-        self.assertAlmostEqual(press_cap(17.8, {'brace_force_N': 10., 'brace_mu': 1.}), 20.)
+        # Pads hold between needed and the 1.3 margin: no partial margin (diag_035).
+        self.assertAlmostEqual(press_cap(17.8, {'brace_force_N': 10., 'brace_mu': 1.}), 17.8)
         # Pads hold less than the insertion force: still press that, or the studs never release.
         self.assertAlmostEqual(press_cap(17.8, {'brace_force_N': 5., 'brace_mu': 1.}), 17.8)
 

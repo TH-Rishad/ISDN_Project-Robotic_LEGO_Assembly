@@ -287,16 +287,17 @@ def press_cap(needed_n, brace):
     """Hand force the ramp may reach, N.
 
     The 1.3 margin stays only while the support's pad friction (mu * 2 * grip)
-    can take the whole press. Past that the joint carries the extra, and a
-    2-stud bridge breaks a few percent over 1. Never below the insertion force,
-    or the studs do not release. No brace: the margin is unchanged."""
+    can take the whole press. A partial margin (hold between needed and full)
+    still loads the joint: diag_035 pressed to 80 N on a 71 N crown and broke
+    B_b_014 on B_b_012 at u 1.043. Then press only the insertion force.
+    Never below that, or the studs do not release. No brace: full margin."""
     full = MARGIN * needed_n
     if not brace or not brace.get('brace_force_N'):
         return full
     hold = float(brace.get('brace_mu', 1.0)) * 2.0 * float(brace['brace_force_N'])
     if hold + 1e-9 >= full:
         return full
-    return max(needed_n, hold)
+    return needed_n
 
 
 def needed(step, brick, footprint):
