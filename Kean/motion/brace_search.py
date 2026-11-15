@@ -180,16 +180,27 @@ def install(ex, planner, world, carried, D):
             return original(n, brace)
         choices = iter(candidates(self, n, brace, D, limit=getattr(self, 'brace_candidate_limit', 8)))
         initial = deepcopy(brace)
+        # Grip failures burn the TCP pose: a 180° yaw flip hits the same brick
+        # face (studfit_014 step 13 → support_lost on the yaw twin).
+        skip_poses = set()
+
+        def pose_key(pick):
+            return tuple(np.round(pick['brace_pose'], 5))
 
         def attempt():
             self.before_braced = None
             self.on_support_failed = None
-            try:
-                pick = next(choices)
-            except StopIteration:
-                self.plan['sequence'][n]['brace'] = initial
-                self.fail('brace_search_exhausted')
-                return
+            while True:
+                try:
+                    pick = next(choices)
+                except StopIteration:
+                    self.plan['sequence'][n]['brace'] = initial
+                    self.fail('brace_search_exhausted')
+                    return
+                if pose_key(pick) in skip_poses:
+                    print('brace search skip same pose step %d: %s' % (n, pick['brace_pose']), flush=True)
+                    continue
+                break
             self.B.waited = 0.  # each bounded physical trial has its own timeout
             self.plan['sequence'][n]['brace'] = pick
             record = dict(step=n, pose=pick['brace_pose'], tilt=pick['brace_tilt_rotvec'],
@@ -214,6 +225,8 @@ def install(ex, planner, world, carried, D):
                 record['accepted'] = False
                 record['error'] = reason
                 print('brace search rejected %s step %d' % (reason, n), flush=True)
+                if reason.startswith('support_'):
+                    skip_poses.add(pose_key(pick))
                 self.before_braced = None
                 self.on_support_failed = None
                 self.pending_hold = None
@@ -247,7 +260,6 @@ def install(ex, planner, world, carried, D):
                         abandon_hold('held approach: ' + str(exc))
                         return False  # do not braced.add; retreat already queued
                     self.before_braced = None
-                    self.on_support_failed = None
                     print('brace search held approach ok step %d' % n, flush=True)
                     return True
 

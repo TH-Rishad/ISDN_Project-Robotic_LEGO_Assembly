@@ -128,7 +128,7 @@ class BraceSearchTest(unittest.TestCase):
         ex.fail.assert_not_called()
 
     def test_support_not_established_opens_then_retries(self):
-        picks = [dict(brace_pose=[0, 0, .02], brace_tilt_rotvec=[x, 0, 0]) for x in (.8, 1.)]
+        picks = [dict(brace_pose=[0, y, .02], brace_tilt_rotvec=[.8, 0, 0]) for y in (0., -.02)]
         ex = self.setup_search(picks)
         with patch('Kean.motion.brace_search.candidates', return_value=iter(picks)), \
              patch('Kean.motion.brace_search.check_approach', side_effect=[None, None]):
@@ -153,6 +153,30 @@ class BraceSearchTest(unittest.TestCase):
             self.assertEqual(ex.plan['sequence'][0]['brace'], picks[1])
             ex.A.moves[0]['then']()
         self.assertTrue(ex.brace_search_report[-1]['accepted'])
+        ex.fail.assert_not_called()
+
+    def test_support_not_established_skips_same_pose_yaw_twin(self):
+        # studfit_014: yaw flip reused the failed TCP and lost the hold.
+        same = [0., -.19, .0556]
+        picks = [
+            dict(brace_pose=same, brace_tilt_rotvec=[1.3, 0, 0]),
+            dict(brace_pose=same, brace_tilt_rotvec=[1.3, 0, 0], helper_yaw=4.71),
+            dict(brace_pose=[0., -.2, .06], brace_tilt_rotvec=[.8, 0, 0]),
+        ]
+        ex = self.setup_search(picks)
+        with patch('Kean.motion.brace_search.candidates', return_value=iter(picks)), \
+             patch('Kean.motion.brace_search.check_approach', side_effect=[None, None]):
+            ex.queue_brace(0, picks[0])
+            ex.A.moves[0]['then']()
+            ex.A.cur = dict(phase='hold', wait=lambda: False)
+            ex.pending_hold = 0
+            ex.on_support_failed(0)
+            park = ex.A.moves[-1]
+            ex.A.moves.clear()
+            park['then']()
+        self.assertEqual(ex.plan['sequence'][0]['brace'], picks[2])
+        self.assertEqual(len(ex.brace_search_report), 2)  # yaw twin never queued
+        self.assertEqual(ex.brace_search_report[-1]['pose'], picks[2]['brace_pose'])
         ex.fail.assert_not_called()
 
     def test_preinsert_failure_backtracks_to_another_hover(self):
