@@ -136,9 +136,15 @@ class BraceSearchTest(unittest.TestCase):
             ex.A.moves[0]['then']()
             self.assertTrue(ex.brace_search_report[0]['accepted'])
             self.assertIsNotNone(ex.on_support_failed)
+            # Simulate the closed hold still waiting for B to retract.
+            ex.A.cur = dict(phase='hold', wait=lambda: False)
+            ex.A.waited = 2.5
+            ex.B.waited = 28.
             ex.pending_hold = 0
             self.assertTrue(ex.on_support_failed(0))
             self.assertIsNone(ex.pending_hold)
+            self.assertIsNone(ex.A.cur)
+            self.assertEqual(ex.B.waited, 0.)
             self.assertEqual(ex.brace_search_report[0]['error'], 'support_not_established')
             self.assertEqual([m['phase'] for m in ex.A.moves], ['open', 'retract', 'park'])
             park = ex.A.moves[-1]

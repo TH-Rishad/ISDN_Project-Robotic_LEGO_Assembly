@@ -150,7 +150,14 @@ def check_approach(ex, planner, world, carried, D):
 
 def _retreat_helper(ex, D, then, *, open_first):
     """Park the helper and continue the candidate loop. B stays at stage."""
+    # Drop a waiting hold/close (studfit_011: cur stayed on hold's retracted-wait,
+    # so the queued open never started and B hit wait_timeout:stage).
     ex.A.moves.clear()
+    ex.A.cur = None
+    ex.A.waited = 0.
+    # Each physical retry is a new trial; B has already been staged through the
+    # failed close/settle and must not keep its prior wait clock.
+    ex.B.waited = 0.
     p, yaw, grip, tilt = ex.A.cmd
     tool = D.rotate(D.qrot(tilt), np.array([0., 0., -1.]))
     back = np.asarray(p) - D.BRACE_BACK * tool
