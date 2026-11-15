@@ -463,6 +463,11 @@ class Build:
         established = len(samples) >= 5 and min(np.mean(samples[-5:], axis=0)) > .5
         if n not in self.braced:
             if established:
+                # Stud-fit brace_search may re-check B's approach with the
+                # measured closed helper before releasing B from stage.
+                gate = getattr(self, 'before_braced', None)
+                if gate is not None and gate(n) is False:
+                    return
                 self.brace_info(n)['executed'] = True
                 self.braced.add(n)
             elif self.sim_time - self.close_t > 3.:

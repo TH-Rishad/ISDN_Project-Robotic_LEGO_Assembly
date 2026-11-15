@@ -148,9 +148,24 @@ def check_approach(ex, planner, world, carried, D):
     raise PlannerUnavailable('; '.join(failures))
 
 
+def _retreat_helper(ex, D, then, *, open_first):
+    """Park the helper and continue the candidate loop. B stays at stage."""
+    ex.A.moves.clear()
+    p, yaw, grip, tilt = ex.A.cmd
+    tool = D.rotate(D.qrot(tilt), np.array([0., 0., -1.]))
+    back = np.asarray(p) - D.BRACE_BACK * tool
+    if open_first:
+        g_open = D.BRACE_HALF_W + D.BRACE_CLEAR
+        ex.A.push('open', np.asarray(p), yaw, g_open, .4, tilt=tilt, contact=True)
+        grip = g_open
+    ex.A.push('retract', back, yaw, grip, .8 if not open_first else .6, tilt=tilt)
+    ex.A.push('park', ex.parks[ex.A], 0., 0., 1.5, then=then)
+
+
 def install(ex, planner, world, carried, D):
     original = ex.queue_brace
     ex.brace_search_report = []
+    ex.before_braced = None
 
     def queue_brace(self, n, brace):
         if self.legacy or not brace.get('feasible', True):
@@ -159,6 +174,7 @@ def install(ex, planner, world, carried, D):
         initial = deepcopy(brace)
 
         def attempt():
+            self.before_braced = None
             try:
                 pick = next(choices)
             except StopIteration:
@@ -195,15 +211,31 @@ def install(ex, planner, world, carried, D):
                     print('brace search rejected step %d: %s' % (n, exc), flush=True)
                     # A has not closed. Discard close/hold, retreat with the
                     # shared controller, and try again only after parking.
-                    self.A.moves.clear()
-                    p, yaw, grip, tilt = self.A.cmd
-                    tool = D.rotate(D.qrot(tilt), np.array([0., 0., -1.]))
-                    self.A.push('retract', np.asarray(p) - D.BRACE_BACK * tool,
-                                yaw, grip, .8, tilt=tilt)
-                    self.A.push('park', self.parks[self.A], 0., 0., 1.5, then=attempt)
+                    _retreat_helper(self, D, attempt, open_first=False)
                     return
                 record['accepted'] = True
                 print('brace search accepted step %d before closing' % n, flush=True)
+
+                # Pre-close check uses A's brace-guard joints. After close the
+                # measured hold can sit deeper into B's pre-insert corridor
+                # (studfit_007–009). Revalidate with the closed helper before
+                # releasing B from stage; refuse and try the next pose if not.
+                def before_braced(_n):
+                    try:
+                        check_approach(self, planner, world, carried, D)
+                    except PlannerUnavailable as exc:
+                        record['accepted'] = False
+                        record['error'] = 'held approach: ' + str(exc)
+                        print('brace search rejected held step %d: %s' % (n, exc), flush=True)
+                        self.before_braced = None
+                        self.pending_hold = None
+                        _retreat_helper(self, D, attempt, open_first=True)
+                        return False
+                    self.before_braced = None
+                    print('brace search held approach ok step %d' % n, flush=True)
+                    return True
+
+                self.before_braced = before_braced
 
             guard['then'] = checked
 

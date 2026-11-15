@@ -58,13 +58,15 @@ class BraceSearchTest(unittest.TestCase):
         ex.parks = {ex.A: np.array([.3, 0, .2])}
         ex.plan = {'sequence': [{'brace': choices[0]}]}
         ex.fail = Mock()
+        ex.pending_hold = None
         self.closed = Mock()
         self.rebased = Mock()
         def queue(n, brace):
             ex.A.push('brace-guard', [0, 0, .1], 0, .01, 1, then=self.rebased)
             ex.A.push('close', [0, 0, .1], 0, .0065, 1, then=self.closed)
         ex.queue_brace = queue
-        D = SimpleNamespace(rotate=lambda q, v: v, qrot=lambda v: v, BRACE_BACK=.05)
+        D = SimpleNamespace(rotate=lambda q, v: v, qrot=lambda v: v, BRACE_BACK=.05,
+                            BRACE_HALF_W=.008, BRACE_CLEAR=.002)
         install(ex, None, None, None, D)
         return ex
 
@@ -85,6 +87,7 @@ class BraceSearchTest(unittest.TestCase):
             ex.A.moves[0]['then']()
         self.assertTrue(ex.brace_search_report[-1]['accepted'])
         self.assertEqual([m['phase'] for m in ex.A.moves], ['brace-guard', 'close'])
+        self.assertIsNotNone(ex.before_braced)
         ex.fail.assert_not_called()
 
     def test_exhaustion_fails_without_closing(self):
@@ -99,6 +102,30 @@ class BraceSearchTest(unittest.TestCase):
             park['then']()
         ex.fail.assert_called_once_with('brace_search_exhausted')
         self.closed.assert_not_called()
+
+    def test_held_approach_failure_opens_then_retries(self):
+        picks = [dict(brace_pose=[0, 0, .02], brace_tilt_rotvec=[x, 0, 0]) for x in (.8, 1.)]
+        ex = self.setup_search(picks)
+        # pre-close ok, post-hold blocked, next candidate pre-close ok
+        with patch('Kean.motion.brace_search.candidates', return_value=iter(picks)), \
+             patch('Kean.motion.brace_search.check_approach',
+                   side_effect=[None, PlannerUnavailable('held blocked'), None]):
+            ex.queue_brace(0, picks[0])
+            ex.A.moves[0]['then']()
+            self.assertTrue(ex.brace_search_report[0]['accepted'])
+            ex.pending_hold = 0
+            self.assertIs(ex.before_braced(0), False)
+            self.assertIsNone(ex.pending_hold)
+            self.assertFalse(ex.brace_search_report[0]['accepted'])
+            self.assertEqual([m['phase'] for m in ex.A.moves], ['open', 'retract', 'park'])
+            park = ex.A.moves[-1]
+            ex.A.moves.clear()
+            park['then']()
+            self.assertEqual(ex.plan['sequence'][0]['brace'], picks[1])
+            ex.A.moves[0]['then']()
+        self.assertTrue(ex.brace_search_report[-1]['accepted'])
+        self.assertIsNotNone(ex.before_braced)
+        ex.fail.assert_not_called()
 
     def test_preinsert_failure_backtracks_to_another_hover(self):
         ex = Ex()
