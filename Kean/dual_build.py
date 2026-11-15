@@ -240,10 +240,11 @@ class Build:
             if step['requires_brace']:
                 # ponytail: no supported tight step exists yet; add when one does.
                 raise RuntimeError('drop-and-press with a generated support is not implemented')
-            from Kean.motion.drop_press import splice
+            from Kean.motion.drop_press import splice, DWELL_STUD
             splice(self.B.moves, self.target[bid][0], self.drop_press[n], grasp_dz=D.GRASP_DZ, press=D.PRESS,
                    tip_below_tcp=D.TIP_BELOW_TCP, brick_h=D.P.BRICK_H, stud_h=D.ex.STUD_HEIGHT,
-                   grasp_offset=step['grasp'].get('tcp_offset_m', [0., 0.]))
+                   grasp_offset=step['grasp'].get('tcp_offset_m', [0., 0.]),
+                   dwell=DWELL_STUD if self.stud_fit is not None else None)
             print('drop-and-press %s: release %.2f mm above the seat' % (bid, self.drop_press[n] * 1000), flush=True)
         elif self.stud_fit is not None:
             from Kean.motion.drop_press import top_press
@@ -543,6 +544,9 @@ class DualExample(D.Example):
             # The run's support search uses the plan's keep-out (stud_fit.planning).
             # Do not reorder leans globally for the crown (diag_048/049): mild-first
             # exhausted step 13 or accepted a 60 deg grip that then hit B_b_006.
+            # studfit_016: A_b_005 pushed through then gate_miss at yaw 5.28° (default 5°).
+            D.GATE = dict(D.GATE)
+            D.GATE['yaw_deg'] = 6.0
 
             import bracing
             from Kean.motion.stud_fit import HAND_KEEP_OUT

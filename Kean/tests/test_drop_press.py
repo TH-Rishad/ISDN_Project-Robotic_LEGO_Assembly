@@ -4,7 +4,7 @@ import numpy as np
 
 from Kean.motion.contact_policy import stud_mating
 from Kean.motion.grasp_clearance import grip_candidates
-from Kean.motion.drop_press import placement_neighbours, splice, top_press
+from Kean.motion.drop_press import DWELL_STUD, placement_neighbours, splice, top_press
 
 GEOM = dict(grasp_dz=.013, press=.001, tip_below_tcp=.0089, brick_h=.0096, stud_h=.0017)
 
@@ -43,6 +43,13 @@ class DropPressTest(unittest.TestCase):
         self.assertTrue(seat['contact'])
         self.assertIs(seat['then'], snap)
         self.assertIs(up['then'], placed)
+
+    def test_splice_stud_fit_dwell_settles_yaw_longer_before_release(self):
+        # studfit_016: A_b_005 pushed through then gate_miss yaw 5.28°; longer aim settle.
+        moves, snap, placed = queue()
+        splice(moves, np.array([.1, .2, .005]), .0087, grasp_offset=[.002, 0.], dwell=DWELL_STUD, **GEOM)
+        self.assertAlmostEqual(moves[3]['dur'], DWELL_STUD)
+        self.assertGreater(moves[3]['dur'], .4)
 
     def test_top_press_keeps_the_insert_and_snaps_after_the_press(self):
         moves, snap, placed = queue()

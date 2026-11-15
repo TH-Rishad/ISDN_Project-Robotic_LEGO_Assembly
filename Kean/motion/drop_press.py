@@ -9,12 +9,14 @@ press its top with the closed tips through the snap gate.
 import numpy as np
 
 DWELL = 0.4        # s at the release height so the brick-aim servo settles
+DWELL_STUD = 0.8   # studfit_016: A_b_005 pushed through but yaw 5.28° (gate 5°); longer settle
 RISE_CLEAR = .003  # tips above the dropped brick's stud tops before closing
 PRESS_DUR = 1.0    # s, as the existing closed-tip legacy brace press
 PRESS_DWELL = 1.5  # s at most at the seat in a top press; stud_fit ends it once the brick is through
 
 
-def splice(moves, target, release_dz, *, grasp_dz, press, tip_below_tcp, brick_h, stud_h, grasp_offset):
+def splice(moves, target, release_dz, *, grasp_dz, press, tip_below_tcp, brick_h, stud_h, grasp_offset,
+           dwell=None):
     """Replace the queued insert..release with drop-and-press, in place.
 
     `release_dz` is the TCP height above the normal insert end where the
@@ -28,6 +30,7 @@ def splice(moves, target, release_dz, *, grasp_dz, press, tip_below_tcp, brick_h
     release = next(m for m in tail if m['phase'] == 'release')
     ref = tail[0]
     drop = np.asarray(target, float) + [0, 0, grasp_dz - press + release_dz]
+    settle = DWELL if dwell is None else float(dwell)
 
     def move(phase, pos, grip, dur, then=None, contact=False):
         return dict(phase=phase, pos=np.array(pos, float), yaw=ref['yaw'], grip=float(grip), dur=dur,
@@ -35,7 +38,7 @@ def splice(moves, target, release_dz, *, grasp_dz, press, tip_below_tcp, brick_h
 
     moves[first:end] = [
         move('insert', drop, ref['grip'], 1.2, contact=True),
-        move('insert', drop, ref['grip'], DWELL, contact=True),
+        move('insert', drop, ref['grip'], settle, contact=True),
         move('release', drop, release['grip'], .4, contact=True),
     ] + press_moves(ref, target, release['grip'], snap, release['then'], press=press, tip_below_tcp=tip_below_tcp,
                     brick_h=brick_h, stud_h=stud_h, grasp_offset=grasp_offset)
