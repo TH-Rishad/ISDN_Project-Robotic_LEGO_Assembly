@@ -174,6 +174,24 @@ def install(ex, planner, world, carried, D):
     ex.brace_search_report = []
     ex.before_braced = None
     ex.on_support_failed = None
+    ex.on_guard_abandon = None
+    # stop_here runs then before brace_guard_stopped. During a brace_search
+    # trial, skip then on brace-in/brace-guard so a GUARD STOP does not
+    # accept and close into the scrape (studfit_017).
+    _stop = ex.A.stop_here
+
+    def stop_here(ee):
+        m = ex.A.cur
+        if (getattr(ex, 'on_guard_abandon', None) is not None
+                and m is not None
+                and m['phase'] in ('brace-in', 'brace-guard')
+                and ex.b_step not in ex.braced):
+            ex.A.cur, ex.A.ee = None, np.array(ee, float)
+            ex.A.rebase(ee)
+            return
+        return _stop(ee)
+
+    ex.A.stop_here = stop_here
 
     def queue_brace(self, n, brace):
         if self.legacy or not brace.get('feasible', True):
@@ -190,6 +208,7 @@ def install(ex, planner, world, carried, D):
         def attempt():
             self.before_braced = None
             self.on_support_failed = None
+            self.on_guard_abandon = None
             while True:
                 try:
                     pick = next(choices)
@@ -207,6 +226,27 @@ def install(ex, planner, world, carried, D):
                           helper_yaw=pick.get('helper_yaw'), accepted=False)
             self.brace_search_report.append(record)
             print('brace search step %d: pose %s tilt %s' % (n, record['pose'], record['tilt']), flush=True)
+
+            def abandon_hold(reason):
+                """Helper cannot support — park and try the next pose."""
+                record['accepted'] = False
+                record['error'] = reason
+                print('brace search rejected %s step %d' % (reason, n), flush=True)
+                # Guard-stop and grip failures burn this TCP: open/retract through
+                # the scrape displaces neighbours (studfit_017 B_b_010).
+                if reason.startswith('support_') or reason == 'guard_stop':
+                    skip_poses.add(pose_key(pick))
+                self.before_braced = None
+                self.on_support_failed = None
+                self.on_guard_abandon = None
+                self.pending_hold = None
+                _retreat_helper(self, D, attempt, open_first=True)
+                return True
+
+            # Armed before the approach so a GUARD STOP on brace-in/brace-guard
+            # abandons instead of stop_here → checked → close (studfit_017).
+            self.on_guard_abandon = lambda _n: abandon_hold('guard_stop')
+
             original(n, pick)
             if hasattr(self, 'check_helper_approach'):
                 try:
@@ -214,26 +254,18 @@ def install(ex, planner, world, carried, D):
                 except PlannerUnavailable as exc:
                     record['error'] = 'helper approach: ' + str(exc)
                     self.A.moves.clear()
+                    self.on_guard_abandon = None
                     print('brace search rejected helper approach step %d: %s' % (n, str(exc)[-300:]), flush=True)
                     attempt()
                     return
             guard = next(m for m in self.A.moves if m['phase'] == 'brace-guard')
             rebase = guard['then']
 
-            def abandon_hold(reason):
-                """Closed (or closing) helper cannot support — try the next pose."""
-                record['accepted'] = False
-                record['error'] = reason
-                print('brace search rejected %s step %d' % (reason, n), flush=True)
-                if reason.startswith('support_'):
-                    skip_poses.add(pose_key(pick))
-                self.before_braced = None
-                self.on_support_failed = None
-                self.pending_hold = None
-                _retreat_helper(self, D, attempt, open_first=True)
-                return True
-
             def checked():
+                # A GUARD STOP already abandoned this candidate (stop_here runs
+                # then before brace_guard_stopped). Do not re-accept or close.
+                if record.get('error') == 'guard_stop':
+                    return
                 rebase()
                 try:
                     check_approach(self, planner, world, carried, D)
@@ -242,6 +274,7 @@ def install(ex, planner, world, carried, D):
                 except PlannerUnavailable as exc:
                     record['error'] = str(exc)
                     print('brace search rejected step %d: %s' % (n, exc), flush=True)
+                    self.on_guard_abandon = None
                     # A has not closed. Discard close/hold, retreat with the
                     # shared controller, and try again only after parking.
                     _retreat_helper(self, D, attempt, open_first=False)
@@ -260,6 +293,7 @@ def install(ex, planner, world, carried, D):
                         abandon_hold('held approach: ' + str(exc))
                         return False  # do not braced.add; retreat already queued
                     self.before_braced = None
+                    self.on_guard_abandon = None
                     print('brace search held approach ok step %d' % n, flush=True)
                     return True
 

@@ -448,6 +448,15 @@ class Build:
 
     def brace_guard_stopped(self, arm):
         self.cell.tick.cancel_at_measured(arm)
+        # stop_here already ran the current move's then. For brace_search that
+        # is checked→close; a scraped brace-in/brace-guard must not close into
+        # the tower (studfit_017 displaced B_b_010 on every failed retry).
+        n = self.b_step
+        if n in self.braced:
+            return
+        abandon = getattr(self, 'on_guard_abandon', None)
+        if abandon is not None:
+            abandon(n)
 
     def confirm_brace(self, n):
         # The original close callback rebases the measured pose. Keep the

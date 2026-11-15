@@ -179,6 +179,36 @@ class BraceSearchTest(unittest.TestCase):
         self.assertEqual(ex.brace_search_report[-1]['pose'], picks[2]['brace_pose'])
         ex.fail.assert_not_called()
 
+    def test_guard_stop_abandons_before_close_and_skips_pose(self):
+        # studfit_017: GUARD STOP then still closed into the scrape and displaced B_b_010.
+        picks = [dict(brace_pose=[0, y, .02], brace_tilt_rotvec=[.8, 0, 0]) for y in (0., -.02)]
+        ex = self.setup_search(picks)
+        ex.braced = set()
+        ex.b_step = 0
+        with patch('Kean.motion.brace_search.candidates', return_value=iter(picks)), \
+             patch('Kean.motion.brace_search.check_approach', side_effect=[None]):
+            ex.queue_brace(0, picks[0])
+            self.assertIsNotNone(ex.on_guard_abandon)
+            # Simulate brace-in GUARD STOP: stop_here must not fire then=checked.
+            guard = ex.A.moves[0]
+            ex.A.cur = dict(guard)
+            ex.A.cur['phase'] = 'brace-in'
+            ex.A.stop_here([0, 0, .1])
+            self.assertIsNone(ex.A.cur)
+            self.assertFalse(ex.brace_search_report[0].get('accepted'))
+            self.rebased.assert_not_called()
+            # DualExample.brace_guard_stopped then abandons.
+            ex.on_guard_abandon(0)
+            self.assertEqual(ex.brace_search_report[0]['error'], 'guard_stop')
+            self.assertEqual([m['phase'] for m in ex.A.moves], ['open', 'retract', 'park'])
+            self.closed.assert_not_called()
+            park = ex.A.moves[-1]
+            ex.A.moves.clear()
+            park['then']()
+        self.assertEqual(ex.plan['sequence'][0]['brace'], picks[1])
+        self.assertEqual(len(ex.brace_search_report), 2)
+        ex.fail.assert_not_called()
+
     def test_preinsert_failure_backtracks_to_another_hover(self):
         ex = Ex()
         ex.B.push('transport', [.1, 0, .2], 0, .01, 1)
