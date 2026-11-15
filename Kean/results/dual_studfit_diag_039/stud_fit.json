@@ -1,0 +1,32 @@
+[
+  {
+    "brick": "B_b_012",
+    "event": "held",
+    "time": 27.367,
+    "dz_mm": 1.84,
+    "needed_N": 53.4
+  },
+  {
+    "brick": "B_b_012",
+    "event": "pushed_through",
+    "time": 30.183,
+    "peak_N": 55.7,
+    "needed_N": 53.4,
+    "hand_N": 39.3
+  },
+  {
+    "brick": "B_b_014",
+    "event": "held",
+    "time": 154.617,
+    "dz_mm": 1.88,
+    "needed_N": 53.4
+  },
+  {
+    "brick": "B_b_014",
+    "event": "pushed_through",
+    "time": 157.45,
+    "peak_N": 56.4,
+    "needed_N": 53.4,
+    "hand_N": 34.7
+  }
+]

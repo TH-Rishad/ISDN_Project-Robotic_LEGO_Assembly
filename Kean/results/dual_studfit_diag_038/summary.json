@@ -1,0 +1,576 @@
+{
+  "done": false,
+  "failure": "B:brace_search_exhausted",
+  "error": null,
+  "frames": 765,
+  "builds": {
+    "A": {
+      "structure": "pyramid",
+      "placed": 0,
+      "preplaced": 11,
+      "total": 11,
+      "completed_steps": 11,
+      "supports": [],
+      "brace_search": []
+    },
+    "B": {
+      "structure": "S3",
+      "placed": 0,
+      "preplaced": 13,
+      "total": 16,
+      "completed_steps": 13,
+      "supports": [
+        {
+          "step": 13,
+          "requested": true,
+          "planned_feasible": true,
+          "executed": false,
+          "brace_infeasible": false,
+          "guard_stop": false,
+          "guard_frame": null,
+          "realised_grip_N": null,
+          "grip_samples": 0,
+          "contacted": [],
+          "gripped_bricks": [
+            "B_b_008",
+            "B_b_010"
+          ],
+          "max_F_N": {},
+          "max_M_Nm": {}
+        }
+      ],
+      "brace_search": [
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.188,
+            0.0536
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry -0.91 mm at B_b_006 (opening 7.45 mm)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.188,
+            0.0536
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry -0.91 mm at B_b_006 (opening 7.45 mm)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.19,
+            0.0556
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.19,
+            0.0556
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.19,
+            0.0556
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: helper obstructs carried-brick insertion corridor: -25.34 mm (hand)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.19,
+            0.0556
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: helper obstructs carried-brick insertion corridor: -25.55 mm (hand)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.186,
+            0.0556
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.186,
+            0.0556
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.186,
+            0.0556
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: helper obstructs carried-brick insertion corridor: -25.34 mm (hand)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.186,
+            0.0556
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: helper obstructs carried-brick insertion corridor: -24.44 mm (hand)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.188,
+            0.0556
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.188,
+            0.0556
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.188,
+            0.0556
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: helper obstructs carried-brick insertion corridor: -25.34 mm (hand)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.188,
+            0.0556
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: helper obstructs carried-brick insertion corridor: -25.55 mm (hand)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.202,
+            0.0556
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed helper at 8.73 mm opening: path clearance 1.07 mm at B_b_006 (sample 0/0)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.202,
+            0.0556
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: closed helper at 8.73 mm opening: path clearance 1.07 mm at B_b_006 (sample 0/0)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.202,
+            0.0556
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: helper obstructs carried-brick insertion corridor: -25.34 mm (hand)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.202,
+            0.0556
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: helper obstructs carried-brick insertion corridor: -25.55 mm (hand)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.2,
+            0.0556
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.2,
+            0.0556
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.2,
+            0.0556
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: helper obstructs carried-brick insertion corridor: -25.34 mm (hand)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.2,
+            0.0556
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: helper obstructs carried-brick insertion corridor: -25.55 mm (hand)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.198,
+            0.0556
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.198,
+            0.0556
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.198,
+            0.0556
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: helper obstructs carried-brick insertion corridor: -25.34 mm (hand)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.198,
+            0.0556
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: helper obstructs carried-brick insertion corridor: -25.55 mm (hand)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.196,
+            0.0556
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.196,
+            0.0556
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.196,
+            0.0556
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: helper obstructs carried-brick insertion corridor: -25.34 mm (hand)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.196,
+            0.0556
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: helper obstructs carried-brick insertion corridor: -25.55 mm (hand)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.194,
+            0.0556
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.194,
+            0.0556
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": 4.71238898038469,
+          "accepted": false,
+          "error": "helper approach: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)"
+        }
+      ]
+    }
+  },
+  "contacts": {},
+  "parallel_frames": 0,
+  "diagnostic": true,
+  "motion": {
+    "strict": true,
+    "workarounds": [],
+    "failures": [],
+    "plans": 4,
+    "plan_failures": 0,
+    "captures": 0,
+    "segments": 4,
+    "min_clearance_m": 0.07749462127685547,
+    "clearance_scope": "executed joints during planned playback; full spheres, measured fingers"
+  },
+  "reserved_parallel_frames": 3,
+  "initial_settling_xy_m": 7.092952728271484e-06,
+  "ok": false,
+  "full_build": false
+}

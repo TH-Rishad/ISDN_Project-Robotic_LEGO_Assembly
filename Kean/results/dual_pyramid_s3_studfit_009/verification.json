@@ -1,0 +1,42 @@
+{
+  "ok": false,
+  "full_build": false,
+  "errors": [
+    "recorded execution failure: motion_plan_failed",
+    "B: incomplete/nonmonotonic own-build progress",
+    "B step 14: no recorded mating",
+    "B step 14: no insertion frames",
+    "B step 15: no recorded mating",
+    "B step 15: no insertion frames",
+    "B step 15: no measured two-finger support force",
+    "B step 15: support was not requested before pickup",
+    "unserved support request",
+    "contact monitor: unintended",
+    "detailed contact evidence: unintended",
+    "execution did not finish cleanly"
+  ],
+  "recorded_parallel_frames": 2029,
+  "grants": [
+    {
+      "arm": "B",
+      "step": 9,
+      "time": 249.36666666675725
+    },
+    {
+      "arm": "B",
+      "step": 11,
+      "time": 323.60000000003436
+    },
+    {
+      "arm": "B",
+      "step": 13,
+      "time": 378.24999999998465
+    },
+    {
+      "arm": "B",
+      "step": 14,
+      "time": 415.81666666661715
+    }
+  ],
+  "frames": 26262
+}

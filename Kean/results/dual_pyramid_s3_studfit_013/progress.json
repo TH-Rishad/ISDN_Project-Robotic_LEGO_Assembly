@@ -1,0 +1,19 @@
+{
+  "frame": 15960,
+  "sim_time": 267.00000000008583,
+  "phases": {
+    "A": "press",
+    "B": "clearance"
+  },
+  "modes": {
+    "A": "stopped",
+    "B": "stopped"
+  },
+  "steps": {
+    "A": 9,
+    "B": 9
+  },
+  "pending": {
+    "B": 9
+  }
+}

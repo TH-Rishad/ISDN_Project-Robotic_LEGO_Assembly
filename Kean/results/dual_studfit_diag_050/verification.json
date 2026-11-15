@@ -1,0 +1,36 @@
+{
+  "ok": false,
+  "full_build": false,
+  "errors": [
+    "contact monitor: unintended",
+    "contact monitor: penetration",
+    "contact monitor: displaced",
+    "detailed contact evidence: displaced",
+    "detailed contact evidence: displaced",
+    "detailed contact evidence: displaced",
+    "detailed contact evidence: unintended",
+    "detailed contact evidence: unintended",
+    "detailed contact evidence: unintended",
+    "detailed contact evidence: unintended",
+    "detailed contact evidence: penetration"
+  ],
+  "recorded_parallel_frames": 0,
+  "grants": [
+    {
+      "arm": "B",
+      "step": 13,
+      "time": 1.1166666666666676
+    },
+    {
+      "arm": "B",
+      "step": 14,
+      "time": 37.71666666666581
+    },
+    {
+      "arm": "B",
+      "step": 15,
+      "time": 73.04999999999714
+    }
+  ],
+  "frames": 6520
+}

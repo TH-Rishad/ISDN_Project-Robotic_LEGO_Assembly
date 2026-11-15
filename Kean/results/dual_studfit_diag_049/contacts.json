@@ -1,0 +1,18 @@
+[
+  {
+    "class": "unintended",
+    "a": "ground#-1",
+    "b": "brick:B_b_012#52",
+    "phase": {
+      "A": "close",
+      "B": "stage"
+    },
+    "start_frame": 1095,
+    "max_pen_mm": -10.47,
+    "peak_force_n": 0.43,
+    "end_frame": 1109,
+    "duration_frames": 15,
+    "contact_frames": 11,
+    "fragments": 3
+  }
+]

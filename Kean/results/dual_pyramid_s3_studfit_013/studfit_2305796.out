@@ -1,0 +1,197 @@
+studfit: out=Kean/results/dual_pyramid_s3_studfit_013 start A=0 B=0 step_limit=none gpu=0
+Warp 1.13.0 initialized:
+   CUDA Toolkit 12.9, Driver 12.8
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA GeForce RTX 4090 D" (22 GiB, sm_89, mempool enabled)
+   Kernel cache:
+     /home/mlieq/.cache/warp/1.13.0
+Module newton._src.geometry.inertia a7ff42e load on device 'cuda:0' took 3.28 ms  (cached)
+Module newton._src.utils.mesh 1476c2a load on device 'cpu' took 4.32 ms  (cached)
+Module validate_and_correct_inertia_kernel_524fb5ef 524fb5e load on device 'cuda:0' took 2.74 ms  (cached)
+Module newton._src.sim.ik.ik_solver d9f8ff8 load on device 'cuda:0' took 3.45 ms  (cached)
+Module IKOptimizerLM___build_specialized__locals___fk_local_a9d6f4f5 a9d6f4f load on device 'cuda:0' took 3.42 ms  (cached)
+Module newton._src.sim.ik.ik_common ec7ac17 load on device 'cuda:0' took 3.55 ms  (cached)
+Module newton._src.sim.ik.ik_objectives 2ab3ea8 load on device 'cuda:0' took 3.19 ms  (cached)
+Module IKOptimizerLM___build_specialized__locals___compute_motion_subspace_2d_28061874 2806187 load on device 'cuda:0' took 6.70 ms  (cached)
+Module _lm_solve_tiled_9_15_71b73c32 641c3f9 load on device 'cuda:0' took 170.15 ms  (cached)
+Module newton._src.sim.ik.ik_lm_optimizer d941fd7 load on device 'cuda:0' took 2.78 ms  (cached)
+Module newton._src.geometry.sdf_utils 30505d5 load on device 'cuda:0' took 4.66 ms  (cached)
+Module newton._src.geometry.sdf_texture ba97079 load on device 'cuda:0' took 8.16 ms  (cached)
+Module newton._src.sim.graph_coloring 95273ab load on device 'cpu' took 2.28 ms  (cached)
+Module newton._src.solvers.mujoco.kernels f5ae6c7 load on device 'cuda:0' took 2.09 ms  (cached)
+Module mujoco_warp._src.io 00dd7e1 load on device 'cuda:0' took 1.80 ms  (cached)
+Module mujoco_warp._src.smooth 976a5d7 load on device 'cuda:0' took 1.85 ms  (cached)
+Module _solve_LD_sparse_fused__locals__kernel_db9f1437 5e36655 load on device 'cuda:0' took 1.32 ms  (cached)
+Module newton._src.sim.articulation 9875313 load on device 'cuda:0' took 1.52 ms  (cached)
+Module newton._src.viewer.kernels 6eaf52b load on device 'cuda:0' took 1.48 ms  (cached)
+Module newton._src.sim.collide 0e6be4c load on device 'cuda:0' took 1.32 ms  (cached)
+Module newton._src.geometry.broad_phase_sap 7baa1de load on device 'cuda:0' took 1.20 ms  (cached)
+Module narrow_phase_primitive_write_contact e070310 load on device 'cuda:0' took 1.22 ms  (cached)
+Module narrow_phase_gjk_mpr_True_write_contact_default_default 00fbe52 load on device 'cuda:0' took 1.54 ms  (cached)
+Module newton._src.geometry.narrow_phase f722f21 load on device 'cuda:0' took 1.57 ms  (cached)
+Module newton._src.geometry.contact_reduction_global 5c84d97 load on device 'cuda:0' took 1.19 ms  (cached)
+Module newton._src.geometry.narrow_phase e577950 load on device 'cuda:0' took 1.39 ms  (cached)
+Module newton._src.geometry.sdf_contact 1cfb221 load on device 'cuda:0' took 1.15 ms  (cached)
+Module narrow_phase_mesh_plane_write_contact_to_reducer_True 0316777 load on device 'cuda:0' took 1.31 ms  (cached)
+Module mesh_triangle_contacts_to_reducer_kernel_98f62989 13e0243 load on device 'cuda:0' took 1.46 ms  (cached)
+Module newton._src.geometry.contact_reduction_global 5db63a2 load on device 'cuda:0' took 2.13 ms  (cached)
+Module sdf_contact_write_contact_to_reducer_False_True e0d3f15 load on device 'cuda:0' took 1.34 ms  (cached)
+Module export_reduced_contacts_write_contact c5c25a3 load on device 'cuda:0' took 1.20 ms  (cached)
+Module dual_arm_sim 83cffed load on device 'cuda:0' took 1.14 ms  (cached)
+Module mujoco_warp._src.constraint eb0e24d load on device 'cuda:0' took 1.43 ms  (cached)
+Module _efc_contact_init__locals__kernel_c7a6ce3a c7a6ce3 load on device 'cuda:0' took 1.12 ms  (cached)
+Module _efc_contact_jac_sparse__locals__kernel_7bafc28b 7bafc28 load on device 'cuda:0' took 1.17 ms  (cached)
+Module _efc_contact_update__locals__kernel_b43fbfe7 b43fbfe load on device 'cuda:0' took 1.26 ms  (cached)
+Module mujoco_warp._src.forward a76b6a3 load on device 'cuda:0' took 1.45 ms  (cached)
+Module mujoco_warp._src.passive 616927b load on device 'cuda:0' took 1.27 ms  (cached)
+Module mujoco_warp._src.forward 398750d load on device 'cuda:0' took 1.35 ms  (cached)
+Module mujoco_warp._src.support f32a4f8 load on device 'cuda:0' took 1.99 ms  (cached)
+Module mujoco_warp._src.solver 7df28c9 load on device 'cuda:0' took 1.44 ms  (cached)
+Module solve_init_jaref__locals__kernel_c16f89ba c16f89b load on device 'cuda:0' took 1.58 ms  (cached)
+Module mul_m_sparse__locals___mul_m_sparse_32fa3590 32fa359 load on device 'cuda:0' took 3.38 ms  (cached)
+Module update_constraint_efc__locals__kernel_6bfb2757 6bfb275 load on device 'cuda:0' took 1.07 ms  (cached)
+Module update_constraint_gauss_cost__locals__kernel_f44c2fe7 f44c2fe load on device 'cuda:0' took 1.16 ms  (cached)
+Module update_gradient_cholesky_blocked__locals__kernel_70c789cb c505d54 load on device 'cuda:0' took 171.60 ms  (cached)
+Module linesearch_jv_fused__locals__kernel_e1239d31 e1239d3 load on device 'cuda:0' took 1.29 ms  (cached)
+Module linesearch_iterative__locals__kernel_6131c716 3698647 load on device 'cuda:0' took 1.29 ms  (cached)
+Module mujoco_warp._src.sensor bee2d80 load on device 'cuda:0' took 1.43 ms  (cached)
+Module mujoco_warp._src.derivative f06cf21 load on device 'cuda:0' took 1.32 ms  (cached)
+dual: 27 bricks, 5 braced (weakest_joint), 30 clutch welds
+brick spheres: 8 inscribed (morphit skipped)
+pickup clearance A_b_000: [0.0, 0.0, 0.0] mm
+coordinator: {'event': 'step_started', 'arm': 'A', 'step': 0, 'time': 1.100000000000001}
+pickup clearance B_b_000: [0.0, 0.0, 0.0] mm
+coordinator: {'event': 'step_started', 'arm': 'B', 'step': 0, 'time': 1.1166666666666676}
+brick spheres: 12 inscribed (morphit skipped)
+brick spheres: 12 inscribed (morphit skipped)
+stud fit: {'brick': 'A_b_000', 'event': 'held', 'time': 13.283, 'dz_mm': 1.76, 'needed_N': 8.9}
+stud fit: {'brick': 'B_b_000', 'event': 'held', 'time': 14.467, 'dz_mm': 1.68, 'needed_N': 35.6}
+stud fit: {'brick': 'A_b_000', 'event': 'pushed_through', 'time': 15.267, 'peak_N': 9.0, 'needed_N': 8.9, 'hand_N': 2.3}
+  step 0 A_b_000 SNAP  {'brick': 'A_b_000', 'lateral_mm': 1.41, 'dz_mm': -0.01, 'yaw_deg': 0.07, 'tilt_deg': 0.82}
+stud fit: {'brick': 'B_b_000', 'event': 'pushed_through', 'time': 16.533, 'peak_N': 36.5, 'needed_N': 35.6, 'hand_N': 17.0}
+  step 0 B_b_000 SNAP  {'brick': 'B_b_000', 'lateral_mm': 1.4, 'dz_mm': -0.0, 'yaw_deg': 0.0, 'tilt_deg': 0.05}
+pickup clearance A_b_001: [0.0, 0.0, 0.0] mm
+coordinator: {'event': 'step_complete', 'arm': 'A', 'step': 0, 'time': 20.95000000000009}
+coordinator: {'event': 'step_started', 'arm': 'A', 'step': 1, 'time': 20.95000000000009}
+pickup clearance B_b_001: [0.0, 0.0, 0.0] mm
+coordinator: {'event': 'step_complete', 'arm': 'B', 'step': 0, 'time': 27.29999999999973}
+coordinator: {'event': 'step_started', 'arm': 'B', 'step': 1, 'time': 27.29999999999973}
+brick spheres: 8 inscribed (morphit skipped)
+stud fit: {'brick': 'A_b_001', 'event': 'held', 'time': 40.0, 'dz_mm': 1.74, 'needed_N': 71.2}
+stud fit: {'brick': 'B_b_001', 'event': 'held', 'time': 41.183, 'dz_mm': 1.75, 'needed_N': 35.6}
+stud fit: {'brick': 'A_b_001', 'event': 'pushed_through', 'time': 44.6, 'peak_N': 72.5, 'needed_N': 71.2, 'hand_N': 40.1}
+stud fit: {'brick': 'B_b_001', 'event': 'pushed_through', 'time': 45.533, 'peak_N': 38.4, 'needed_N': 35.6, 'hand_N': 17.0}
+  step 1 A_b_001 SNAP  {'brick': 'A_b_001', 'lateral_mm': 1.44, 'dz_mm': -0.0, 'yaw_deg': 0.0, 'tilt_deg': 0.03}
+  step 1 B_b_001 SNAP  {'brick': 'B_b_001', 'lateral_mm': 1.39, 'dz_mm': -0.0, 'yaw_deg': 0.01, 'tilt_deg': 0.04}
+pickup clearance A_b_002: [0.0, 0.0, 0.0] mm
+drop-and-press A_b_002: release 11.00 mm above the seat
+coordinator: {'event': 'step_complete', 'arm': 'A', 'step': 1, 'time': 50.7999999999984}
+coordinator: {'event': 'step_started', 'arm': 'A', 'step': 2, 'time': 50.7999999999984}
+pickup clearance B_b_002: [0.0, 0.0, 1.25] mm
+coordinator: {'event': 'step_complete', 'arm': 'B', 'step': 1, 'time': 52.74999999999829}
+coordinator: {'event': 'step_started', 'arm': 'B', 'step': 2, 'time': 52.74999999999829}
+brick spheres: 12 inscribed (morphit skipped)
+stud fit: {'brick': 'B_b_002', 'event': 'held', 'time': 69.6, 'dz_mm': 1.84, 'needed_N': 35.6}
+stud fit: {'brick': 'A_b_002', 'event': 'held', 'time': 70.067, 'dz_mm': 1.06, 'needed_N': 35.6}
+stud fit: {'brick': 'A_b_002', 'event': 'pushed_through', 'time': 72.95, 'peak_N': 39.0, 'needed_N': 35.6, 'hand_N': 17.0}
+  step 2 A_b_002 SNAP  {'brick': 'A_b_002', 'lateral_mm': 0.37, 'dz_mm': -0.0, 'yaw_deg': 0.2, 'tilt_deg': 0.14}
+stud fit: {'brick': 'B_b_002', 'event': 'pushed_through', 'time': 74.117, 'peak_N': 36.7, 'needed_N': 35.6, 'hand_N': 17.0}
+  step 2 B_b_002 SNAP  {'brick': 'B_b_002', 'lateral_mm': 1.4, 'dz_mm': 0.0, 'yaw_deg': 0.03, 'tilt_deg': 0.15}
+pickup clearance A_b_003: [0.0, 0.0, 0.0] mm
+drop-and-press A_b_003: release 10.75 mm above the seat
+coordinator: {'event': 'step_complete', 'arm': 'A', 'step': 2, 'time': 79.03333333333013}
+coordinator: {'event': 'step_started', 'arm': 'A', 'step': 3, 'time': 79.03333333333013}
+pickup clearance B_b_003: [0.0, 0.0, 1.25] mm
+coordinator: {'event': 'step_complete', 'arm': 'B', 'step': 2, 'time': 84.74999999999648}
+coordinator: {'event': 'step_started', 'arm': 'B', 'step': 3, 'time': 84.74999999999648}
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+stud fit: {'brick': 'A_b_003', 'event': 'held', 'time': 100.333, 'dz_mm': 1.93, 'needed_N': 71.2}
+stud fit: {'brick': 'B_b_003', 'event': 'held', 'time': 101.45, 'dz_mm': 1.77, 'needed_N': 35.6}
+stud fit: {'brick': 'A_b_003', 'event': 'pushed_through', 'time': 104.017, 'peak_N': 73.3, 'needed_N': 71.2, 'hand_N': 37.0}
+  step 3 A_b_003 SNAP  {'brick': 'A_b_003', 'lateral_mm': 0.35, 'dz_mm': -0.0, 'yaw_deg': 0.03, 'tilt_deg': 0.02}
+stud fit: {'brick': 'B_b_003', 'event': 'pushed_through', 'time': 105.95, 'peak_N': 35.9, 'needed_N': 35.6, 'hand_N': 17.0}
+  step 3 B_b_003 SNAP  {'brick': 'B_b_003', 'lateral_mm': 1.41, 'dz_mm': 0.01, 'yaw_deg': 0.03, 'tilt_deg': 0.17}
+pickup clearance A_b_004: [0.0, 0.0, 0.0] mm
+drop-and-press A_b_004: release 10.75 mm above the seat
+coordinator: {'event': 'step_complete', 'arm': 'A', 'step': 3, 'time': 110.0666666666617}
+coordinator: {'event': 'step_started', 'arm': 'A', 'step': 4, 'time': 110.0666666666617}
+pickup clearance B_b_004: [0.0, 0.0, 1.25] mm
+coordinator: {'event': 'step_complete', 'arm': 'B', 'step': 3, 'time': 117.28333333332796}
+coordinator: {'event': 'step_started', 'arm': 'B', 'step': 4, 'time': 117.28333333332796}
+stud fit: {'brick': 'A_b_004', 'event': 'held', 'time': 129.7, 'dz_mm': 1.6, 'needed_N': 35.6}
+stud fit: {'brick': 'B_b_004', 'event': 'held', 'time': 133.317, 'dz_mm': 1.81, 'needed_N': 35.6}
+stud fit: {'brick': 'A_b_004', 'event': 'pushed_through', 'time': 134.85, 'peak_N': 37.6, 'needed_N': 35.6, 'hand_N': 17.0}
+  step 4 A_b_004 SNAP  {'brick': 'A_b_004', 'lateral_mm': 0.83, 'dz_mm': -0.0, 'yaw_deg': 1.2, 'tilt_deg': 0.03}
+stud fit: {'brick': 'B_b_004', 'event': 'pushed_through', 'time': 138.267, 'peak_N': 38.3, 'needed_N': 35.6, 'hand_N': 20.1}
+pickup clearance A_b_006: [0.0, 0.0, 1.25] mm
+coordinator: {'event': 'step_complete', 'arm': 'A', 'step': 4, 'time': 141.40000000000467}
+coordinator: {'event': 'step_started', 'arm': 'A', 'step': 5, 'time': 141.40000000000467}
+  step 4 B_b_004 SNAP  {'brick': 'B_b_004', 'lateral_mm': 1.4, 'dz_mm': 0.01, 'yaw_deg': 0.03, 'tilt_deg': 0.17}
+pickup clearance B_b_005: [0.0, 0.0, 1.25] mm
+coordinator: {'event': 'step_complete', 'arm': 'B', 'step': 4, 'time': 148.00000000000992}
+coordinator: {'event': 'step_started', 'arm': 'B', 'step': 5, 'time': 148.00000000000992}
+stud fit: {'brick': 'A_b_006', 'event': 'held', 'time': 157.85, 'dz_mm': 1.8, 'needed_N': 8.9}
+stud fit: {'brick': 'B_b_005', 'event': 'held', 'time': 163.883, 'dz_mm': 1.84, 'needed_N': 35.6}
+stud fit: {'brick': 'A_b_006', 'event': 'pushed_through', 'time': 165.533, 'peak_N': 9.3, 'needed_N': 8.9, 'hand_N': 3.1}
+  step 5 A_b_006 SNAP  {'brick': 'A_b_006', 'lateral_mm': 1.41, 'dz_mm': 0.0, 'yaw_deg': 0.09, 'tilt_deg': 0.12}
+stud fit: {'brick': 'B_b_005', 'event': 'pushed_through', 'time': 167.917, 'peak_N': 37.0, 'needed_N': 35.6, 'hand_N': 17.0}
+  step 5 B_b_005 SNAP  {'brick': 'B_b_005', 'lateral_mm': 1.43, 'dz_mm': 0.0, 'yaw_deg': 0.03, 'tilt_deg': 0.14}
+grip fallback A_b_007: edge, yaw 90 deg, offset [0.0, 7.0] mm
+pickup clearance A_b_007: [0.0, 7.0, 1.25] mm
+coordinator: {'event': 'step_complete', 'arm': 'A', 'step': 5, 'time': 171.08333333336162}
+coordinator: {'event': 'step_started', 'arm': 'A', 'step': 6, 'time': 171.08333333336162}
+pickup clearance B_b_006: [0.0, 0.0, 1.25] mm
+coordinator: {'event': 'step_complete', 'arm': 'B', 'step': 5, 'time': 177.36666666669996}
+coordinator: {'event': 'step_started', 'arm': 'B', 'step': 6, 'time': 177.36666666669996}
+stud fit: {'brick': 'A_b_007', 'event': 'held', 'time': 188.083, 'dz_mm': 1.79, 'needed_N': 8.9}
+stud fit: {'brick': 'A_b_007', 'event': 'pushed_through', 'time': 191.817, 'peak_N': 9.6, 'needed_N': 8.9, 'hand_N': 3.1}
+  step 6 A_b_007 SNAP  {'brick': 'A_b_007', 'lateral_mm': 1.38, 'dz_mm': -0.0, 'yaw_deg': 0.01, 'tilt_deg': 0.23}
+stud fit: {'brick': 'B_b_006', 'event': 'held', 'time': 192.783, 'dz_mm': 1.7, 'needed_N': 35.6}
+grip fallback A_b_008: edge, yaw 90 deg, offset [0.0, 7.0] mm
+pickup clearance A_b_008: [0.0, 7.0, 1.25] mm
+coordinator: {'event': 'step_complete', 'arm': 'A', 'step': 6, 'time': 195.75000000004792}
+coordinator: {'event': 'step_started', 'arm': 'A', 'step': 7, 'time': 195.75000000004792}
+stud fit: {'brick': 'B_b_006', 'event': 'pushed_through', 'time': 197.55, 'peak_N': 35.7, 'needed_N': 35.6, 'hand_N': 23.1}
+  step 6 B_b_006 SNAP  {'brick': 'B_b_006', 'lateral_mm': 1.09, 'dz_mm': 0.0, 'yaw_deg': 0.03, 'tilt_deg': 0.12}
+pickup clearance B_b_007: [0.0, 0.0, 1.25] mm
+coordinator: {'event': 'step_complete', 'arm': 'B', 'step': 6, 'time': 203.0833333333871}
+coordinator: {'event': 'step_started', 'arm': 'B', 'step': 7, 'time': 203.0833333333871}
+stud fit: {'brick': 'A_b_008', 'event': 'held', 'time': 212.917, 'dz_mm': 1.86, 'needed_N': 8.9}
+stud fit: {'brick': 'B_b_007', 'event': 'held', 'time': 215.533, 'dz_mm': 1.7, 'needed_N': 35.6}
+stud fit: {'brick': 'A_b_008', 'event': 'pushed_through', 'time': 217.267, 'peak_N': 10.4, 'needed_N': 8.9, 'hand_N': 3.1}
+  step 7 A_b_008 SNAP  {'brick': 'A_b_008', 'lateral_mm': 1.4, 'dz_mm': -0.01, 'yaw_deg': 0.0, 'tilt_deg': 0.28}
+stud fit: {'brick': 'B_b_007', 'event': 'pushed_through', 'time': 217.933, 'peak_N': 35.9, 'needed_N': 35.6, 'hand_N': 23.1}
+  step 7 B_b_007 SNAP  {'brick': 'B_b_007', 'lateral_mm': 1.1, 'dz_mm': 0.0, 'yaw_deg': 0.04, 'tilt_deg': 0.1}
+grip fallback A_b_009: edge, yaw 0 deg, offset [-3.0, 0.0] mm
+pickup clearance A_b_009: [-3.0, 0.0, 1.25] mm
+coordinator: {'event': 'step_complete', 'arm': 'A', 'step': 7, 'time': 220.98333333340133}
+coordinator: {'event': 'step_started', 'arm': 'A', 'step': 8, 'time': 220.98333333340133}
+pickup clearance B_b_009: [0.0, 0.0, 1.25] mm
+coordinator: {'event': 'step_complete', 'arm': 'B', 'step': 7, 'time': 229.1500000000745}
+coordinator: {'event': 'step_started', 'arm': 'B', 'step': 8, 'time': 229.1500000000745}
+brick spheres: 12 inscribed (morphit skipped)
+stud fit: {'brick': 'A_b_009', 'event': 'held', 'time': 237.967, 'dz_mm': 1.79, 'needed_N': 17.8}
+stud fit: {'brick': 'B_b_009', 'event': 'held', 'time': 243.067, 'dz_mm': 1.69, 'needed_N': 35.6}
+stud fit: {'brick': 'A_b_009', 'event': 'pushed_through', 'time': 244.25, 'peak_N': 18.0, 'needed_N': 17.8, 'hand_N': 5.4}
+  step 8 A_b_009 SNAP  {'brick': 'A_b_009', 'lateral_mm': 1.44, 'dz_mm': -0.0, 'yaw_deg': 0.01, 'tilt_deg': 0.09}
+stud fit: {'brick': 'B_b_009', 'event': 'pushed_through', 'time': 246.417, 'peak_N': 35.7, 'needed_N': 35.6, 'hand_N': 23.1}
+  step 8 B_b_009 SNAP  {'brick': 'B_b_009', 'lateral_mm': 1.08, 'dz_mm': 0.0, 'yaw_deg': 0.04, 'tilt_deg': 0.1}
+pickup clearance A_b_005: [0.0, 0.0, 0.0] mm
+drop-and-press A_b_005: release 11.00 mm above the seat
+coordinator: {'event': 'step_complete', 'arm': 'A', 'step': 8, 'time': 249.46666666675733}
+coordinator: {'event': 'step_started', 'arm': 'A', 'step': 9, 'time': 249.46666666675733}
+coordinator: {'event': 'step_complete', 'arm': 'B', 'step': 8, 'time': 255.8000000000957}
+coordinator: {'event': 'support_requested', 'arm': 'B', 'step': 9, 'time': 255.8000000000957}
+stud fit: {'brick': 'A_b_005', 'event': 'held', 'time': 264.633, 'dz_mm': 1.99, 'needed_N': 35.6}
+stud fit: {'brick': 'A_b_005', 'event': 'not_pushed_through', 'time': 264.733, 'peak_N': 24.2, 'needed_N': 35.6, 'hand_N': 7.7}
+  step 9 A_b_005 MISS  {'brick': 'A_b_005', 'lateral_mm': 0.29, 'dz_mm': 1.97, 'yaw_deg': 0.04, 'tilt_deg': 21.48}
+verification: ['recorded execution failure: A:gate_miss', 'A: incomplete/nonmonotonic own-build progress', 'A step 9: no recorded mating', 'A step 10: no recorded mating', 'A step 10: no insertion frames', 'B: incomplete/nonmonotonic own-build progress', 'B step 9: no recorded mating', 'B step 9: no insertion frames', 'B step 9: no measured two-finger support force', 'B step 9: support was not requested before pickup', 'B step 10: no recorded mating', 'B step 10: no insertion frames', 'B step 11: no recorded mating', 'B step 11: no insertion frames', 'B step 11: no measured two-finger support force', 'B step 11: support was not requested before pickup', 'B step 12: no recorded mating', 'B step 12: no insertion frames', 'B step 13: no recorded mating', 'B step 13: no insertion frames', 'B step 13: no measured two-finger support force', 'B step 13: support was not requested before pickup', 'B step 14: no recorded mating', 'B step 14: no insertion frames', 'B step 14: no measured two-finger support force', 'B step 14: support was not requested before pickup', 'B step 15: no recorded mating', 'B step 15: no insertion frames', 'B step 15: no measured two-finger support force', 'B step 15: support was not requested before pickup', 'unserved support request', 'execution did not finish cleanly']
+dual build: {"ok": false, "done": false, "failure": "A:gate_miss", "frames": 16006, "parallel_frames": 591}

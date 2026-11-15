@@ -1,0 +1,17 @@
+{
+  "frame": 24840,
+  "sim_time": 414.9999999999512,
+  "phases": {
+    "A": "hold",
+    "B": "transport"
+  },
+  "modes": {
+    "A": "stopped",
+    "B": "stopped"
+  },
+  "steps": {
+    "A": 11,
+    "B": 13
+  },
+  "pending": {}
+}

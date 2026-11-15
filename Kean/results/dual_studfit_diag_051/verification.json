@@ -1,0 +1,31 @@
+{
+  "ok": false,
+  "full_build": false,
+  "errors": [
+    "contact monitor: penetration",
+    "contact monitor: displaced",
+    "detailed contact evidence: displaced",
+    "detailed contact evidence: displaced",
+    "detailed contact evidence: displaced",
+    "detailed contact evidence: penetration"
+  ],
+  "recorded_parallel_frames": 0,
+  "grants": [
+    {
+      "arm": "B",
+      "step": 13,
+      "time": 1.1166666666666676
+    },
+    {
+      "arm": "B",
+      "step": 14,
+      "time": 37.68333333333248
+    },
+    {
+      "arm": "B",
+      "step": 15,
+      "time": 73.01666666666381
+    }
+  ],
+  "frames": 6518
+}
