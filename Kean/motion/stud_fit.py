@@ -54,6 +54,8 @@ POST_SNAP = 0.5     # minimum s after a braced snap; breaker also stays off whil
 HAND_KEEP_OUT = 0.020  # m, planner keep-out between the support grip and the pressed brick
 CORRIDOR_CLEAR = 0.0012   # m, helper clearance from the insertion box without stud resistance
 CORRIDOR_OVERLAP = 0.0015  # m: diag_032 fingers were 1.04-1.16 mm into the corridor; runtime 1.08 mm
+SUPPORT_PATH_OVERLAP = 0.002  # m: studfit_008 B step 14 pre-insert path was -1.69 mm into the
+                    # holding arm after a full dual build; keep corridor slop separate.
 CORRIDOR_PAD = 0.004      # m, insertion-box xy pad without stud resistance (wriggle room)
 CORRIDOR_PAD_STUD = 0.001  # m: diag_029's fingers sat 1.02 mm into the +4 mm box; stud-fit wriggle is 0.1 mm
 FINGER_CLEAR = 0.0012     # m, closed-finger clearance from a placed brick
@@ -151,12 +153,12 @@ def support_insert_ignores_carried(stud_fit):
 
 
 def support_motion_floor(stud_fit):
-    """Tick clearance floor while a stud-fit support holds through insert/press.
+    """Clearance floor while a stud-fit support holds through pre-insert/press.
 
     diag_034 fired the motion guard 171 times at 0.71-1.00 mm during the crown
-    press, zeroing velocity into the bridge; the joint then broke at u 1.008.
-    Use the same overlap slop as the corridor; non-stud-fit keeps 1 mm."""
-    return -CORRIDOR_OVERLAP if stud_fit else 0.001
+    press. studfit_008's replanned pre-insert after a full dual build was
+    -1.69 mm into the holding arm (past the old 1.5 mm corridor slop)."""
+    return -SUPPORT_PATH_OVERLAP if stud_fit else 0.001
 
 
 def near_support_press(roles, arms):

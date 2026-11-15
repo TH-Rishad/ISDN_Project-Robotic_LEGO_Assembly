@@ -58,10 +58,10 @@ class PathContactTest(unittest.TestCase):
             validate(probe, request, np.zeros((1, 7)))
 
     def test_stud_fit_near_support_allows_sub_mm_other_arm_gap(self):
-        """dual_pyramid_s3_studfit_007: 0.97 mm at the holding arm failed a 1 mm floor."""
+        """studfit_007/008: pre-insert into the holding arm at +0.97 / -1.69 mm."""
         from Kean.motion.stud_fit import support_motion_floor
         probe = Probe()
-        probe.clearance_spheres = lambda *args: 0.00097
+        probe.clearance_spheres = lambda *args: -0.00169
         request = self.request(5)
         request.boxes = []
         with self.assertRaisesRegex(PathCollision, 'other arm'):

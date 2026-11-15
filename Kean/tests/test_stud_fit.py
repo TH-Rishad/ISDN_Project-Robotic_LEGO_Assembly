@@ -276,7 +276,7 @@ class StudFitTest(unittest.TestCase):
         from Kean.motion.stud_fit import SUPPORT_GRIP, near_support_press, support_motion_floor
         # 3x grip: pad hold 2*42.9 N covers the 71 N crown that broke the bridge at 2x.
         self.assertGreaterEqual(2.0 * 14.3 * SUPPORT_GRIP, 71.2)
-        self.assertEqual(support_motion_floor(True), -0.0015)
+        self.assertEqual(support_motion_floor(True), -0.002)
         self.assertEqual(support_motion_floor(False), 0.001)
         arms = {'A': NS(phase='hold'), 'B': NS(phase='press')}
         self.assertTrue(near_support_press({'A': 'supporter', 'B': 'builder'}, arms))
