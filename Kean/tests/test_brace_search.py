@@ -127,6 +127,28 @@ class BraceSearchTest(unittest.TestCase):
         self.assertIsNotNone(ex.before_braced)
         ex.fail.assert_not_called()
 
+    def test_support_not_established_opens_then_retries(self):
+        picks = [dict(brace_pose=[0, 0, .02], brace_tilt_rotvec=[x, 0, 0]) for x in (.8, 1.)]
+        ex = self.setup_search(picks)
+        with patch('Kean.motion.brace_search.candidates', return_value=iter(picks)), \
+             patch('Kean.motion.brace_search.check_approach', side_effect=[None, None]):
+            ex.queue_brace(0, picks[0])
+            ex.A.moves[0]['then']()
+            self.assertTrue(ex.brace_search_report[0]['accepted'])
+            self.assertIsNotNone(ex.on_support_failed)
+            ex.pending_hold = 0
+            self.assertTrue(ex.on_support_failed(0))
+            self.assertIsNone(ex.pending_hold)
+            self.assertEqual(ex.brace_search_report[0]['error'], 'support_not_established')
+            self.assertEqual([m['phase'] for m in ex.A.moves], ['open', 'retract', 'park'])
+            park = ex.A.moves[-1]
+            ex.A.moves.clear()
+            park['then']()
+            self.assertEqual(ex.plan['sequence'][0]['brace'], picks[1])
+            ex.A.moves[0]['then']()
+        self.assertTrue(ex.brace_search_report[-1]['accepted'])
+        ex.fail.assert_not_called()
+
     def test_preinsert_failure_backtracks_to_another_hover(self):
         ex = Ex()
         ex.B.push('transport', [.1, 0, .2], 0, .01, 1)

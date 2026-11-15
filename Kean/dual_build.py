@@ -471,6 +471,11 @@ class Build:
                 self.brace_info(n)['executed'] = True
                 self.braced.add(n)
             elif self.sim_time - self.close_t > 3.:
+                # One-sided grip after a guard stop (studfit_010 step 13: [0, 1.6] N)
+                # is a bad candidate, not a dead build — brace_search retries.
+                handler = getattr(self, 'on_support_failed', None)
+                if handler is not None and handler(n):
+                    return
                 self.fail('support_not_established')
         else:
             self.support_loss_frames = 0 if established else self.support_loss_frames + 1

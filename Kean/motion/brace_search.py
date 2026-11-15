@@ -166,6 +166,7 @@ def install(ex, planner, world, carried, D):
     original = ex.queue_brace
     ex.brace_search_report = []
     ex.before_braced = None
+    ex.on_support_failed = None
 
     def queue_brace(self, n, brace):
         if self.legacy or not brace.get('feasible', True):
@@ -175,6 +176,7 @@ def install(ex, planner, world, carried, D):
 
         def attempt():
             self.before_braced = None
+            self.on_support_failed = None
             try:
                 pick = next(choices)
             except StopIteration:
@@ -200,6 +202,17 @@ def install(ex, planner, world, carried, D):
             guard = next(m for m in self.A.moves if m['phase'] == 'brace-guard')
             rebase = guard['then']
 
+            def abandon_hold(reason):
+                """Closed (or closing) helper cannot support — try the next pose."""
+                record['accepted'] = False
+                record['error'] = reason
+                print('brace search rejected %s step %d' % (reason, n), flush=True)
+                self.before_braced = None
+                self.on_support_failed = None
+                self.pending_hold = None
+                _retreat_helper(self, D, attempt, open_first=True)
+                return True
+
             def checked():
                 rebase()
                 try:
@@ -224,18 +237,20 @@ def install(ex, planner, world, carried, D):
                     try:
                         check_approach(self, planner, world, carried, D)
                     except PlannerUnavailable as exc:
-                        record['accepted'] = False
-                        record['error'] = 'held approach: ' + str(exc)
-                        print('brace search rejected held step %d: %s' % (n, exc), flush=True)
-                        self.before_braced = None
-                        self.pending_hold = None
-                        _retreat_helper(self, D, attempt, open_first=True)
-                        return False
+                        abandon_hold('held approach: ' + str(exc))
+                        return False  # do not braced.add; retreat already queued
                     self.before_braced = None
+                    self.on_support_failed = None
                     print('brace search held approach ok step %d' % n, flush=True)
                     return True
 
+                # Guard-stop close can land one finger only (studfit_010 step 13).
+                # That used to end the whole dual build; retry the next candidate.
+                def on_support_failed(_n):
+                    return abandon_hold('support_not_established')
+
                 self.before_braced = before_braced
+                self.on_support_failed = on_support_failed
 
             guard['then'] = checked
 
