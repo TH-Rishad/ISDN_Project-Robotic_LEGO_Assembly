@@ -203,25 +203,42 @@ def install(ex, planner, world, carried, D):
         # Grip failures burn the TCP pose: a 180° yaw flip hits the same brick
         # face (studfit_014 step 13 → support_lost on the yaw twin).
         skip_poses = set()
+        # After a GUARD STOP, try columns ≥12 mm away before nearby twins
+        # (studfit_018 scraped -0.19/-0.186/-0.188 before -0.202 worked).
+        avoid_ys = []
+        deferred = []
 
         def pose_key(pick):
             return tuple(np.round(pick['brace_pose'], 5))
+
+        def take_pick():
+            while True:
+                if deferred and not avoid_ys:
+                    return deferred.pop(0)
+                try:
+                    pick = next(choices)
+                except StopIteration:
+                    if deferred:
+                        return deferred.pop(0)
+                    return None
+                if pose_key(pick) in skip_poses:
+                    print('brace search skip same pose step %d: %s' % (n, pick['brace_pose']), flush=True)
+                    continue
+                if avoid_ys and any(abs(pick['brace_pose'][1] - y) < .012 for y in avoid_ys):
+                    deferred.append(pick)
+                    print('brace search defer near guard-stop y step %d: %s' % (n, pick['brace_pose']), flush=True)
+                    continue
+                return pick
 
         def attempt():
             self.before_braced = None
             self.on_support_failed = None
             self.on_guard_abandon = None
-            while True:
-                try:
-                    pick = next(choices)
-                except StopIteration:
-                    self.plan['sequence'][n]['brace'] = initial
-                    self.fail('brace_search_exhausted')
-                    return
-                if pose_key(pick) in skip_poses:
-                    print('brace search skip same pose step %d: %s' % (n, pick['brace_pose']), flush=True)
-                    continue
-                break
+            pick = take_pick()
+            if pick is None:
+                self.plan['sequence'][n]['brace'] = initial
+                self.fail('brace_search_exhausted')
+                return
             self.B.waited = 0.  # each bounded physical trial has its own timeout
             self.plan['sequence'][n]['brace'] = pick
             record = dict(step=n, pose=pick['brace_pose'], tilt=pick['brace_tilt_rotvec'],
@@ -238,6 +255,8 @@ def install(ex, planner, world, carried, D):
                 # the scrape displaces neighbours (studfit_017 B_b_010).
                 if reason.startswith('support_') or reason == 'guard_stop':
                     skip_poses.add(pose_key(pick))
+                if reason == 'guard_stop':
+                    avoid_ys.append(float(pick['brace_pose'][1]))
                 self.before_braced = None
                 self.on_support_failed = None
                 self.on_guard_abandon = None

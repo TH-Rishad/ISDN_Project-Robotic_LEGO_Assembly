@@ -340,12 +340,9 @@ class Build:
             if move['phase'] not in ('to brace', 'approach', 'brace-in', 'brace-guard'):
                 break
             allowed = self.cell.allowed_finger_contacts(helper, move['phase'])
-            # studfit_018: 1.2 mm paths still GUARD STOP'd into B_b_010/012 and
-            # displaced them on every near retry. Demand more open-hand clearance.
-            clear = .0025 if self.stud_fit is not None else .0012
             request = Request(helper, q, ee, move['pos'], [0, 0, 0, 1], boxes=boxes, other_q=other_q,
                               full_path=True, grip=move['grip'], tilt=move['tilt'], allowed_finger_contacts=allowed,
-                              proposal_build=self.owner, clearance=clear,
+                              proposal_build=self.owner, clearance=.0012,
                               yaw=planner_yaw(self, self.A, move['yaw'], resolve_wrap(D)))
             result = self.cell.planner.plan(request)
             if move['phase'] != 'brace-guard':

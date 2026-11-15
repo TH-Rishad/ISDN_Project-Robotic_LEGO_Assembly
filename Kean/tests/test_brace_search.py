@@ -211,6 +211,27 @@ class BraceSearchTest(unittest.TestCase):
         self.assertEqual(len(ex.brace_search_report), 2)
         ex.fail.assert_not_called()
 
+    def test_guard_stop_defers_nearby_y_before_far_column(self):
+        # studfit_018: three near Y scrapes before the far hold at -0.202.
+        picks = [
+            dict(brace_pose=[0., -.19, .0556], brace_tilt_rotvec=[1.3, 0, 0]),
+            dict(brace_pose=[0., -.186, .0556], brace_tilt_rotvec=[1.3, 0, 0]),
+            dict(brace_pose=[0., -.202, .0556], brace_tilt_rotvec=[1.3, 0, 0]),
+        ]
+        ex = self.setup_search(picks)
+        ex.braced = set()
+        ex.b_step = 0
+        with patch('Kean.motion.brace_search.candidates', return_value=iter(picks)), \
+             patch('Kean.motion.brace_search.check_approach', side_effect=[None]):
+            ex.queue_brace(0, picks[0])
+            ex.on_guard_abandon(0)
+            park = ex.A.moves[-1]
+            ex.A.moves.clear()
+            park['then']()
+        self.assertEqual(ex.plan['sequence'][0]['brace']['brace_pose'], picks[2]['brace_pose'])
+        self.assertEqual(len(ex.brace_search_report), 2)  # near twin deferred, far tried
+        ex.fail.assert_not_called()
+
     def test_preinsert_failure_backtracks_to_another_hover(self):
         ex = Ex()
         ex.B.push('transport', [.1, 0, .2], 0, .01, 1)
