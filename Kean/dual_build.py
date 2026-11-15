@@ -459,8 +459,15 @@ class Build:
         n = self.pending_hold
         if n is None or self.A.phase != 'hold':
             return
-        samples = self.brace_info(n)['grip_samples']
-        established = len(samples) >= 5 and min(np.mean(samples[-5:], axis=0)) > .5
+        info = self.brace_info(n)
+        samples = info['grip_samples']
+        both_fingers = len(samples) >= 5 and min(np.mean(samples[-5:], axis=0)) > .5
+        # studfit_015 step 14: one finger on B_b_010 briefly cleared 0.5 N, got
+        # support_held, then support_lost. Require every planned grip brick.
+        gripped = set((self.plan['sequence'][n].get('brace') or {}).get('gripped_bricks') or [])
+        covered = (not gripped) or gripped <= set(info.get('contacted') or ())
+        stud = getattr(self.cell, 'stud_fit', None) is not None
+        established = both_fingers and (covered if stud else True)
         if n not in self.braced:
             if established:
                 # Stud-fit brace_search may re-check B's approach with the
@@ -468,7 +475,7 @@ class Build:
                 gate = getattr(self, 'before_braced', None)
                 if gate is not None and gate(n) is False:
                     return
-                self.brace_info(n)['executed'] = True
+                info['executed'] = True
                 self.braced.add(n)
             elif self.sim_time - self.close_t > 3.:
                 # One-sided grip after a guard stop (studfit_010 step 13: [0, 1.6] N)

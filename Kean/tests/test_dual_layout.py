@@ -45,11 +45,12 @@ else:
 from types import SimpleNamespace
 from Kean.dual_build import Build
 view = Build.__new__(Build)
-view.cell = SimpleNamespace(sim_time=0.)
+view.cell = SimpleNamespace(sim_time=0., stud_fit=None)
 view.A = SimpleNamespace(phase='hold')
 view.close_t = 0.
 view.braced = set()
-info = dict(executed=True, grip_samples=[])
+view.plan = {'sequence': [{'brace': {}} for _ in range(12)]}
+info = dict(executed=True, grip_samples=[], contacted=set())
 view.brace_info = lambda n: info
 failures = []
 view.fail = failures.append
@@ -72,6 +73,18 @@ info['grip_samples'].clear()
 view.cell.sim_time = 3.1
 view.check_support()
 assert failures[-1] == 'support_not_established'
+# stud-fit: one-finger contact on a two-brick grip must not establish (studfit_015).
+view.cell.stud_fit = object()
+view.plan['sequence'][11] = {'brace': {'gripped_bricks': ['B_b_010', 'B_b_012']}}
+info['grip_samples'] = [[10., 10.]] * 5
+info['contacted'] = {'B_b_010'}
+view.cell.sim_time = 0.
+view.confirm_brace(11)
+view.check_support()
+assert 11 not in view.braced
+info['contacted'] = {'B_b_010', 'B_b_012'}
+view.check_support()
+assert 11 in view.braced
 
 from Kean.dual_build import DualExample
 own = SimpleNamespace(active=True, b_step=0, placed=set(), plan=dict(sequence=[dict(brick_id='A_b0')]))
