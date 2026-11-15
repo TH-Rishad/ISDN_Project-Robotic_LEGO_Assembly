@@ -42,6 +42,17 @@ class CoordinatorTest(unittest.TestCase):
         self.assertEqual(c.dispatch(dict(A=True, B=True), 0), [('B', 'A')])
         self.assertEqual(c.dispatch(dict(A=True, B=True), 1), [])
 
+    def test_hold_helper_while_other_finishes_pre_brace_step(self):
+        # studfit_013: A must not start A_b_005 while B is still finishing the
+        # step before a braced placement that needs A as helper.
+        c = Coordinator({'A': [False, False], 'B': [False, True]})
+        self.assertEqual(c.dispatch(dict(A=True, B=True), 0), [('A', None), ('B', None)])
+        c.complete('A', 1)
+        self.assertEqual(c.dispatch(dict(A=True, B=False), 1), [])
+        self.assertFalse(c.builds['A'].busy)
+        c.complete('B', 2)
+        self.assertEqual(c.dispatch(dict(A=True, B=True), 2), [('B', 'A')])
+
 
 if __name__ == '__main__':
     unittest.main()

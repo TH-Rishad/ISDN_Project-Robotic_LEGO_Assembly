@@ -39,6 +39,21 @@ class Coordinator:
         state.step += 1
         state.busy = False
 
+    def _needed_as_helper(self, helper):
+        """True if starting helper now would race past an upcoming brace need.
+
+        studfit_012/013: A finished pyramid step 8 while B was still on S3 step 8,
+        started drop-press A_b_005, then could not help B's braced step 9 → gate_miss.
+        Hold only when the helper has already moved past the other's current step
+        (same-layer parallel free steps still start together).
+        """
+        other = 'B' if helper == 'A' else 'A'
+        o, h = self.builds[other], self.builds[helper]
+        if o.done or not o.busy:
+            return False
+        nxt = o.step + 1
+        return (nxt < len(o.supports) and bool(o.supports[nxt]) and h.step > o.step)
+
     def dispatch(self, ready, time):
         """Return (builder, helper-or-None) starts; collect BOTH requests first."""
         if self.active is not None:
@@ -63,6 +78,8 @@ class Coordinator:
         starts = []
         for arm, state in self.builds.items():
             if ready[arm] and not state.busy and not state.done:
+                if self._needed_as_helper(arm):
+                    continue
                 state.busy = True
                 self.event('step_started', arm, time)
                 starts.append((arm, None))
