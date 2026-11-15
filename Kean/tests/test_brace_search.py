@@ -200,7 +200,9 @@ class BraceSearchTest(unittest.TestCase):
             # DualExample.brace_guard_stopped then abandons.
             ex.on_guard_abandon(0)
             self.assertEqual(ex.brace_search_report[0]['error'], 'guard_stop')
-            self.assertEqual([m['phase'] for m in ex.A.moves], ['open', 'retract', 'park'])
+            # Already open in the scrape: retract farther, no dwell-open (studfit_018).
+            self.assertEqual([m['phase'] for m in ex.A.moves], ['retract', 'park'])
+            self.assertGreater(np.linalg.norm(ex.A.moves[0]['pos'] - [0, 0, .1]), .05)
             self.closed.assert_not_called()
             park = ex.A.moves[-1]
             ex.A.moves.clear()
