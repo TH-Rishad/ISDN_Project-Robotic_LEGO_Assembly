@@ -2,8 +2,11 @@
 
 Status: implemented and validated. The complete from-empty arch/S3 build
 `results/dual_arch_s3_012` passes `verify_dual` (exit 0), including a live
-A-first simultaneous support request.
-Branch: `feat/dual-builder-coordination`.
+A-first simultaneous support request. Under `--stud-fit`, the complete
+from-empty pyramid + S3 build `results/dual_pyramid_s3_studfit_030` also
+passes `verify_dual` (`ok` and `full_build` true; A 11/11, B 16/16).
+Branches: dual-builder coordination landed earlier; stud-fit work merged to
+`main` at `ec86e5e` (code tip for that run: `6be3fc9`).
 
 Execution refinements from GPU validation: support-waiting builders move with
 their carried brick to a checked park pose before the helper approaches.
@@ -423,7 +426,7 @@ and recording 3 s past the first failure). The break (u 1.131 this time, at
 0.00 mm) and the tower springs back to within 0.02 mm, with B_b_014 still held
 by its 4-stud joint and contact. It is the joint model's load check over its
 limit for two samples, not a brick coming off. Close-up side view at half
-speed: `results/dual_studfit_diag_019/dual_studfit_diag_019_step15_halfspeed.mp4`
+speed: `results/archive/dual_studfit_diag/dual_studfit_diag_019/dual_studfit_diag_019_step15_halfspeed.mp4`
 (`play_run.sh --start 125 --speed 0.5 --camera -0.30 -0.165 0.11 -8 0 --mp4 ...`;
 the break is at 0:29).
 
@@ -445,13 +448,30 @@ corridor ends at the stud tops.
 | `dual_studfit_diag_021` (S3 9-15) | 20x support hold: 9-14 seated, 13 at -0.53 mm / 0.97 deg; 15 broke the bridge joint (u 1.13) with its support sent to the pier |
 | `dual_studfit_diag_022`-`026` (S3 13-15) | Support-search ordering and corridor; 13 and 14 seat every time; 15 breaks (u 1.05-1.25) |
 
-Open: S3 step 15. Every grip beside the bridge puts the helper's fingers within
-0.5 mm of the new brick's path (`helper obstructs carried-brick insertion
-corridor`), and the search accepts alternatives only if the model rates them as
-strong as the planned grip (load 0.0), so it falls back to the pier, which does
-not protect the 2-stud bridge joint.
+### Closed: full pyramid + S3 under `--stud-fit`
 
-Open: S3's last step. The planner judges it safe unsupported at a 1.3 x
-press; the cell's joint model breaks its 2-stud bridge joint 3.5 % over
-capacity before the brick goes through. A full pyramid + S3 stud-fit build has
-not passed yet.
+S3 step 15 is forced-supported near the press (overhang rule). Later work kept
+the seating path and fixed brace-search scrapes that the verifier scored as
+`displaced` after every brick was already placed:
+
+- Abandon on GUARD STOP before closing into a scrape; lift clear, then retract
+  along the tool axis (no lateral plow through the structure).
+- Defer near-Y brace twins after a closed-finger reject; keep the support
+  clearance floor through release/retract and B staging.
+- `STUD_FIT_DISPLACED_MM` 2.0; rebaseline rest through GUARD retreat.
+- Suspend displaced scoring for the physics frame of a brace_search GUARD
+  trial, armed on Build views (not only `DualExample`).
+
+| Run | Result |
+|---|---|
+| `archive/dual_pyramid_s3_studfit_failed/…_018` | Place complete (A 11/11, B 16/16); verifier FAIL (unintended + displaced) |
+| `…_020` | Stopped mid-S3 (`command_clearance:other arm`) |
+| `…_021`–`023`, `026`–`027`, `029` | Place complete; verifier FAIL on brace_search GUARD scrape → displaced |
+| `…_024` | Stopped (`command_clearance:A:B_b_008`) after lateral abandon escape |
+| `…_025` | Stopped (`joint_break`) |
+| `dual_pyramid_s3_studfit_030` (current) | **PASS**: A 11/11, B 16/16, `done` true, `verify_dual` `ok`/`full_build` true, 0 errors. Supports B steps 9, 11, 13, 14, 15. HPC job 2313901, revision `6be3fc9`, results commit `ec86e5e` on `main`. |
+
+Validated package: `results/dual_pyramid_s3_studfit_030` (`summary.json`,
+`verification.json`, `stud_fit.json`, `provenance.json`). Failed trail and
+diagnostics: `results/archive/` (see `results/archive/README.md`). Branch
+`feat/dual-stud-fit` is merged to `main` at that tip.

@@ -20,9 +20,10 @@ venv/
 .DS_Store
 Thumbs.db
 
-# Temporary / build. Result logs under results/checks stay; they are the run record.
+# Temporary / build. Archived check logs stay under results/archive/checks/.
 *.tmp
 *.log
+!results/archive/checks/**/*.log
 !results/checks/**/*.log
 *.bak
 build/
@@ -31,13 +32,16 @@ dist/
 # Recorder dumps. JSON summaries stay.
 *.npz
 
-# Personal notes & scratch
+# Personal scratch only (not assignment docs). Work trajectory Markdown —
+# README.md, work_record.md, task.md, review.md, DUAL_BUILDER_PLAN.md,
+# results/**/*.md — stays tracked for submission.
 notes/
 scratch/
 *.md.bak
 todo-personal.md
 
-# Personal identity instructions (do not push)
+# Identity only: local agent instructions. Do not push. kean.id is ignored
+# at the repository root .gitignore.
 AGENTS.md
 
 # Local HPC agent skill and cluster config (do not push)

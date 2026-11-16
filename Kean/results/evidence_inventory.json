@@ -1,6 +1,6 @@
 {
  "runs": {
-  "acceptance": {
+  "archive/acceptance_legacy/acceptance": {
    "present": true,
    "files": [
     "S3_weakest_joint_s0.npz",
@@ -62,9 +62,10 @@
    },
    "provenance": false,
    "cell_rows": 2,
-   "episodes": 27
+   "episodes": 27,
+   "path": "archive/acceptance_legacy/acceptance"
   },
-  "acceptance_arch_wriggle2": {
+  "archive/acceptance_legacy/acceptance_arch_wriggle2": {
    "present": true,
    "files": [
     "arch_weakest_joint_s0.npz",
@@ -100,9 +101,10 @@
    },
    "provenance": false,
    "cell_rows": 1,
-   "episodes": 11
+   "episodes": 11,
+   "path": "archive/acceptance_legacy/acceptance_arch_wriggle2"
   },
-  "acceptance_s3_wriggle": {
+  "archive/acceptance_legacy/acceptance_s3_wriggle": {
    "present": true,
    "files": [
     "S3_weakest_joint_s0.npz",
@@ -142,7 +144,8 @@
    },
    "provenance": false,
    "cell_rows": 1,
-   "episodes": 16
+   "episodes": 16,
+   "path": "archive/acceptance_legacy/acceptance_s3_wriggle"
   }
  },
  "combined_matches_separate_runs": {
@@ -164,5 +167,16 @@
   "arch": true
  },
  "explicit_aggregation_manifest": false,
- "conclusion": "results/acceptance holds both structures in one directory and has no aggregation manifest. Plan hashes match the separate runs. Arch frames match (9139) but S3 frames do not (14649 vs 14581). No provenance.json or source revision is stored, so the combined summary is unverified."
+ "conclusion": "archive/acceptance_legacy/acceptance holds both structures in one directory and has no aggregation manifest. Plan hashes match the separate runs. Arch frames match (9139) but S3 frames do not (14649 vs 14581). No provenance.json or source revision is stored, so the combined summary is unverified. Current certified packages remain at results/ root; see results/README.md.",
+ "layout": {
+  "current_root": [
+   "instructor_run_001",
+   "verification_instructor_run_001",
+   "instructor_preview",
+   "dual_arch_s3_012",
+   "dual_pyramid_s3_006",
+   "dual_pyramid_s3_studfit_030"
+  ],
+  "archive": "archive/"
+ }
 }

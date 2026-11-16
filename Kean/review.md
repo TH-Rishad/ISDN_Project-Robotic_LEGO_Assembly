@@ -1,12 +1,16 @@
 # Reuse audit — 2026-10-21
 
-> Updated 2026-11-01. The 2026-10-21 audit body and the 2026-10-25 "not finished"
+> Updated 2026-11-17. The 2026-10-21 audit body and the 2026-10-25 "not finished"
 > note below are historical. `results/instructor_run_001` (gpu12) is the certified
-> package: arch 11/11, S3 16/16, verifier exit 0. Support counts come from the plans:
-> arch step 10, S3 steps 11, 13, 14. `results/acceptance` is the older directory
-> with no provenance; the verifier exits 2 on it. Do not replace the certified run.
-> The omitted prototypes listed in older notes were removed. This file's body
-> remains the 2026-10-21 record.
+> single-cell acceptance package: arch 11/11, S3 16/16, verifier exit 0. Support
+> counts come from the plans: arch step 10, S3 steps 11, 13, 14.
+> `results/archive/acceptance_legacy/acceptance` is the older directory with no
+> provenance; the verifier exits 2 on it. Do not replace the certified run.
+> Dual-builder stud resistance: `results/dual_pyramid_s3_studfit_030` (job
+> 2313901, revision `6be3fc9`) is the first full pyramid + S3 `--stud-fit`
+> package with `verify_dual` `ok`/`full_build` true. Failed and intermediate
+> runs are under `results/archive/`. The omitted prototypes listed in older
+> notes were removed. This file's body remains the 2026-10-21 record.
 
 This review supersedes the earlier cleanup notes. It covers all Kean source areas, scripts, tests and existing evidence, compared with Sakib's current launcher, cell controller, P3 probe, perception, observation encoder, camera/contact/record interfaces, motion skills and PPO code. No cluster run, environment installation or shared-source edit was made.
 

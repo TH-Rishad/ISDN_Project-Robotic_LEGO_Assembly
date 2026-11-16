@@ -2,6 +2,26 @@
 
 Sakib owns the environment, the Newton cell, and the sequence and support generators. Tanvir owns the tight-fit skill. Kean runs the generators on a structure id and finishes the arch and S3. Do not copy Tanvir's modules into `Kean/`.
 
+## Documentation and evidence (submission)
+
+These Markdown files are part of the assignment record (trajectory and
+evidence). Only the local identity file `AGENTS.md` / `kean.id` stays private.
+
+| File | What it records |
+|---|---|
+| [task.md](task.md) | Instructor criteria, completion checklist, dual-builder stud-fit add-on |
+| [work_record.md](work_record.md) | Dated log of tests, fixes, HPC jobs, and outcomes |
+| [review.md](review.md) | Reuse audit and current certified-package banner |
+| [DUAL_BUILDER_PLAN.md](DUAL_BUILDER_PLAN.md) | Dual-builder design, stud-fit path, validation tables |
+| [results/README.md](results/README.md) | Current packages vs `results/archive/` |
+| [results/evidence_inventory.md](results/evidence_inventory.md) | Inventory of acceptance and dual-builder evidence |
+| [report/project_report.tex](report/project_report.tex) | Written project report (PDF alongside) |
+
+Current simulation packages: `results/instructor_run_001`,
+`results/dual_arch_s3_012`, `results/dual_pyramid_s3_006`,
+`results/dual_pyramid_s3_studfit_030`. Failed and intermediate runs remain
+visible under `results/archive/` (indexed there, not deleted).
+
 ## Concurrent independent builders
 
 The new `dual_build` mode gives A and B separate structures, studded pads and
@@ -70,8 +90,11 @@ flush neighbours at the seat, the builder tries the other axis and edge grips,
 then drop-and-press (release above the neighbours' studs, press with closed
 fingertips). A dropped 1x1 tips on its single stud, so a course with a boxed-in
 1x1 is placed fewest studs first. `results/dual_pyramid_s3_006` builds the
-pyramid and S3 completely (`verify_dual` exit 0); its 8x video is
-`dual_pyramid_s3_006_8x.mp4`. See the plan.
+pyramid and S3 completely without stud resistance (`verify_dual` exit 0); its
+8x video is `dual_pyramid_s3_006_8x.mp4`. With `--stud-fit`,
+`results/dual_pyramid_s3_studfit_030` is the first full place that also passes
+`verify_dual` (`ok`/`full_build` true; A 11/11, B 16/16, supports on B steps
+9, 11, 13, 14, 15). See the plan.
 
 `--step-limit N` executes a short diagnostic. `--start-step-a N` and
 `--start-step-b N` pre-place earlier bricks for support diagnostics. Such runs
@@ -95,7 +118,7 @@ The two structures are the arch and S3. Support counts are the plan's `requires_
 | Workspace | Has | Finished | Not finished |
 | --- | --- | --- | --- |
 | `Sakib/` | `brickassembly/` (cell, planner, bracing, stability, vision, RL env, plans, ledger), `robofab_sim/`, `BrickSim/`, `Docs/`, `setup_env.sh` | Unbraced cube 8/8, arch 11/11, hollow_box 12/12. Sequence and vertical-press support generators. Perception V1 closed. v3.1 frozen. | G-V1. Live default is `--strategy none`, so braced acceptance builds are not the current path. |
-| `Kean/` | `motion/` planned-path adapter, acceptance runner, CPU verifier | `results/instructor_run_001` on gpu12: arch 11/11, S3 16/16, verifier exit 0. | Physical robot. `KEAN_NEWTON_FIT` stays off. |
+| `Kean/` | `motion/` planned-path adapter, dual_build, `--stud-fit`, acceptance runner, CPU verifier | `results/instructor_run_001` on gpu12: arch 11/11, S3 16/16, verifier exit 0. Dual-builder: `dual_arch_s3_012`; stud-fit pyramid+S3: `dual_pyramid_s3_studfit_030` (`verify_dual` ok). | Physical robot. `KEAN_NEWTON_FIT` stays off. |
 | `Tanvir/` | `tight_fit_audit.py`, `socket_family.py`, `socket_env.py`, `wriggle_brace.py`, `skill_env.py`, trainers, `report/` | `ScriptedWriggle` is the best policy. Pad shift is the measured gain. Five PPO runs and one ES run did not beat scripted. Proposal written. | Not in the Newton cell. Held-out, no brace, 1–2 mm: 26/68. |
 | `Richard/` | `.gitkeep` | Nothing | Everything |
 
@@ -150,7 +173,7 @@ Replay the saved arch planning failure and S3 command-guard snapshot first on
 HPC, without reconstructing the preceding placements:
 
 ```sh
-bash Kean/scripts/run.sh Kean/scripts/replay_motion.py Kean/results/acceptance/summary.json
+bash Kean/scripts/run.sh Kean/scripts/replay_motion.py Kean/results/archive/acceptance_legacy/acceptance/summary.json
 ```
 
 The guard replay prints three independently recomputed minimum clearances.
@@ -199,7 +222,7 @@ Import local modules as `Kean.*`; the top-level `motion` package belongs to Saki
 
 ## Experiments and prototypes
 
-Default M0.5 uses shared grasp execution and optimizer iterations. `P3_ITER_SCALE` explicitly opts into Kean's iteration-budget experiment; its default is now 1.0. The pickup-offset search stays opt-in (`m05.py --experimental-grasp-offset`). Cube job 0 in `results/checks/20261021-191332-980676` placed 8/8, had no unintended contacts, and passed the motion gate; planned-playback clearance was 0.046 m. That cube has no temporary-support section, so it does not meet instructor acceptance. Hollow_box is extra regression only. Contact acceptance thresholds are unchanged.
+Default M0.5 uses shared grasp execution and optimizer iterations. `P3_ITER_SCALE` explicitly opts into Kean's iteration-budget experiment; its default is now 1.0. The pickup-offset search stays opt-in (`m05.py --experimental-grasp-offset`). Cube job 0 in `results/archive/checks/20261021-191332-980676` placed 8/8, had no unintended contacts, and passed the motion gate; planned-playback clearance was 0.046 m. That cube has no temporary-support section, so it does not meet instructor acceptance. Hollow_box is extra regression only. Contact acceptance thresholds are unchanged.
 
 The insertion-RL, memory-scan, grip-adjustment and camera-bridge prototypes and the opt-in P3 extension (`p3.sh`/`p3_env.py`, sphere repair, contact rescoring) were removed (2026-10-29) — they were not part of the acceptance path. Tight steps call `motion/wriggle.py`, which replays Tanvir's `ScriptedWriggle` search phases on the cell's waypoint queue.
 
@@ -207,8 +230,16 @@ The insertion-RL, memory-scan, grip-adjustment and camera-bridge prototypes and 
 
 See [review.md](review.md) for the audit and validation limits.
 
-## Current status (2026-11-01)
+## Current status (2026-11-17)
 
 Historical notes above that say GPU acceptance is still pending, or that S3 has two supports, are records of that date. Support counts are read from the plans, not fixed at two or three.
 
-`results/instructor_run_001` is the certified package (gpu12, seed 0, `weakest_joint`, revision `d9fc5d79`). The verifier exits 0: arch 11/11 with support step 10, S3 16/16 with supports 11, 13, and 14. Contacts were arch 6 unintended / 4 penetration and S3 11 unintended / 5 penetration. Those counts do not change the three criteria. Replay clearances with `bash Kean/scripts/run.sh Kean/scripts/replay_motion.py Kean/results/instructor_run_001/summary.json`. Show the saved assembly, without stepping the cell, with `bash Kean/scripts/play_run.sh --run Kean/results/instructor_run_001 --shape arch` and open the tunnel at http://localhost:8080. The `.npz` recordings are gitignored; a sync that follows gitignore must still copy them. `results/acceptance` remains the older package with no provenance. Do not pass `--replace` on `instructor_run_001`.
+`results/instructor_run_001` is the certified single-cell acceptance package (gpu12, seed 0, `weakest_joint`, revision `d9fc5d79`). The verifier exits 0: arch 11/11 with support step 10, S3 16/16 with supports 11, 13, and 14. Contacts were arch 6 unintended / 4 penetration and S3 11 unintended / 5 penetration. Those counts do not change the three criteria. Replay clearances with `bash Kean/scripts/run.sh Kean/scripts/replay_motion.py Kean/results/instructor_run_001/summary.json`. Show the saved assembly, without stepping the cell, with `bash Kean/scripts/play_run.sh --run Kean/results/instructor_run_001 --shape arch` and open the tunnel at http://localhost:8080. The `.npz` recordings are gitignored; a sync that follows gitignore must still copy them. `results/archive/acceptance_legacy/acceptance` is the older package with no provenance. Do not pass `--replace` on `instructor_run_001`.
+
+Dual-builder: `results/dual_arch_s3_012` remains the validated arch/S3 concurrent build. Stud resistance: `results/dual_pyramid_s3_studfit_030` (HPC job 2313901, revision `6be3fc9`, results on `main` at `ec86e5e`) is the validated pyramid + S3 `--stud-fit` package — place complete, `verify_dual` exit 0. Failed and intermediate runs (including stud-fit `018`–`029`) are under `results/archive/` — see `results/README.md`. Run with:
+
+```bash
+bash Kean/scripts/dual_build.sh --build-a pyramid --build-b S3 --stud-fit \
+  --viewer null --out Kean/results/dual_pyramid_s3_studfit_NNN
+Sakib/.venv/bin/python -m Kean.verify_dual --run Kean/results/dual_pyramid_s3_studfit_030
+```

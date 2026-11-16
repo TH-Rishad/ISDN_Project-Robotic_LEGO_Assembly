@@ -65,3 +65,20 @@ Use a new run suffix if the directory already exists. GPU checks/live execution 
 - [x] Document a short CPU-only verification command and a separate GPU execution command, prerequisites, expected outputs and exit codes in Kean's README.
 - [x] Package the two target definitions, plans, execution evidence and verification reports with usable relative paths. Ensure collaborators can obtain required artifacts; ignored local results are not a shared submission. The package is `results/instructor_run_001` plus `results/verification_instructor_run_001`. Copy the gitignored `.npz` files with it.
 - [x] Finish when both structures satisfy all three criteria and the dedicated verifier independently passes the evidence package. Further master-plan work is optional. Simulation acceptance is finished. A physical robot is not in this package.
+
+## Additional completed work (dual-builder stud fit, 2026-11-16)
+
+Not part of the three course criteria above; recorded here so the workspace
+status matches the tree.
+
+- [x] Concurrent independent builders (`dual_build`): validated arch/S3 at
+  `results/dual_arch_s3_012`; pyramid/S3 without stud resistance at
+  `results/dual_pyramid_s3_006`.
+- [x] `--stud-fit` press-fit path (`motion/stud_fit.py`, brace_search GUARD
+  abandon/lift retreat, Build-view GUARD trial displaced suspend): full
+  from-empty pyramid + S3 passes `verify_dual` at
+  `results/dual_pyramid_s3_studfit_030` (A 11/11, B 16/16, supports 9/11/13/14/15,
+  job 2313901, revision `6be3fc9`, on `main` at `ec86e5e`).
+- [x] Trail runs `dual_pyramid_s3_studfit_018`–`029` archived under
+  `Kean/results/archive/dual_pyramid_s3_studfit_failed/`; plan and
+  README/work_record updated; `results/` root holds current packages only.

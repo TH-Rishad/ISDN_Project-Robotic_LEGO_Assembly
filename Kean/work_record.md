@@ -689,3 +689,59 @@ true, no failure; b_005 tilt 0.41°, b_007 tilt 0.4°, all walls seat cleanly
 1–2, penetration 11–12) — the flush-wall rub/penetration and the 1 mm press are
 inherent, unchanged from every earlier 12/12 run. CPU suite 121 passed (one
 pre-existing `test_shared` `__pycache__` cleanup race, unrelated).
+
+### 2026-11-17 — Archive failed runs; organize `results/`
+
+Moved failed and intermediate packages out of `Kean/results/` root into
+`Kean/results/archive/` by category (`dual_pyramid_s3_studfit_failed`,
+`dual_studfit_diag`, `dual_probes`, `dual_arch_s3_trail`,
+`dual_pyramid_s3_trail`, `acceptance_legacy`, `checks`, `m05`, `local`,
+`studfit_logs`). Current packages remain at the root:
+`instructor_run_001`, `verification_instructor_run_001`, `instructor_preview`,
+`dual_arch_s3_012`, `dual_pyramid_s3_006`, `dual_pyramid_s3_studfit_030`.
+Index: `results/README.md`, `results/archive/README.md`, updated
+`evidence_inventory.md` / `.json`. Removed `__pycache__`, `.DS_Store`, and
+leftover `tests/tmp*` scratch dirs.
+
+### 2026-11-16 — Dual pyramid + S3 under `--stud-fit` (verification ok)
+
+Goal: from-empty concurrent pyramid (A) + S3 (B) with stud resistance enabled
+(`dual_build.sh --stud-fit`), through S3 bridge step 15, with `verify_dual`
+`ok` and `full_build` true and no joint break.
+
+**Seating path (already in tree before the late trail):** hold/press/seat in
+`motion/stud_fit.py` and `drop_press.py`; near-press support assignment and
+forced supports on overhangs (S3 9 and 15); support motion floor / near-support
+press clearance; mating-shell and deep-stud contacts classified as intended.
+
+**Late failure mode (runs 018–029):** place often reached A 11/11 and B 16/16,
+but brace_search GUARD STOP approach/retreat scraped seated bricks and the
+verifier scored `displaced`. Lateral abandon escapes caused
+`command_clearance` / `joint_break` (024–025). Raising `STUD_FIT_DISPLACED_MM`
+during GUARD trials initially never armed because the check looked at
+`DualExample` instead of the live Build views.
+
+**Fixes (Kean only, then CPU tests → commit → HPC):**
+
+| Area | Change |
+|------|--------|
+| `motion/brace_search.py` | Abandon on GUARD STOP; lift-first retreat; 12 mm avoid-Y; skip deferred burned near-Y poses; `brace_search_retreating` |
+| `motion/stud_fit.py` | `near_support_press`; `STUD_FIT_DISPLACED_MM` 2.0; `brace_search_guard_trial` / Build-view arming; rebaseline rest through retreat |
+| `dual_build.py` | Rebaseline + raise displaced threshold when a GUARD trial is active on views |
+
+**Validated run:** `results/dual_pyramid_s3_studfit_030`, HPC job **2313901**,
+code revision **`6be3fc9`**, results recorded in **`ec86e5e`** on `main`
+(`feat/dual-stud-fit` fast-forward merged). Summary: `done` true, A 11/11,
+B 16/16, supports executed on B steps 9, 11, 13, 14, 15; `verification.json`
+`ok`/`full_build` true, errors `[]`. Trail packages
+`dual_pyramid_s3_studfit_018`–`029` archived under
+`Kean/results/archive/dual_pyramid_s3_studfit_failed/`; diagnostics and job
+logs under `archive/dual_studfit_diag/` and `archive/studfit_logs/`. Layout:
+`Kean/results/README.md`.
+
+Replay / verify:
+
+```bash
+Sakib/.venv/bin/python -m Kean.verify_dual --run Kean/results/dual_pyramid_s3_studfit_030
+bash Kean/scripts/play_run.sh --run Kean/results/dual_pyramid_s3_studfit_030 --port 8081 --loop
+```
