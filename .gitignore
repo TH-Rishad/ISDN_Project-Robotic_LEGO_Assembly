@@ -10,7 +10,10 @@ __pycache__/
 Kean/kean.id
 Kean/AGENTS.md
 Kean/.cursor/
+Kean/config/
 Kean/config/hpc/
+**/hpc4.json
+**/hpc-slurm/
 
 # Kean run artifacts. JSON evidence stays; recorder dumps do not.
 Kean/results/**/*.npz

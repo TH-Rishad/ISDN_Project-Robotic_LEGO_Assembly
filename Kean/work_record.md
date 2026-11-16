@@ -46,7 +46,7 @@ No crashes on initialization or basic execution. Full 8/8 builds succeed on cube
 
 ## Interactive / Remote Viewer Attempts (2026-10-16)
 
-**Setup:** mlieq@hpc4.ust.hk → allocated compute node (headless). Access via SSH tunnel + Viser.
+**Setup:** HPC login → allocated compute node (headless). Access via SSH tunnel + Viser.
 
 **Working:**
 - `bash scripts/run.sh dual_arm_sim.py --shape arch --viewer viser`
@@ -90,7 +90,7 @@ No crashes on initialization or basic execution. Full 8/8 builds succeed on cube
 - Identifier: `Kean/kean.id` (delete it to disable; Sakib's sim then runs unchanged).
 - Hook: `Sakib/brickassembly/dual_arm_sim.py` `_kean_viz()` — if `kean.id` exists, imports `Kean/viz_cameras.py` and calls `attach(example)`.
 - `viz_cameras.attach` serves top / wrist_A / wrist_B JPEGs on `0.0.0.0:8081` (env `KEAN_CAM_PORT`) in a thread of the sim process. Viser 3D stays on :8080. Physics unchanged. Do not pass `--show-cameras` (that path is ViewerGL-only; the hook turns it off).
-- Tunnel (replace NODE with the allocated node): `ssh -L 8080:NODE:8080 -L 8081:NODE:8081 mlieq@hpc4.ust.hk`
+- Tunnel (replace NODE with the allocated node): `ssh -L 8080:NODE:8080 -L 8081:NODE:8081 <hpc-login>`
 - Pages: `http://localhost:8080` (3D), `http://localhost:8081` (cameras).
 - These three files must be on the compute node before the run.
 

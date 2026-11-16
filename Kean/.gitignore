@@ -44,6 +44,8 @@ todo-personal.md
 # at the repository root .gitignore.
 AGENTS.md
 
-# Local HPC agent skill and cluster config (do not push)
-.cursor/skills/hpc-slurm/
+# Never commit local agent tooling or cluster account config.
+.cursor/
 config/hpc/
+**/hpc4.json
+**/hpc-slurm/
