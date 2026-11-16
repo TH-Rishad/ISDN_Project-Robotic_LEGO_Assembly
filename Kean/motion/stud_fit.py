@@ -180,19 +180,23 @@ def near_support_press(roles, arms):
 
 
 def brace_search_guard_trial(ex):
-    """True during a brace_search physical approach that may GUARD STOP.
+    """True during a brace_search GUARD approach or its abandon retreat.
 
     studfit_026: brace-in into a rejected column nudged B_b_010/012 by 2–3 mm
-    before GUARD STOP; that is how the search discovers a scrape, not a
-    verification failure once the candidate is abandoned."""
-    if getattr(ex, 'stud_fit', None) is None or getattr(ex, 'on_guard_abandon', None) is None:
+    before GUARD STOP. studfit_027: the same scrape scored displaced on the
+    lift/retract after abandon because on_guard_abandon was already cleared."""
+    if getattr(ex, 'stud_fit', None) is None:
+        return False
+    if getattr(ex, 'brace_search_retreating', False):
+        return True
+    if getattr(ex, 'on_guard_abandon', None) is None:
         return False
     arms = getattr(ex, 'arms', None) or {}
     return any(getattr(arms.get(a), 'phase', None) in ('brace-in', 'brace-guard') for a in 'AB')
 
 
 def rebaseline_rest_for_guard_trial(monitor, body_q):
-    """Absorb brace-in GUARD contact motion into rest without logging displaced."""
+    """Absorb GUARD-trial scrape/retreat motion into rest without logging displaced."""
     import numpy as np
     for body in monitor.rest:
         monitor.rest[body] = np.asarray(body_q[body, :3], float).copy()

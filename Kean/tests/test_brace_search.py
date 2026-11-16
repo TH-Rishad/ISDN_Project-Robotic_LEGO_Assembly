@@ -204,22 +204,24 @@ class BraceSearchTest(unittest.TestCase):
             # Already open in the scrape: +Z lift then tool retract, no dwell-open
             # (studfit_022 ≤1.9 mm; studfit_025 large-Y plow broke the joint).
             self.assertEqual([m['phase'] for m in ex.A.moves], ['retract', 'retract', 'park'])
+            self.assertTrue(ex.brace_search_retreating)
             self.assertAlmostEqual(ex.A.moves[0]['pos'][2], ex.A.cmd[0][2] + 0.025)
             self.assertGreater(np.linalg.norm(ex.A.moves[1]['pos'] - ex.A.moves[0]['pos']), .05)
             self.closed.assert_not_called()
             park = ex.A.moves[-1]
             ex.A.moves.clear()
             park['then']()
+            self.assertFalse(ex.brace_search_retreating)
         self.assertEqual(ex.plan['sequence'][0]['brace'], picks[1])
         self.assertEqual(len(ex.brace_search_report), 2)
         ex.fail.assert_not_called()
 
     def test_guard_stop_defers_nearby_y_before_far_column(self):
-        # studfit_018/026: near Y scrapes before a column ≥20 mm away.
+        # studfit_018: near Y scrapes before a column ≥12 mm away.
         picks = [
             dict(brace_pose=[0., -.19, .0556], brace_tilt_rotvec=[1.3, 0, 0]),
             dict(brace_pose=[0., -.186, .0556], brace_tilt_rotvec=[1.3, 0, 0]),
-            dict(brace_pose=[0., -.22, .0556], brace_tilt_rotvec=[1.3, 0, 0]),
+            dict(brace_pose=[0., -.202, .0556], brace_tilt_rotvec=[1.3, 0, 0]),
         ]
         ex = self.setup_search(picks)
         ex.braced = set()
@@ -240,7 +242,7 @@ class BraceSearchTest(unittest.TestCase):
         picks = [
             dict(brace_pose=[0., -.188, .0536], brace_tilt_rotvec=[.8, 0, 0]),
             dict(brace_pose=[0., -.19, .0556], brace_tilt_rotvec=[1.3, 0, 0]),
-            dict(brace_pose=[0., -.22, .0556], brace_tilt_rotvec=[1.3, 0, 0]),
+            dict(brace_pose=[0., -.202, .0556], brace_tilt_rotvec=[1.3, 0, 0]),
         ]
         ex = self.setup_search(picks)
         ex.check_helper_approach = Mock(

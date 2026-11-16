@@ -290,11 +290,13 @@ class StudFitTest(unittest.TestCase):
         arms['A'], arms['B'] = NS(phase='retract'), NS(phase='stage')
         self.assertFalse(near_support_press({'A': 'supporter', 'B': 'builder'}, arms))
         from Kean.motion.stud_fit import brace_search_guard_trial, rebaseline_rest_for_guard_trial
-        ex = NS(stud_fit=object(), on_guard_abandon=lambda *_: None,
+        ex = NS(stud_fit=object(), on_guard_abandon=lambda *_: None, brace_search_retreating=False,
                 arms={'A': NS(phase='brace-in'), 'B': NS(phase='stage')})
         self.assertTrue(brace_search_guard_trial(ex))
         ex.on_guard_abandon = None
         self.assertFalse(brace_search_guard_trial(ex))
+        ex.brace_search_retreating = True
+        self.assertTrue(brace_search_guard_trial(ex))
         mon = NS(rest={0: np.zeros(3), 1: np.ones(3)})
         body_q = np.array([[.01, .02, .03, 0, 0, 0, 1], [.04, .05, .06, 0, 0, 0, 1]])
         rebaseline_rest_for_guard_trial(mon, body_q)

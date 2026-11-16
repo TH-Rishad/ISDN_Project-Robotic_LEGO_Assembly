@@ -158,6 +158,14 @@ def _retreat_helper(ex, D, then, *, open_first, back_scale=1., lift_first=False)
     # Each physical retry is a new trial; B has already been staged through the
     # failed close/settle and must not keep its prior wait clock.
     ex.B.waited = 0.
+    # Keep displacement rebaseline through the escape (studfit_027 scored
+    # displaced on retract after on_guard_abandon was cleared).
+    ex.brace_search_retreating = True
+
+    def done():
+        ex.brace_search_retreating = False
+        then()
+
     p, yaw, grip, tilt = ex.A.cmd
     tool = D.rotate(D.qrot(tilt), np.array([0., 0., -1.]))
     # guard_stop leaves open fingers already in the scrape: dwell-open there
@@ -176,7 +184,7 @@ def _retreat_helper(ex, D, then, *, open_first, back_scale=1., lift_first=False)
         ex.A.push('open', np.asarray(p), yaw, g_open, .4, tilt=tilt, contact=True)
         grip = g_open
     ex.A.push('retract', back, yaw, grip, .8 if not open_first else .6, tilt=tilt)
-    ex.A.push('park', ex.parks[ex.A], 0., 0., 1.5, then=then)
+    ex.A.push('park', ex.parks[ex.A], 0., 0., 1.5, then=done)
 
 
 def install(ex, planner, world, carried, D):
@@ -211,12 +219,12 @@ def install(ex, planner, world, carried, D):
         # Grip failures burn the TCP pose: a 180° yaw flip hits the same brick
         # face (studfit_014 step 13 → support_lost on the yaw twin).
         skip_poses = set()
-        # After a GUARD STOP, try columns ≥20 mm away before nearby twins
-        # (studfit_018: 12 mm; studfit_026 still GUARD STOPed at -0.168 after
-        # -0.182, 14 mm away, and nudged B_b_012 during brace-in).
+        # After a GUARD STOP, try columns ≥12 mm away before nearby twins
+        # (studfit_018). studfit_027's 20 mm band deferred the working -0.202
+        # hold after a -0.188 finger reject and drained back into -0.19 scrapes.
         avoid_ys = []
         deferred = []
-        avoid_y_tol = .02
+        avoid_y_tol = .012
 
         def pose_key(pick):
             return tuple(np.round(pick['brace_pose'], 5))
@@ -228,8 +236,12 @@ def install(ex, planner, world, carried, D):
                 try:
                     pick = next(choices)
                 except StopIteration:
-                    if deferred:
-                        return deferred.pop(0)
+                    while deferred:
+                        pick = deferred.pop(0)
+                        if pose_key(pick) in skip_poses:
+                            print('brace search skip same pose step %d: %s' % (n, pick['brace_pose']), flush=True)
+                            continue
+                        return pick
                     return None
                 if pose_key(pick) in skip_poses:
                     print('brace search skip same pose step %d: %s' % (n, pick['brace_pose']), flush=True)
