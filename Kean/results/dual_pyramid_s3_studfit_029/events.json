@@ -1,0 +1,466 @@
+[
+  {
+    "event": "step_started",
+    "arm": "A",
+    "step": 0,
+    "time": 1.100000000000001
+  },
+  {
+    "event": "step_started",
+    "arm": "B",
+    "step": 0,
+    "time": 1.1166666666666676
+  },
+  {
+    "event": "step_complete",
+    "arm": "A",
+    "step": 0,
+    "time": 20.95000000000009
+  },
+  {
+    "event": "step_started",
+    "arm": "A",
+    "step": 1,
+    "time": 20.95000000000009
+  },
+  {
+    "event": "step_complete",
+    "arm": "B",
+    "step": 0,
+    "time": 27.29999999999973
+  },
+  {
+    "event": "step_started",
+    "arm": "B",
+    "step": 1,
+    "time": 27.29999999999973
+  },
+  {
+    "event": "step_complete",
+    "arm": "A",
+    "step": 1,
+    "time": 50.7999999999984
+  },
+  {
+    "event": "step_started",
+    "arm": "A",
+    "step": 2,
+    "time": 50.7999999999984
+  },
+  {
+    "event": "step_complete",
+    "arm": "B",
+    "step": 1,
+    "time": 52.74999999999829
+  },
+  {
+    "event": "step_started",
+    "arm": "B",
+    "step": 2,
+    "time": 52.74999999999829
+  },
+  {
+    "event": "step_complete",
+    "arm": "A",
+    "step": 2,
+    "time": 80.33333333333006
+  },
+  {
+    "event": "step_started",
+    "arm": "A",
+    "step": 3,
+    "time": 80.33333333333006
+  },
+  {
+    "event": "step_complete",
+    "arm": "B",
+    "step": 2,
+    "time": 82.28333333332995
+  },
+  {
+    "event": "step_started",
+    "arm": "B",
+    "step": 3,
+    "time": 82.28333333332995
+  },
+  {
+    "event": "step_complete",
+    "arm": "A",
+    "step": 3,
+    "time": 110.99999999999498
+  },
+  {
+    "event": "step_started",
+    "arm": "A",
+    "step": 4,
+    "time": 110.99999999999498
+  },
+  {
+    "event": "step_complete",
+    "arm": "B",
+    "step": 3,
+    "time": 113.88333333332815
+  },
+  {
+    "event": "step_started",
+    "arm": "B",
+    "step": 4,
+    "time": 113.88333333332815
+  },
+  {
+    "event": "step_complete",
+    "arm": "B",
+    "step": 4,
+    "time": 138.85000000000264
+  },
+  {
+    "event": "step_started",
+    "arm": "B",
+    "step": 5,
+    "time": 138.85000000000264
+  },
+  {
+    "event": "step_complete",
+    "arm": "A",
+    "step": 4,
+    "time": 147.41666666667612
+  },
+  {
+    "event": "step_started",
+    "arm": "A",
+    "step": 5,
+    "time": 147.41666666667612
+  },
+  {
+    "event": "step_complete",
+    "arm": "B",
+    "step": 5,
+    "time": 169.91666666669403
+  },
+  {
+    "event": "step_started",
+    "arm": "B",
+    "step": 6,
+    "time": 169.91666666669403
+  },
+  {
+    "event": "step_complete",
+    "arm": "A",
+    "step": 5,
+    "time": 175.65000000003192
+  },
+  {
+    "event": "step_started",
+    "arm": "A",
+    "step": 6,
+    "time": 175.65000000003192
+  },
+  {
+    "event": "step_complete",
+    "arm": "B",
+    "step": 6,
+    "time": 197.1666666667157
+  },
+  {
+    "event": "step_started",
+    "arm": "B",
+    "step": 7,
+    "time": 197.1666666667157
+  },
+  {
+    "event": "step_complete",
+    "arm": "A",
+    "step": 6,
+    "time": 201.96666666671953
+  },
+  {
+    "event": "step_started",
+    "arm": "A",
+    "step": 7,
+    "time": 201.96666666671953
+  },
+  {
+    "event": "step_complete",
+    "arm": "B",
+    "step": 7,
+    "time": 225.8166666667385
+  },
+  {
+    "event": "step_started",
+    "arm": "B",
+    "step": 8,
+    "time": 225.8166666667385
+  },
+  {
+    "event": "step_complete",
+    "arm": "A",
+    "step": 7,
+    "time": 227.78333333340674
+  },
+  {
+    "event": "step_started",
+    "arm": "A",
+    "step": 8,
+    "time": 227.78333333340674
+  },
+  {
+    "event": "step_complete",
+    "arm": "B",
+    "step": 8,
+    "time": 247.26666666675558
+  },
+  {
+    "event": "support_requested",
+    "arm": "B",
+    "step": 9,
+    "time": 247.26666666675558
+  },
+  {
+    "event": "step_complete",
+    "arm": "A",
+    "step": 8,
+    "time": 250.51666666675817
+  },
+  {
+    "event": "support_granted",
+    "arm": "B",
+    "step": 9,
+    "time": 250.51666666675817,
+    "helper": "A"
+  },
+  {
+    "event": "helper_ready",
+    "arm": "B",
+    "step": 9,
+    "time": 250.51666666675817,
+    "helper": "A"
+  },
+  {
+    "event": "support_held",
+    "arm": "B",
+    "step": 9,
+    "time": 268.3500000000846,
+    "helper": "A"
+  },
+  {
+    "event": "step_complete",
+    "arm": "B",
+    "step": 9,
+    "time": 286.31666666673493
+  },
+  {
+    "event": "support_released",
+    "arm": "B",
+    "step": 9,
+    "time": 286.31666666673493,
+    "helper": "A"
+  },
+  {
+    "event": "step_started",
+    "arm": "A",
+    "step": 9,
+    "time": 286.31666666673493
+  },
+  {
+    "event": "step_started",
+    "arm": "B",
+    "step": 10,
+    "time": 286.31666666673493
+  },
+  {
+    "event": "step_complete",
+    "arm": "B",
+    "step": 10,
+    "time": 303.2333333333862
+  },
+  {
+    "event": "support_requested",
+    "arm": "B",
+    "step": 11,
+    "time": 303.2333333333862
+  },
+  {
+    "event": "step_complete",
+    "arm": "A",
+    "step": 9,
+    "time": 307.90000000004864
+  },
+  {
+    "event": "support_granted",
+    "arm": "B",
+    "step": 11,
+    "time": 307.90000000004864,
+    "helper": "A"
+  },
+  {
+    "event": "helper_ready",
+    "arm": "B",
+    "step": 11,
+    "time": 307.90000000004864,
+    "helper": "A"
+  },
+  {
+    "event": "support_held",
+    "arm": "B",
+    "step": 11,
+    "time": 325.7500000000324,
+    "helper": "A"
+  },
+  {
+    "event": "step_complete",
+    "arm": "B",
+    "step": 11,
+    "time": 344.4833333333487
+  },
+  {
+    "event": "support_released",
+    "arm": "B",
+    "step": 11,
+    "time": 344.4833333333487,
+    "helper": "A"
+  },
+  {
+    "event": "step_started",
+    "arm": "A",
+    "step": 10,
+    "time": 344.4833333333487
+  },
+  {
+    "event": "step_started",
+    "arm": "B",
+    "step": 12,
+    "time": 344.4833333333487
+  },
+  {
+    "event": "step_complete",
+    "arm": "A",
+    "step": 10,
+    "time": 365.88333333332923
+  },
+  {
+    "event": "step_complete",
+    "arm": "B",
+    "step": 12,
+    "time": 367.83333333332746
+  },
+  {
+    "event": "support_requested",
+    "arm": "B",
+    "step": 13,
+    "time": 367.83333333332746
+  },
+  {
+    "event": "support_granted",
+    "arm": "B",
+    "step": 13,
+    "time": 367.83333333332746,
+    "helper": "A"
+  },
+  {
+    "event": "helper_ready",
+    "arm": "B",
+    "step": 13,
+    "time": 367.83333333332746,
+    "helper": "A"
+  },
+  {
+    "event": "support_held",
+    "arm": "B",
+    "step": 13,
+    "time": 386.59999999997706,
+    "helper": "A"
+  },
+  {
+    "event": "step_complete",
+    "arm": "B",
+    "step": 13,
+    "time": 407.2333333332916
+  },
+  {
+    "event": "support_released",
+    "arm": "B",
+    "step": 13,
+    "time": 407.2333333332916,
+    "helper": "A"
+  },
+  {
+    "event": "support_requested",
+    "arm": "B",
+    "step": 14,
+    "time": 407.2333333332916
+  },
+  {
+    "event": "support_granted",
+    "arm": "B",
+    "step": 14,
+    "time": 407.2333333332916,
+    "helper": "A"
+  },
+  {
+    "event": "helper_ready",
+    "arm": "B",
+    "step": 14,
+    "time": 407.2333333332916,
+    "helper": "A"
+  },
+  {
+    "event": "support_held",
+    "arm": "B",
+    "step": 14,
+    "time": 456.4166666665802,
+    "helper": "A"
+  },
+  {
+    "event": "step_complete",
+    "arm": "B",
+    "step": 14,
+    "time": 475.7166666665627
+  },
+  {
+    "event": "support_released",
+    "arm": "B",
+    "step": 14,
+    "time": 475.7166666665627,
+    "helper": "A"
+  },
+  {
+    "event": "support_requested",
+    "arm": "B",
+    "step": 15,
+    "time": 475.7166666665627
+  },
+  {
+    "event": "support_granted",
+    "arm": "B",
+    "step": 15,
+    "time": 475.7166666665627,
+    "helper": "A"
+  },
+  {
+    "event": "helper_ready",
+    "arm": "B",
+    "step": 15,
+    "time": 475.7166666665627,
+    "helper": "A"
+  },
+  {
+    "event": "support_held",
+    "arm": "B",
+    "step": 15,
+    "time": 492.6166666665473,
+    "helper": "A"
+  },
+  {
+    "event": "step_complete",
+    "arm": "B",
+    "step": 15,
+    "time": 511.3499999998636
+  },
+  {
+    "event": "support_released",
+    "arm": "B",
+    "step": 15,
+    "time": 511.3499999998636,
+    "helper": "A"
+  }
+]

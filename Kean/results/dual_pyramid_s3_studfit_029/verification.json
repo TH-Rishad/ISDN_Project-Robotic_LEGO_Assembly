@@ -1,0 +1,38 @@
+{
+  "ok": false,
+  "full_build": false,
+  "errors": [
+    "contact monitor: displaced",
+    "detailed contact evidence: displaced",
+    "detailed contact evidence: displaced"
+  ],
+  "recorded_parallel_frames": 2315,
+  "grants": [
+    {
+      "arm": "B",
+      "step": 9,
+      "time": 250.51666666675817
+    },
+    {
+      "arm": "B",
+      "step": 11,
+      "time": 307.90000000004864
+    },
+    {
+      "arm": "B",
+      "step": 13,
+      "time": 367.83333333332746
+    },
+    {
+      "arm": "B",
+      "step": 14,
+      "time": 407.2333333332916
+    },
+    {
+      "arm": "B",
+      "step": 15,
+      "time": 475.7166666665627
+    }
+  ],
+  "frames": 30622
+}
