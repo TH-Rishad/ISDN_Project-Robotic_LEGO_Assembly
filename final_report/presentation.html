@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dual-Arm LEGO Assembly</title>
+<style>
+:root{
+  --bg:#e9edf2; --slide:#ffffff; --ink:#18212b; --muted:#5b6876; --line:#d7dee6;
+  --accent:#1f5fae; --accent-soft:#e6eef9; --red:#c0392b; --green:#2e8b4e; --amber:#e0a100;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);
+  font:20px/1.4 "Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif}
+#deck{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+.slide{position:absolute;width:1280px;height:720px;background:var(--slide);border-radius:10px;
+  box-shadow:0 10px 40px rgba(20,30,50,.18);padding:48px 64px 56px;display:none;flex-direction:column;
+  transform-origin:center center;overflow:hidden}
+.slide.on{display:flex}
+h1{font-size:50px;margin:0 0 12px;line-height:1.1}
+h2{font-size:34px;margin:0 0 6px;color:var(--ink)}
+.kicker{font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:6px}
+.lead{font-size:21px;color:var(--muted);margin:0 0 18px}
+ul{margin:6px 0;padding-left:24px} li{margin:6px 0}
+.cols{display:grid;gap:28px;flex:1;min-height:0}
+.c2{grid-template-columns:1fr 1fr} .c3{grid-template-columns:repeat(3,1fr)} .c64{grid-template-columns:3fr 2fr} .c46{grid-template-columns:2fr 3fr}
+figure{margin:0;display:flex;flex-direction:column;min-height:0}
+figure img{width:100%;height:100%;object-fit:contain;min-height:0;border-radius:6px}
+figure img.photo{object-fit:cover}
+figcaption{font-size:14px;color:var(--muted);margin-top:6px;text-align:center}
+.img-fill{flex:1;min-height:0}
+.why{background:var(--accent-soft);border-left:5px solid var(--accent);padding:10px 16px;border-radius:4px;font-size:18px;margin-top:10px}
+.why b{color:var(--accent)}
+.algo{display:inline-block;background:#1f2b38;color:#fff;border-radius:4px;padding:1px 8px;font-size:15px;margin-left:6px;vertical-align:2px}
+.num{font-size:44px;font-weight:800;color:var(--accent);line-height:1}
+.stat{border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.stat small{display:block;color:var(--muted);font-size:15px;margin-top:4px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.flow{display:flex;gap:10px;align-items:stretch;margin-top:10px}
+.flow .box{flex:1;border:2px solid var(--accent);border-radius:10px;padding:14px;background:var(--accent-soft);font-size:17px}
+.flow .box b{display:block;font-size:20px;margin-bottom:4px}
+.flow .arrow{align-self:center;font-size:30px;color:var(--accent)}
+.flow .box.in{border-color:var(--green);background:#e6f4ea}
+.flow .box.out{border-color:var(--red);background:#fbe9e7}
+.layers{display:flex;flex-direction:column;gap:8px}
+.layers div{border-radius:6px;padding:9px 14px;font-size:17px;background:var(--accent-soft);border-left:6px solid var(--accent)}
+.layers div:nth-child(2){margin-left:24px}.layers div:nth-child(3){margin-left:48px}.layers div:nth-child(4){margin-left:72px}.layers div:nth-child(5){margin-left:96px}
+table{border-collapse:collapse;font-size:17px;width:100%}
+th,td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:left}
+th{color:var(--muted);font-weight:600}
+.req{display:flex;gap:14px;align-items:flex-start;margin:12px 0}
+.req .tick{flex:none;width:34px;height:34px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800}
+.foot{position:absolute;left:64px;right:64px;bottom:18px;display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+.title-slide{justify-content:center;background:linear-gradient(135deg,#ffffff 55%,#e6eef9)}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-size:15px;margin:3px 4px 3px 0;color:var(--muted)}
+#bar{position:fixed;left:0;bottom:0;height:4px;background:var(--accent);transition:width .2s}
+#hint{position:fixed;right:14px;bottom:10px;font-size:12px;color:var(--muted)}
+code{font-family:ui-monospace,Consolas,monospace;font-size:.9em;background:#f1f4f8;padding:0 4px;border-radius:3px}
+@media print{
+  @page{size:1280px 720px;margin:0}
+  html,body{background:#fff}
+  #deck{position:static;display:block}
+  .slide{display:flex!important;position:relative;transform:none!important;box-shadow:none;border-radius:0;page-break-after:always}
+  #bar,#hint{display:none}
+}
+</style>
+</head>
+<body>
+<div id="deck">
+
+<!-- 1 -->
+<section class="slide title-slide">
+  <div class="kicker">ISDN Robotic Fabrication with Python · Group 10</div>
+  <h1>Two robot arms that build LEGO<br>and hold each other's work steady</h1>
+  <p class="lead" style="max-width:900px">From a drawing to two finished structures: blueprint, plan, control,
+  manipulation, collision avoidance and task completion, and the algorithm behind each stage.</p>
+  <div><span class="chip">Newton physics (GPU)</span><span class="chip">cuRobo motion planning</span>
+  <span class="chip">force-balance LP</span><span class="chip">2 × Franka FR3</span></div>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <div class="kicker">The task</div>
+  <h2>Supervisor's three requirements, all met</h2>
+  <div class="cols c64" style="margin-top:10px">
+    <div>
+      <div class="req"><div class="tick">1</div><div><b>Take the target structure directly as input.</b><br><span style="color:var(--muted)">Brick list or, optionally, a drawing.</span></div></div>
+      <div class="req"><div class="tick">2</div><div><b>Generate the assembly sequence and decide where temporary support is needed.</b><br><span style="color:var(--muted)">Fully automatic: order, grips, press points, supports.</span></div></div>
+      <div class="req"><div class="tick">3</div><div><b>Both arms autonomously build two different structures</b>, ≥ 8 bricks each, each with a section needing support.<br><span style="color:var(--muted)">Arch (11 bricks, 1 support) + S3 bridge (16 bricks, 3 supports).</span></div></div>
+    </div>
+    <figure><img class="img-fill photo" src="figures/sim_a_fin_s3.jpg" alt="Finished S3 and arch in simulation"><figcaption>End of the validated run: S3 (front) and arch (back)</figcaption></figure>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <div class="kicker">Overview</div>
+  <h2>Four transformations, each with one clear job</h2>
+  <div class="flow" style="margin-top:28px">
+    <div class="box in"><b>Input</b>Front/side drawing, or a brick list</div><div class="arrow">→</div>
+    <div class="box"><b>1. Blueprint</b>Silhouette carving + bonded brick tiling</div><div class="arrow">→</div>
+    <div class="box"><b>2. Plan</b>Order, grip, press point; LP stability check decides supports</div><div class="arrow">→</div>
+    <div class="box"><b>3. Control</b>cuRobo paths, straight contact moves, IK, manipulation, collision checks</div><div class="arrow">→</div>
+    <div class="box out"><b>4. Execution</b>Two-arm coordinator, snap check, independent verifier</div>
+  </div>
+  <div class="grid4" style="margin-top:40px">
+    <div class="stat"><div class="num">27/27</div><small>bricks placed (arch 11 + S3 16)</small></div>
+    <div class="stat"><div class="num">4/4</div><small>generated supports held by the other arm</small></div>
+    <div class="stat"><div class="num">1,643</div><small>frames with both arms building at once</small></div>
+    <div class="stat"><div class="num">0</div><small>unintended collisions or broken joints</small></div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section class="slide">
+  <div class="kicker">The work cell</div>
+  <h2>A physics simulation of the real cell</h2>
+  <div class="cols c46" style="margin-top:6px">
+    <ul style="font-size:19px">
+      <li><b>2 × Franka FR3</b>, 0.9 m apart, each with its own studded pad and feeder bricks.</li>
+      <li><b>Newton 1.2.1 + MuJoCo solver</b> on the GPU: 60 fps × 16 sub-steps.</li>
+      <li><b>Bricks</b>: visual mesh + simple hidden colliders (slab, walls, stud cylinders).</li>
+      <li><b>Clutch</b>: a brick that passes the snap check is welded to the bricks below.</li>
+      <li><b>Breaking</b>: each weld's load → utilisation <i>u</i>; <i>u</i> ≥ 1 twice in a row → the joint breaks and the run fails.</li>
+    </ul>
+    <figure><img class="img-fill photo" src="figures/sim_a_over_120.jpg" alt="Both arms working"><figcaption>Both arms working at t = 120 s</figcaption></figure>
+  </div>
+  <div class="why"><b>Why?</b> Contact-rich physics for two arms, per-joint forces for the break rule, same robot model as the planner.</div>
+</section>
+
+<!-- 5 -->
+<section class="slide">
+  <div class="kicker">Stage 1 · Image → blueprint</div>
+  <h2>The inputs</h2>
+  <p class="lead">Black-on-white silhouettes (any polarity). S3 is given directly as a brick list.</p>
+  <div class="cols" style="grid-template-columns:1.5fr 1fr 1fr 1.2fr;align-items:center">
+    <figure><img src="figures/input_arch_front.png" alt="Arch front drawing" style="border:1px solid var(--line)"><figcaption>Arch, front (depth 2)</figcaption></figure>
+    <figure><img src="figures/input_pyramid_front.png" alt="Pyramid front drawing" style="border:1px solid var(--line)"><figcaption>Pyramid, front (user)</figcaption></figure>
+    <figure><img src="figures/input_pyramid_side.png" alt="Pyramid side drawing" style="border:1px solid var(--line)"><figcaption>Pyramid, side (user)</figcaption></figure>
+    <figure><img src="figures/s3_bricks.png" alt="S3 brick list rendered"><figcaption>S3, brick list</figcaption></figure>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="slide">
+  <div class="kicker">Stage 1 · Image → blueprint</div>
+  <h2>Carve with shadows, then tile with bricks <span class="algo">visual hull + greedy tiling</span></h2>
+  <figure style="margin-top:8px"><img src="figures/pipeline_arch.png" alt="Arch blueprint pipeline"></figure>
+  <figure style="margin-top:4px"><img src="figures/pipeline_pyramid.png" alt="Pyramid blueprint pipeline"></figure>
+  <ol style="font-size:17px;margin-top:6px;columns:2">
+    <li>Threshold + crop; polarity from the border.</li>
+    <li>Scale: 1 stud = 8.0 mm, 1 layer = 9.6 mm.</li>
+    <li>Grid cell is full if &gt; 50 % dark.</li>
+    <li>Keep a cell only if <i>every</i> view sees it.</li>
+    <li>Tile layer by layer, overhangs first.</li>
+    <li>Number bricks in build order.</li>
+  </ol>
+</section>
+
+<!-- 7 -->
+<section class="slide">
+  <div class="kicker">Stage 1 · Image → blueprint</div>
+  <h2>How a brick is chosen</h2>
+  <div class="cols c2" style="flex:none;margin-top:6px">
+    <div>
+      <p style="margin:0 0 6px">Every placement covering the next cell is scored, in this order:</p>
+      <ol style="font-size:19px;margin:0">
+        <li>rests on the <b>most different bricks below</b> (ties the arch's legs together)</li>
+        <li><b>fewest seams over seams</b> (running bond)</li>
+        <li><b>bigger</b> bricks</li>
+      </ol>
+    </div>
+    <div>
+      <ol start="4" style="font-size:19px;margin:30px 0 0">
+        <li>long axis <b>alternates</b> between layers</li>
+        <li>closer to the centre</li>
+      </ol>
+      <p style="font-size:17px;color:var(--muted)">No support below → error "overhangs too far", never an unbuildable blueprint.</p>
+    </div>
+  </div>
+  <figure class="img-fill" style="margin-top:8px"><img src="figures/layers_arch.png" alt="Arch layers"><figcaption>Arch, layer by layer (numbers = build step): the 2×6 crown, step 10, spans the gap and rests on both legs</figcaption></figure>
+  <div class="why"><b>Why?</b> No training data or calibration; exact for extrusion-like LEGO shapes; milliseconds; each rule is one a human builder follows.</div>
+</section>
+
+<!-- 8 -->
+<section class="slide">
+  <div class="kicker">Stage 2 · Blueprint → plan</div>
+  <h2>One step per brick</h2>
+  <div class="cols c2" style="margin-top:10px">
+    <div class="stat"><b>When</b> — bottom layer first; a brick only after everything under it. 2×2s first in a layer (16 mm faces vs 17.5 mm pads). Courses with a boxed-in 1×1 go <b>fewest studs first</b>.</div>
+    <div class="stat"><b>Where</b> — target pose from grid position, plus a <b>pre-insert point 25 mm above</b>, where free-space motion ends.</div>
+    <div class="stat"><b>How to hold</b> — the pair of faces whose pads touch the fewest placed neighbours; grip width = brick − 1.2 mm.</div>
+    <div class="stat"><b>Where to press</b> — slide the grip along an overhanging brick to the offset with the <b>lowest predicted joint load</b>.</div>
+  </div>
+  <div class="why"><b>Why?</b> Layer order is always physically valid. A cleverer per-layer search was tried; it pushed the arch crown into a 0.1 mm slot, so it was reverted.</div>
+</section>
+
+<!-- 9 -->
+<section class="slide">
+  <div class="kicker">Stage 2b · Stability</div>
+  <h2>Will pressing this brick break the model? <span class="algo">force-balance LP</span></h2>
+  <div class="cols c2" style="margin-top:6px">
+    <div>
+      <ul style="font-size:19px">
+        <li>A stud joint resists pull-off up to <b>11.3 N/stud</b>; pushing a brick on needs <b>8.9 N/stud</b>.</li>
+        <li>Press on an overhang = standing at the end of a diving board: it <b>levers</b> the root joint open.</li>
+        <li><b>Utilisation</b> <i>u</i> = prying moment ÷ moment the studs can resist (closed form per edge).</li>
+        <li>Linear program over all bricks: equilibrium of every brick, minimise the worst <i>u</i>. If <i>u</i> &lt; 1, the structure holds (lower-bound theorem).</li>
+        <li>Worst case of 4 sideways 3 N disturbances.</li>
+      </ul>
+    </div>
+    <div>
+      <div class="stat" style="font-size:19px">
+        <b>Support needed if &nbsp; u × 3 ≥ 1</b><br>
+        <span style="color:var(--muted);font-size:16px">Safety factor 3: simulated joints are compliant (a pier leans), which a rigid model underestimates.</span>
+      </div>
+      <div class="stat" style="font-size:18px;margin-top:14px">
+        Matches BrickSim's independent static solver on S3: <b>u = 2.36</b> for the same press.
+      </div>
+      <div class="stat" style="font-size:18px;margin-top:14px">
+        The simulator breaks joints with the <b>same capacity law</b>, so planning and execution agree on "too much load".
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 -->
+<section class="slide">
+  <div class="kicker">Stage 2b · Temporary support</div>
+  <h2>Which steps need a helping hand</h2>
+  <figure class="img-fill" style="margin-top:6px"><img src="figures/utilisation.png" alt="Predicted utilisation per step"></figure>
+  <p style="font-size:17px;color:var(--muted);margin:6px 0 0">Generated, not hand-written: arch step 10 (the crown), S3 steps 11, 13, 14. Steps 13 and 14 drop from 3.43 → 1.48 and 1.96 → 0.22 with support.</p>
+</section>
+
+<!-- 11 -->
+<section class="slide">
+  <div class="kicker">Stage 2b · Temporary support</div>
+  <h2>Where to hold <span class="algo">weakest-joint support</span></h2>
+  <figure style="margin-top:4px;flex:1;min-height:0"><img class="img-fill" src="figures/s3_supports.png" alt="S3 support positions"></figure>
+  <ol style="font-size:17px;margin:4px 0 0;columns:2">
+    <li>Find joints over the threshold.</li>
+    <li>Candidate pad positions: every stud column × seam/quarter heights.</li>
+    <li>Keep only reachable ones (clear of plate, backed by bricks, away from the placing hand; lean 45°).</li>
+    <li>Add each as a bounded grip to the LP; keep the lowest predicted load.</li>
+  </ol>
+</section>
+
+<!-- 12 -->
+<section class="slide">
+  <div class="kicker">Stage 3 · Plan → control</div>
+  <h2>Plan the big moves, script the small ones</h2>
+  <div class="cols c3" style="grid-template-rows:1fr auto;margin-top:6px">
+    <figure><img class="img-fill photo" src="figures/sim_a4_090.jpg" alt="Over feeder"><figcaption>to feeder — planned</figcaption></figure>
+    <figure><img class="img-fill photo" src="figures/sim_a4_098.jpg" alt="Transport"><figcaption>transport — planned</figcaption></figure>
+    <figure><img class="img-fill photo" src="figures/sim_a4_104.jpg" alt="Insert"><figcaption>last 30 mm — straight line</figcaption></figure>
+    <div class="stat" style="font-size:16px"><b>cuRobo</b> — GPU trajectory optimisation from many seeds; arm = spheres, world = boxes, carried brick attached.</div>
+    <div class="stat" style="font-size:16px"><b>IK</b> — damped least squares (Levenberg–Marquardt), both arms batched, 24 iterations / frame → stiff joint servos.</div>
+    <div class="stat" style="font-size:16px"><b>Brick-aim servo</b> — integral control on the <i>brick's</i> position (±4 mm), paused while the arm is held to stop wind-up.</div>
+  </div>
+</section>
+
+<!-- 13 -->
+<section class="slide">
+  <div class="kicker">Manipulation</div>
+  <h2>Grip that fits, or drop-and-press</h2>
+  <div class="cols c46" style="margin-top:6px">
+    <div>
+      <p style="margin:0 0 6px">Full finger-sphere check at the seat, open and closed, 1.5 mm margin. First that fits:</p>
+      <ol style="font-size:19px">
+        <li>planner's grip</li><li>other face pair, centred</li><li>edge grips (≥ 70 % of pad on the face)</li><li><b>drop-and-press</b>: release just above neighbours, close fingers, press stud tops</li>
+      </ol>
+      <p style="font-size:17px;color:var(--muted)">Tight slots (arch crown, ~0.1 mm play): scripted <b>wriggle</b> — 0.1 mm lateral, 0.1° rocking, longer press. RL was tried; scripted won.</p>
+    </div>
+    <div class="cols c3" style="gap:10px">
+      <figure><img class="img-fill photo" src="figures/sim_p_drop9.jpg" alt="Lowering 2x2"><figcaption>lower</figcaption></figure>
+      <figure><img class="img-fill photo" src="figures/sim_p_press9.jpg" alt="Pressing 2x2"><figcaption>press with fingertips</figcaption></figure>
+      <figure><img class="img-fill photo" src="figures/sim_p_fin.jpg" alt="Finished pyramid"><figcaption>pyramid done</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- 14 -->
+<section class="slide">
+  <div class="kicker">Manipulation · The helper</div>
+  <h2>Reciprocal support</h2>
+  <div class="cols c3" style="margin-top:6px">
+    <figure><img class="img-fill photo" src="figures/sim_a_sup10_side.jpg" alt="Arch step 10 support"><figcaption>Arch 10: B holds, A presses the crown</figcaption></figure>
+    <figure><img class="img-fill photo" src="figures/sim_a_sup11_side.jpg" alt="S3 step 11 support"><figcaption>S3 11: A holds, B places the corbel</figcaption></figure>
+    <figure><img class="img-fill photo" src="figures/sim_a_sup13_side.jpg" alt="S3 step 13 support"><figcaption>S3 13: A grips the pier top</figcaption></figure>
+  </div>
+  <ul style="font-size:18px;margin-top:8px">
+    <li>Tries up to 8 generated configurations; each must be <b>no weaker</b> than planned and clear its own approach <i>and</i> the builder's insertion corridor.</li>
+    <li>Slow 10 mm guarded approach, closes, needs force on <b>both fingers</b> (13–14 N measured vs 14.3 N planned), then holds still.</li>
+  </ul>
+</section>
+
+<!-- 15 -->
+<section class="slide">
+  <div class="kicker">Collision avoidance</div>
+  <h2>Five layers of protection</h2>
+  <div class="cols c64" style="margin-top:8px">
+    <div class="layers">
+      <div><b>1 · Plan</b> — cuRobo avoids every box: pads, structures, feeders, the other arm.</div>
+      <div><b>2 · Validate</b> — re-check every path densely with the full sphere model, real finger openings, both carried bricks. Failing sphere → new obstacle (≤ 8).</div>
+      <div><b>3 · Reserve</b> — book the volume a move will sweep; overlapping bookings wait.</div>
+      <div><b>4 · Guard</b> — every command, every frame: ≥ 1 mm from anything not meant to be touched.</div>
+      <div><b>5 · Audit</b> — every physics contact classified; any unintended one fails the run.</div>
+    </div>
+    <div>
+      <div class="stat"><div class="num">1 mm</div><small>clearance floor, never relaxed — fallbacks change how a path is proposed, not how it is accepted</small></div>
+      <div class="stat" style="margin-top:14px"><div class="num">1.21 mm</div><small>smallest measured clearance in the validated run (188 planned motions, 0 failures)</small></div>
+    </div>
+  </div>
+</section>
+
+<!-- 16 -->
+<section class="slide">
+  <div class="kicker">Collision avoidance · Two arms</div>
+  <h2>Sharing space with reservations</h2>
+  <div class="cols c2" style="margin-top:10px">
+    <ul style="font-size:19px">
+      <li>Each arm keeps its own proven planner — no joint 14-joint planner needed.</li>
+      <li><b>Planned path</b>: reserve the boxes swept by each link's spheres.</li>
+      <li><b>Straight move</b>: reserve the measured arm volume padded by 1.5 × hand travel; stop if the arm leaves it.</li>
+      <li>Admit only if ≥ 25 mm from the other arm's booking; otherwise wait at a checked pose.</li>
+    </ul>
+    <div>
+      <div class="stat"><div class="num" style="color:var(--muted)">260</div><small>frames of simultaneous motion with a global lock on contact moves (run 010)</small></div>
+      <div class="stat" style="margin-top:14px"><div class="num">1,643</div><small>frames with bounded reservations (run 012), same safety checks</small></div>
+    </div>
+  </div>
+  <div class="why"><b>Why?</b> Spheres are fast and conservative, and planner and checker share one geometry. Reservations add coordination with a small, testable change.</div>
+</section>
+
+<!-- 17 -->
+<section class="slide">
+  <div class="kicker">Task execution</div>
+  <h2>The coordinator: build, ask, help</h2>
+  <div class="cols c2" style="flex:none;margin-top:4px">
+    <ul style="font-size:18px;margin:0">
+      <li>Each arm follows its own plan; both build at once when space allows.</li>
+      <li>Support requested <b>before pickup</b>; granted only when both arms are idle.</li>
+    </ul>
+    <ul style="font-size:18px;margin:0">
+      <li>Tie → <b>A first</b>, B's request kept and served next (no starvation).</li>
+      <li>Finished builder stays as helper. "Both hold a brick and wait" cannot happen.</li>
+    </ul>
+  </div>
+  <figure class="img-fill" style="margin-top:8px"><img src="figures/timeline_arch_s3.png" alt="Run timeline"></figure>
+  <p style="font-size:15px;color:var(--muted);margin:2px 0 0;text-align:center">241 s: A asks (step 10) · 245 s: B asks (step 11) · A served first, then B, then B's 13 and 14 with A helping</p>
+</section>
+
+<!-- 18 -->
+<section class="slide">
+  <div class="kicker">Task completion</div>
+  <h2>When is a brick placed? When is the job done?</h2>
+  <div class="cols c46" style="margin-top:6px">
+    <div>
+      <table>
+        <tr><th>Snap check</th><th>limit</th></tr>
+        <tr><td>sideways</td><td>2 mm</td></tr>
+        <tr><td>height</td><td>1.5 mm</td></tr>
+        <tr><td>rotation / tilt</td><td>5° / 5°</td></tr>
+      </table>
+      <p style="font-size:17px">Pass → weld on, step complete. Fail → run stops (never hidden).</p>
+      <p style="font-size:17px"><b>Independent verifier</b> reads only the saved files: every step mated, every support requested, held with two-finger force and released in order, real parallel motion, no bad contacts or breaks. <b>Both runs: exit 0.</b></p>
+    </div>
+    <figure><img class="img-fill" src="figures/snap_accuracy.png" alt="Snap accuracy"><figcaption>All 54 bricks: ≤ 1.13 mm sideways, ≤ 1.16 mm height, ≤ 1.92° tilt</figcaption></figure>
+  </div>
+</section>
+
+<!-- 19 -->
+<section class="slide">
+  <div class="kicker">Results</div>
+  <h2>Three structures, from their inputs</h2>
+  <div class="cols c3" style="margin-top:6px">
+    <figure><img class="img-fill photo" src="figures/sim_a_fin_arch_side.jpg" alt="Arch"><figcaption>Arch — 11/11, 1 support</figcaption></figure>
+    <figure><img class="img-fill photo" src="figures/sim_a_fin_s3_side.jpg" alt="S3"><figcaption>S3 bridge — 16/16, 3 supports</figcaption></figure>
+    <figure><img class="img-fill photo" src="figures/sim_p_fin_side.jpg" alt="Pyramid"><figcaption>Pyramid (user drawing) — 11/11</figcaption></figure>
+  </div>
+  <table style="margin-top:10px;font-size:16px">
+    <tr><th></th><th>Arch + S3 (012)</th><th>Pyramid + S3 (006)</th></tr>
+    <tr><td>Bricks / supports</td><td>27/27 · 4 held</td><td>27/27 · 3 held</td></tr>
+    <tr><td>Simultaneous frames · sim time</td><td>1,643 · 411 s</td><td>1,358 · 400 s</td></tr>
+    <tr><td>Planned motions / failures · min clearance</td><td>188 / 0 · 1.21 mm</td><td>196 / 0 · 1.60 mm</td></tr>
+  </table>
+</section>
+
+<!-- 20 -->
+<section class="slide">
+  <div class="kicker">Honest limits</div>
+  <h2>What is not done yet</h2>
+  <div class="cols c2" style="margin-top:8px">
+    <ul style="font-size:19px">
+      <li><b>Simulation only</b> — no physical robot.</li>
+      <li><b>Brick aim uses the simulator's brick pose</b>; a camera estimator exists but is not in the dual-arm runs.</li>
+      <li><b>Clutch</b> is snap check + welds. Opt-in <code>--stud-fit</code> needs a real 8.9 N/stud push: pyramid builds; S3's last step overloads a 2-stud joint by ~3.5 %.</li>
+    </ul>
+    <ul style="font-size:19px">
+      <li><b>Conservative stability model</b> (safety factor 3); for 2 of 4 supports the model shows no load reduction, because the critical pier-base joint cannot be gripped.</li>
+      <li><b>Silhouettes</b> cannot show hidden cavities.</li>
+      <li><b>Sampled</b> collision checks, backed by the physics contact audit.</li>
+    </ul>
+  </div>
+  <div class="why"><b>Next:</b> camera-based brick pose, compliant joint model, two-sided support grips, transfer to the real cell.</div>
+</section>
+
+<!-- 21 -->
+<section class="slide title-slide">
+  <div class="kicker">Summary</div>
+  <h1>Drawing → blueprint → plan → control → two finished structures</h1>
+  <p class="lead" style="max-width:1000px">Visual hull + bonded tiling · layer-ordered plan with force-aware grips · force-balance LP for supports ·
+  cuRobo + straight contact moves + IK · five-layer collision safety with reservations · deterministic coordinator, snap check, independent verifier.</p>
+  <p style="font-size:24px;margin-top:30px"><b>Questions?</b></p>
+</section>
+
+</div>
+<div id="bar"></div>
+<div id="hint">← → / space · F fullscreen</div>
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide')), i=0;
+  slides.forEach(function(s,n){
+    if(n===0||n===slides.length-1) return;
+    var f=document.createElement('div'); f.className='foot';
+    f.innerHTML='<span>Dual-Arm Robotic LEGO Assembly · Group 10</span><span>'+(n+1)+' / '+slides.length+'</span>';
+    s.appendChild(f);
+  });
+  function fit(){
+    var k=Math.min(window.innerWidth/1320, window.innerHeight/760);
+    slides.forEach(function(s){ s.style.transform='scale('+k+')'; });
+  }
+  function show(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach(function(s,k){ s.classList.toggle('on',k===i); });
+    document.getElementById('bar').style.width=(100*(i+1)/slides.length)+'%';
+    try{ history.replaceState(null,'','#'+(i+1)); }catch(e){}
+  }
+  document.addEventListener('keydown',function(e){
+    if(['ArrowRight','PageDown',' ','Enter'].indexOf(e.key)>=0){ e.preventDefault(); show(i+1); }
+    else if(['ArrowLeft','PageUp','Backspace'].indexOf(e.key)>=0){ e.preventDefault(); show(i-1); }
+    else if(e.key==='Home') show(0);
+    else if(e.key==='End') show(slides.length-1);
+    else if(e.key==='f'||e.key==='F'){ if(!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+  });
+  document.getElementById('deck').addEventListener('click',function(e){ show(e.clientX>window.innerWidth/2?i+1:i-1); });
+  window.addEventListener('resize',fit);
+  fit(); show((parseInt(location.hash.slice(1),10)||1)-1);
+})();
+</script>
+</body>
+</html>

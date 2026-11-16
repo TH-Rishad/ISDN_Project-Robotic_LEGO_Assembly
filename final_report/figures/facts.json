@@ -1,0 +1,216 @@
+{
+ "dual_arch_s3_012": {
+  "verifier_ok": true,
+  "full_build": true,
+  "frames": 24659,
+  "parallel_frames": 1643,
+  "sim_time_s": 407.78,
+  "placed": {
+   "A": "11/11",
+   "B": "16/16"
+  },
+  "plans": 188,
+  "plan_failures": 0,
+  "min_clearance_mm": 1.21,
+  "max_lateral_mm": 1.1,
+  "max_abs_dz_mm": 1.05,
+  "max_tilt_deg": 1.66,
+  "contacts": {
+   "neighbour_rub": 31,
+   "stud_mating": 3
+  },
+  "supports": [
+   [
+    "A",
+    10,
+    [
+     13.48,
+     13.23
+    ]
+   ],
+   [
+    "B",
+    11,
+    [
+     12.98,
+     13.35
+    ]
+   ],
+   [
+    "B",
+    13,
+    [
+     13.79,
+     13.63
+    ]
+   ],
+   [
+    "B",
+    14,
+    [
+     13.66,
+     13.98
+    ]
+   ]
+  ],
+  "brace_search": [
+   [
+    "A",
+    10,
+    false,
+    "helper approach: closed finger geometry 0.90 mm at A_b_000"
+   ],
+   [
+    "A",
+    10,
+    true,
+    ""
+   ],
+   [
+    "B",
+    11,
+    false,
+    "helper approach: closed finger geometry -1.05 mm at plate_B"
+   ],
+   [
+    "B",
+    11,
+    true,
+    ""
+   ],
+   [
+    "B",
+    13,
+    false,
+    "helper approach: closed finger geometry 0.94 mm at B_b_006"
+   ],
+   [
+    "B",
+    13,
+    true,
+    ""
+   ],
+   [
+    "B",
+    14,
+    false,
+    "helper approach: closed finger geometry 0.94 mm at B_b_006"
+   ],
+   [
+    "B",
+    14,
+    false,
+    "helper approach: helper obstructs carried-brick insertion corridor: 0.74 mm"
+   ],
+   [
+    "B",
+    14,
+    false,
+    "helper approach: helper obstructs carried-brick insertion corridor: 0.74 mm"
+   ],
+   [
+    "B",
+    14,
+    true,
+    ""
+   ]
+  ]
+ },
+ "dual_pyramid_s3_006": {
+  "verifier_ok": true,
+  "full_build": true,
+  "frames": 23993,
+  "parallel_frames": 1358,
+  "sim_time_s": 396.7,
+  "placed": {
+   "A": "11/11",
+   "B": "16/16"
+  },
+  "plans": 196,
+  "plan_failures": 0,
+  "min_clearance_mm": 1.6,
+  "max_lateral_mm": 1.13,
+  "max_abs_dz_mm": 1.16,
+  "max_tilt_deg": 1.92,
+  "contacts": {
+   "neighbour_rub": 49,
+   "stud_mating": 8
+  },
+  "supports": [
+   [
+    "B",
+    11,
+    [
+     13.06,
+     13.26
+    ]
+   ],
+   [
+    "B",
+    13,
+    [
+     13.65,
+     13.91
+    ]
+   ],
+   [
+    "B",
+    14,
+    [
+     13.66,
+     13.99
+    ]
+   ]
+  ],
+  "brace_search": [
+   [
+    "B",
+    11,
+    false,
+    "helper approach: closed finger geometry -1.05 mm at plate_B"
+   ],
+   [
+    "B",
+    11,
+    true,
+    ""
+   ],
+   [
+    "B",
+    13,
+    false,
+    "helper approach: closed finger geometry 0.94 mm at B_b_006"
+   ],
+   [
+    "B",
+    13,
+    true,
+    ""
+   ],
+   [
+    "B",
+    14,
+    false,
+    "helper approach: closed finger geometry 0.94 mm at B_b_006"
+   ],
+   [
+    "B",
+    14,
+    false,
+    "helper approach: helper obstructs carried-brick insertion corridor: 0.74 mm"
+   ],
+   [
+    "B",
+    14,
+    false,
+    "helper approach: helper obstructs carried-brick insertion corridor: 0.74 mm"
+   ],
+   [
+    "B",
+    14,
+    true,
+    ""
+   ]
+  ]
+ }
+}
