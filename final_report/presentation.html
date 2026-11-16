@@ -27,6 +27,7 @@ ul{margin:6px 0;padding-left:24px} li{margin:6px 0}
 figure{margin:0;display:flex;flex-direction:column;min-height:0}
 figure img{width:100%;height:100%;object-fit:contain;min-height:0;border-radius:6px}
 figure img.photo{object-fit:cover}
+figure video{width:100%;height:100%;min-height:0;object-fit:contain;background:#111;border-radius:6px}
 figcaption{font-size:14px;color:var(--muted);margin-top:6px;text-align:center}
 .img-fill{flex:1;min-height:0}
 .why{background:var(--accent-soft);border-left:5px solid var(--accent);padding:10px 16px;border-radius:4px;font-size:18px;margin-top:10px}
@@ -388,6 +389,26 @@ code{font-family:ui-monospace,Consolas,monospace;font-size:.9em;background:#f1f4
   </table>
 </section>
 
+<!-- 19v1 -->
+<section class="slide">
+  <div class="kicker">Results · Video</div>
+  <h2>Arch + S3: the verified build in 30 seconds</h2>
+  <figure class="img-fill" style="margin-top:6px">
+    <video src="videos/dual_arch_s3_30s.mp4" poster="figures/sim_a_fin_arch.jpg" controls muted loop playsinline preload="metadata"></video>
+    <figcaption>Run dual_arch_s3_012 · overhead while both arms build, side close-ups of the supported steps, then the finished structures</figcaption>
+  </figure>
+</section>
+
+<!-- 19v2 -->
+<section class="slide">
+  <div class="kicker">Results · Video</div>
+  <h2>Pyramid + S3: the verified build in 30 seconds</h2>
+  <figure class="img-fill" style="margin-top:6px">
+    <video src="videos/dual_pyramid_s3_30s.mp4" poster="figures/sim_p_fin.jpg" controls muted loop playsinline preload="metadata"></video>
+    <figcaption>Run dual_pyramid_s3_006 · the pyramid from a user drawing, drop-and-press, then arm A supporting S3</figcaption>
+  </figure>
+</section>
+
 <!-- 19b -->
 <section class="slide">
   <div class="kicker">In progress · Real stud resistance</div>
@@ -453,6 +474,11 @@ code{font-family:ui-monospace,Consolas,monospace;font-size:.9em;background:#f1f4
     slides.forEach(function(s,k){ s.classList.toggle('on',k===i); });
     document.getElementById('bar').style.width=(100*(i+1)/slides.length)+'%';
     try{ history.replaceState(null,'','#'+(i+1)); }catch(e){}
+    // Play the current slide's video from the start; pause every other one.
+    slides.forEach(function(s,k){ s.querySelectorAll('video').forEach(function(v){
+      if(k===i){ try{ v.currentTime=0; var p=v.play(); if(p&&p.catch) p.catch(function(){}); }catch(e){} }
+      else v.pause();
+    }); });
   }
   document.addEventListener('keydown',function(e){
     if(['ArrowRight','PageDown',' ','Enter'].indexOf(e.key)>=0){ e.preventDefault(); show(i+1); }
@@ -461,7 +487,7 @@ code{font-family:ui-monospace,Consolas,monospace;font-size:.9em;background:#f1f4
     else if(e.key==='End') show(slides.length-1);
     else if(e.key==='f'||e.key==='F'){ if(!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
   });
-  document.getElementById('deck').addEventListener('click',function(e){ show(e.clientX>window.innerWidth/2?i+1:i-1); });
+  document.getElementById('deck').addEventListener('click',function(e){ if(e.target.closest('video')) return; show(e.clientX>window.innerWidth/2?i+1:i-1); });
   window.addEventListener('resize',fit);
   fit(); show((parseInt(location.hash.slice(1),10)||1)-1);
 })();
