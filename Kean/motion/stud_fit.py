@@ -167,12 +167,19 @@ def near_support_press(roles, arms):
     """True when one arm holds a support and the other is seating nearby.
 
     Includes release/retract: studfit_020 held A while B released B_b_014 at
-    0.50 mm arm clearance, then failed command_clearance (floor still 1 mm)."""
+    0.50 mm arm clearance, then failed command_clearance (floor still 1 mm).
+    Includes helper open/retract while the builder still stages: brace_search
+    abandon escapes (studfit_024 command_clearance:A:B_b_008 on the step-14
+    lateral retreat after a rejected brace-guard)."""
     for helper, builder in (('A', 'B'), ('B', 'A')):
-        if (roles.get(helper) == 'supporter'
-                and getattr(arms.get(helper), 'phase', None) in ('brace-in', 'brace-guard', 'close', 'hold')
-                and getattr(arms.get(builder), 'phase', None) in (
-                    'pre-insert', 'insert', 'press', 'release', 'retract')):
+        if roles.get(helper) != 'supporter':
+            continue
+        hp = getattr(arms.get(helper), 'phase', None)
+        bp = getattr(arms.get(builder), 'phase', None)
+        if (hp in ('brace-in', 'brace-guard', 'close', 'hold')
+                and bp in ('pre-insert', 'insert', 'press', 'release', 'retract')):
+            return True
+        if hp in ('open', 'retract') and bp == 'stage':
             return True
     return False
 
