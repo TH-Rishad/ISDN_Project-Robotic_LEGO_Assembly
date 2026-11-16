@@ -281,6 +281,11 @@ class StudFitTest(unittest.TestCase):
         arms = {'A': NS(phase='hold'), 'B': NS(phase='press')}
         self.assertTrue(near_support_press({'A': 'supporter', 'B': 'builder'}, arms))
         self.assertFalse(near_support_press({'A': 'builder', 'B': 'builder'}, arms))
+        # studfit_020: A hold + B release at 0.50 mm must keep the support floor.
+        arms['B'] = NS(phase='release')
+        self.assertTrue(near_support_press({'A': 'supporter', 'B': 'builder'}, arms))
+        arms['B'] = NS(phase='retract')
+        self.assertTrue(near_support_press({'A': 'supporter', 'B': 'builder'}, arms))
 
     def test_press_stops_at_the_grip_when_the_margin_would_overload_it(self):
         from Kean.motion.stud_fit import BRACE_HAND, BRACE_PUSH, BRACE_RAMP, brace_release, press_cap, press_ramp

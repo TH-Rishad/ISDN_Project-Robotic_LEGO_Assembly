@@ -162,11 +162,15 @@ def support_motion_floor(stud_fit):
 
 
 def near_support_press(roles, arms):
-    """True when one arm holds a support and the other is inserting or pressing."""
+    """True when one arm holds a support and the other is seating nearby.
+
+    Includes release/retract: studfit_020 held A while B released B_b_014 at
+    0.50 mm arm clearance, then failed command_clearance (floor still 1 mm)."""
     for helper, builder in (('A', 'B'), ('B', 'A')):
         if (roles.get(helper) == 'supporter'
                 and getattr(arms.get(helper), 'phase', None) in ('brace-in', 'brace-guard', 'close', 'hold')
-                and getattr(arms.get(builder), 'phase', None) in ('pre-insert', 'insert', 'press')):
+                and getattr(arms.get(builder), 'phase', None) in (
+                    'pre-insert', 'insert', 'press', 'release', 'retract')):
             return True
     return False
 

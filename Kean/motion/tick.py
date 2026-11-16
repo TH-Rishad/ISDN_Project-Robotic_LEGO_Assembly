@@ -192,7 +192,7 @@ class Tick:
             if getattr(ex, 'stud_fit', None) is not None and hasattr(ex, 'roles') and hasattr(ex, 'arms'):
                 from Kean.motion.stud_fit import near_support_press, support_motion_floor
                 if near_support_press(ex.roles, ex.arms) or (
-                        move.get('phase') in ('pre-insert', 'insert', 'press')
+                        move.get('phase') in ('pre-insert', 'insert', 'press', 'release', 'retract')
                         and any(ex.roles.get(h) == 'supporter'
                                 and getattr(ex.arms.get(h), 'phase', None)
                                 in ('brace-in', 'brace-guard', 'close', 'hold')

@@ -831,6 +831,16 @@ class DualExample(D.Example):
                 if helper_brace_finger_ok(pair, view.A.name[0], gripped, active,
                                           self.stud_fit is not None):
                     return None
+            # Brace-search retreat after a GUARD STOP: open fingers brush a
+            # neighbour while B still stages (studfit_020 A vs B_b_009).
+            helper = view.A.name[0]
+            if (self.stud_fit is not None
+                    and self.roles.get(helper) == 'supporter'
+                    and self.arms[helper].phase in ('open', 'retract')
+                    and self.arms[view.B.name[0]].phase == 'stage'
+                    and (helper + '_finger') in pair
+                    and any(c.startswith('brick:') for c in pair)):
+                return None
         return 'unintended'
 
     def penetration_kind(self, monitor, cls_a, cls_b, shape_a, shape_b, depth, point=None):
@@ -933,7 +943,7 @@ class DualExample(D.Example):
             from Kean.motion.stud_fit import support_insert_ignores_carried
             near_support = (
                 support_insert_ignores_carried(self.stud_fit is not None)
-                and phase in ('pre-insert', 'insert', 'press')
+                and phase in ('pre-insert', 'insert', 'press', 'release', 'retract')
                 and self.roles.get(other) == 'supporter'
                 and self.arms[other].phase in ('brace-in', 'brace-guard', 'close', 'hold'))
             if not near_support and gap < minimum:
