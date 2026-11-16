@@ -55,7 +55,7 @@ th{color:var(--muted);font-weight:600}
 .chip{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-size:15px;margin:3px 4px 3px 0;color:var(--muted)}
 #bar{position:fixed;left:0;bottom:0;height:4px;background:var(--accent);transition:width .2s}
 #hint{position:fixed;right:14px;bottom:10px;font-size:12px;color:var(--muted)}
-code{font-family:ui-monospace,Consolas,monospace;font-size:.9em;background:#f1f4f8;padding:0 4px;border-radius:3px}
+code{font-family:ui-monospace,Consolas,monospace;font-size:.9em;background:#f1f4f8;padding:0 4px;border-radius:3px;white-space:nowrap}
 @media print{
   @page{size:1280px 720px;margin:0}
   html,body{background:#fff}
@@ -291,6 +291,7 @@ code{font-family:ui-monospace,Consolas,monospace;font-size:.9em;background:#f1f4
   <ul style="font-size:18px;margin-top:8px">
     <li>Tries up to 8 generated configurations; each must be <b>no weaker</b> than planned and clear its own approach <i>and</i> the builder's insertion corridor.</li>
     <li>Slow 10 mm guarded approach, closes, needs force on <b>both fingers</b> (13–14 N measured vs 14.3 N planned), then holds still.</li>
+    <li><b>New:</b> if the closed hand blocks the builder, one finger misses, or the approach scrapes, the helper retreats and tries the next pose instead of ending the run.</li>
   </ul>
 </section>
 
@@ -344,6 +345,7 @@ code{font-family:ui-monospace,Consolas,monospace;font-size:.9em;background:#f1f4
     <ul style="font-size:18px;margin:0">
       <li>Tie → <b>A first</b>, B's request kept and served next (no starvation).</li>
       <li>Finished builder stays as helper. "Both hold a brick and wait" cannot happen.</li>
+      <li><b>New:</b> an arm that is ahead does not start a step while the other's next step needs support.</li>
     </ul>
   </div>
   <figure class="img-fill" style="margin-top:8px"><img src="figures/timeline_arch_s3.png" alt="Run timeline"></figure>
@@ -386,6 +388,21 @@ code{font-family:ui-monospace,Consolas,monospace;font-size:.9em;background:#f1f4
   </table>
 </section>
 
+<!-- 19b -->
+<section class="slide">
+  <div class="kicker">In progress · Real stud resistance</div>
+  <h2>Pushing every brick onto real studs (<code>--stud-fit</code>)</h2>
+  <div class="cols c64" style="margin-top:4px">
+    <figure><img class="img-fill" src="figures/studfit_progress.png" alt="Stud-fit run progress"><figcaption>All 16 saved full pyramid + S3 runs and why each stopped</figcaption></figure>
+    <div style="font-size:17px">
+      <div class="stat"><div class="num">27/27</div><small>bricks placed in run 017, all 5 S3 supports held, snap error ≤ 1.96 mm</small></div>
+      <div class="stat" style="margin-top:10px;border-color:var(--red)"><b style="color:var(--red)">Verifier: fail</b><br>
+        3 helper-finger brushes (0.9–2.1 N), 2 floor-chatter contacts (now exempt), 4 S3 bricks pushed ≤ 2.2 mm during failed support attempts. Newest commits target these; not yet re-run.</div>
+      <div class="stat" style="margin-top:10px"><b>How it got there:</b> supported presses at 0.90× force (through at 0.85×), <b>joint breaker paused</b> on supported steps, ~43 N helper grip, clearance limits loosened near the helper.</div>
+    </div>
+  </div>
+</section>
+
 <!-- 20 -->
 <section class="slide">
   <div class="kicker">Honest limits</div>
@@ -394,7 +411,8 @@ code{font-family:ui-monospace,Consolas,monospace;font-size:.9em;background:#f1f4
     <ul style="font-size:19px">
       <li><b>Simulation only</b> — no physical robot.</li>
       <li><b>Brick aim uses the simulator's brick pose</b>; a camera estimator exists but is not in the dual-arm runs.</li>
-      <li><b>Clutch</b> is snap check + welds. Opt-in <code>--stud-fit</code> needs a real 8.9 N/stud push: pyramid builds; S3's last step overloads a 2-stud joint by ~3.5 %.</li>
+      <li><b>Clutch</b> is snap check + welds. With real stud resistance (<code>--stud-fit</code>) all 27 bricks placed once, but <b>no full run passes the verifier yet</b>, and supported presses run with the joint breaker paused.</li>
+      <li><b>Validated runs predate</b> the newest support-recovery and scheduling code; no fresh default-mode run yet.</li>
     </ul>
     <ul style="font-size:19px">
       <li><b>Conservative stability model</b> (safety factor 3); for 2 of 4 supports the model shows no load reduction, because the critical pier-base joint cannot be gripped.</li>
@@ -402,7 +420,7 @@ code{font-family:ui-monospace,Consolas,monospace;font-size:.9em;background:#f1f4
       <li><b>Sampled</b> collision checks, backed by the physics contact audit.</li>
     </ul>
   </div>
-  <div class="why"><b>Next:</b> camera-based brick pose, compliant joint model, two-sided support grips, transfer to the real cell.</div>
+  <div class="why"><b>Next:</b> a verified stud-fit run, a breaker that ignores weld hand-over spikes, a fresh default run, camera-based brick pose, compliant joint model, the real cell.</div>
 </section>
 
 <!-- 21 -->

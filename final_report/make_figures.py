@@ -302,5 +302,45 @@ for run in (RUN, RUN_PYR):
         supports=[(a, x["step"], x["realised_grip_N"]) for a in "AB" for x in s["builds"][a]["supports"]],
         brace_search=[(a, x["step"], x["accepted"], x.get("error", "")) for a in "AB"
                       for x in s["builds"][a]["brace_search"]])
+
+
+# ---- 6. stud-fit (real insertion force) progress, full pyramid + S3 runs ----------
+CAUSE = {"gate_miss": "brick missed the snap check", "motion_plan_failed": "no collision-free path",
+         "support_not_established": "support grip not established", "support_lost": "support grip lost",
+         "wait_timeout": "scheduler wait timed out", "command_clearance": "clearance guard stopped an arm",
+         "joint_break": "a stud joint broke"}
+rows = []
+for run in sorted((ROOT / "Kean" / "results").glob("dual_pyramid_s3_studfit_0*")):
+    s, vf = run / "summary.json", run / "verification.json"
+    if not s.is_file():
+        continue
+    s, v = json.loads(s.read_text()), json.loads(vf.read_text()) if vf.is_file() else {}
+    fail = s.get("failure") or ""
+    key = fail.split(":")[1] if fail.startswith(("A:", "B:")) else fail.split(":")[0]
+    if v.get("ok"):
+        label = "verifier PASS"
+    elif fail:
+        label = CAUSE.get(key, fail)
+    else:
+        label = "all placed; verifier: %s" % ", ".join(sorted({e.split(": ")[-1] for e in v.get("errors", [])
+                                                               if e.startswith("contact monitor")}))
+    b = s["builds"]
+    rows.append((run.name[-3:], b["A"]["placed"], b["B"]["placed"], label))
+facts["studfit_runs"] = rows
+fig, ax = plt.subplots(figsize=(11, .3 * len(rows) + 1.0))
+for n, (name, a, bb, label) in enumerate(rows):
+    ax.barh(n, a, color="#1f77b4", height=.6)
+    ax.barh(n, bb, left=a, color="#ff7f0e", height=.6)
+    ax.text(28.5, n, label, va="center", fontsize=8)
+ax.axvline(27, color="k", ls="--", lw=1)
+ax.set_yticks(range(len(rows)))
+ax.set_yticklabels(["run " + r[0] for r in rows])
+ax.invert_yaxis()
+ax.set_xlim(0, 46)
+ax.set_xticks([0, 5, 10, 15, 20, 27])
+ax.set_xlabel("bricks placed, out of 27 (blue: pyramid, 11; orange: S3, 16)")
+ax.set_title("Full pyramid + S3 builds with real stud insertion force (--stud-fit)", fontsize=10)
+save(fig, "studfit_progress.png")
+
 (OUT / "facts.json").write_text(json.dumps(facts, indent=1))
 print(json.dumps(facts, indent=1))

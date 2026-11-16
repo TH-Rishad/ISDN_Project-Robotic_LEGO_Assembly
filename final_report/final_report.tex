@@ -65,9 +65,12 @@ a strict check decides when each brick, and the whole task, is complete. In the
 validated run an 11-brick arch and a 16-brick corbelled bridge (S3) were built
 completely, with all four generated supports held by the other arm, the arms
 moving simultaneously for 1{,}643 frames, every brick within 1.1\,mm of its
-target, and no unintended collision. This report explains each component in
-plain language, names the algorithm behind it and the reason it was chosen, and
-shows the inputs and the simulation.
+target, and no unintended collision. In a harder mode where every brick must
+be pushed onto real stud resistance, the latest run placed all 27 bricks of the
+pyramid and S3, but it does not yet pass verification (\S\ref{sec:studfit}).
+This report explains each component in plain language, names the algorithm
+behind it and the reason it was chosen, and shows the inputs and the
+simulation.
 \end{abstract}
 
 \tableofcontents
@@ -152,7 +155,10 @@ Independent verifier & pass (exit 0) & pass (exit 0) \\
 \end{center}
 The arch + S3 run is the one that satisfies requirement~3, because the pyramid
 needs no support. All numbers are read from the saved run files by
-\texttt{final\_report/make\_figures.py}.
+\texttt{final\_report/make\_figures.py}. Both runs were recorded with code
+revisions \texttt{04dc565} and \texttt{6f47aef}. The support-search recovery
+and scheduling rules added later (\S\ref{sec:recovery}, \S\ref{sec:coord})
+have not yet been exercised in a new default-mode full build.
 
 \begin{figure}[H]
 \centering
@@ -615,6 +621,28 @@ the carried brick's insertion corridor by 0.74\,mm'') and an alternative was
 accepted each time. Measured grip force was 13.0--14.0\,N per finger against
 the 14.3\,N the plan assumed.
 
+\subsection{Recovering from a failed support attempt}\label{sec:recovery}
+The checks above all happen \emph{before} the helper closes its fingers. The
+harder stud-fit runs (\S\ref{sec:studfit}) showed four ways an attempt can still
+go wrong after that point. Each one used to end the build or push the
+structure out of place. The support search now treats each as a bad candidate
+and moves on:
+\begin{itemize}[nosep]
+\item \textbf{The closed hand blocks the builder.} After closing, the measured hold
+      can sit deeper than the open-hand check predicted. The builder's approach is
+      re-checked against the \emph{closed} helper before the builder may move; if it
+      is blocked, the helper opens, retreats and tries the next pose.
+\item \textbf{One finger misses.} A grip is only ``held'' when both fingers feel
+      force; in stud-fit mode every brick the plan meant to grip must also be in
+      contact. Otherwise the helper retreats and tries the next pose.
+\item \textbf{The guarded approach stops on contact (guard stop).} The helper no
+      longer closes into the scrape. It pulls back 2.5$\times$ further than usual,
+      without first opening its fingers there, and tries a column at least 12\,mm
+      away before nearby ones.
+\item \textbf{A pose that failed is not retried}, including its 180$^\circ$ wrist twin,
+      which grips the same brick face.
+\end{itemize}
+
 \begin{figure}[H]
 \centering
 \begin{subfigure}{.32\linewidth}\includegraphics[width=\linewidth]{sim_a_sup10_side.jpg}\caption{Arch step 10: B holds, A presses the crown.}\end{subfigure}\hfill
@@ -693,7 +721,7 @@ the final layer.}
 pauses one to help the other when a step needs support (arm A first on a tie),
 and a strict snap check decides when each brick, and the whole task, is done.}
 
-\subsection{The coordinator}
+\subsection{The coordinator}\label{sec:coord}
 The coordinator (\texttt{dual\_coordinator.py}) acts only at step boundaries. Each
 arm has its own plan, step counter and status. Every frame it is asked who may
 start what:
@@ -706,6 +734,11 @@ start what:
       request is kept and served next, so it cannot starve.
 \item \textbf{Completed builder:} an arm that has finished its own structure stays
       available as a helper.
+\item \textbf{Don't run ahead (added after the validated runs):} an arm that is
+      already ahead of the other in step count does not start a new step of its own
+      while the other arm's \emph{next} step needs support. Without this rule, the
+      pyramid arm, already ahead, started a slow drop-and-press just as S3's
+      next step needed a helper, and that S3 brick later missed its snap check.
 \end{itemize}
 Because requests are collected before pickup and only granted when both arms are
 idle, the state ``both arms hold a brick and each waits for the other to help''
@@ -817,6 +850,94 @@ it alone and then helps B with S3's three supported steps.}
 \end{figure}
 
 % =====================================================================
+\section{Towards real stud resistance (stud-fit mode)}\label{sec:studfit}
+
+\keyidea{When every brick must be pushed onto the studs with real force, the
+supported presses become the hard part. The latest run places all 27 bricks,
+but several safety checks had to be loosened, and it still fails verification
+on contacts.}
+
+\subsection{What changes in this mode}
+In the default cell a brick slides onto the studs under its own weight. With
+\texttt{--stud-fit}, a brick that reaches the stud tops is held there until the
+measured push reaches $n\times 8.9$\,N over its $n$ mating studs. The builder's
+side grip slips at about 3\,N, so every brick is released on the stud tops and
+pressed from above with the closed fingertips, ramping to 1.3$\times$ the needed
+force. The pressing arm's joints are 5$\times$ stiffer during the press.
+
+Supported steps needed the most work (Nov 10--16, about 40 commits and 27
+diagnostic runs):
+\begin{itemize}
+\item \textbf{More and stronger supports.} The plan picks, among grips the force
+      model rates safe, the one nearest the press, and forces a support wherever a
+      brick or anything under it overhangs. S3 now has five supported steps (9, 11,
+      13, 14, 15). The helper grips at about 43\,N per finger and holds at 20$\times$
+      joint stiffness.
+\item \textbf{Softer supported presses.} At 1.3$\times$ the needed force, S3's
+      last brick broke the two-stud bridge joint below it, even though the
+      force model rated that step safe with the support. Supported presses now
+      ramp over 2\,s to 0.90$\times$ the needed force, and the brick is allowed
+      through at 0.85$\times$.
+\item \textbf{Joint breaker paused on supported steps.} Even then, the
+      simulated joint load briefly crossed $u=1$ before push-through and spiked
+      to $u=1.3$--$3.2$ at the moment the clutch welds took over. The break
+      rule is now switched off from the start of a supported press until
+      0.5\,s after the snap \emph{and} the helper has let go.
+\item \textbf{Looser clearance limits near a holding helper.} A closed finger may
+      overlap a placed brick's collision box by up to 1.25\,mm. The carried brick's
+      corridor may overlap the helper by 1.5\,mm, and a supported pre-insert path
+      may come within 2\,mm \emph{inside} the holding arm's spheres. Stud contacts
+      may be 2.0\,mm deep (default 1.7\,mm), and a support may flex the structure
+      by 1.5\,mm before it counts as ``displaced''. These limits apply only in
+      stud-fit mode.
+\end{itemize}
+
+\subsection{Results}
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{studfit_progress.png}
+\caption{Every saved full pyramid + S3 stud-fit run and why it stopped. The
+pyramid (blue) is reliably finished; the failures move later into S3 (orange)
+as each cause is fixed.}
+\label{fig:studfit}
+\end{figure}
+
+\begin{itemize}
+\item \textbf{Run 017} is the first to place all 27 bricks against stud
+      resistance (11/11 and 16/16, all five supports held). Every brick
+      passed the snap check with at most 1.96\,mm sideways error, 0.33\,mm height
+      error and 1.33$^\circ$ tilt. 219 motions were planned with no
+      planning failure. The new recovery mattered: 14 support attempts were
+      rejected and retried, 5 of them because only one finger made contact.
+\item \textbf{It does not pass the verifier.} The audit recorded 5 unintended
+      contacts and 23 ``displaced'' events:
+      \begin{itemize}[nosep]
+      \item 2 contacts were feeder bricks resting on the floor (0.01\,N). These are
+            now exempt while an arm is staging.
+      \item 3 contacts were the helper's finger brushing an S3 brick (0.9--2.1\,N)
+            while it retracted.
+      \item The 23 displacements moved four S3 bricks by up to 2.2\,mm during failed
+            support attempts.
+      \end{itemize}
+      Its lowest measured clearance was $-0.86$\,mm, inside the loosened limits.
+\item \textbf{The three newest commits target exactly these scrapes}
+      (\S\ref{sec:recovery}): pull back further after a guard stop, then try a
+      farther column. No full run with them has been saved yet.
+\item \textbf{The previously open step now seats.} Diagnostic run 053 starts S3
+      at step 13 with the earlier bricks pre-placed. It completes steps 13--15,
+      and the verifier accepts it as a diagnostic, not as a full build.
+\end{itemize}
+
+\why{Pausing the joint breaker during supported presses deserves a plain
+reading. The support is meant to carry the load around the weak joint. But the
+simulated joints measure load only at the end of each frame, and they spike
+when the welds hand over. So the breaker was reporting failures that a held
+real structure would probably survive. The cost is that a supported step can no
+longer \emph{fail} by breaking a joint in this mode. Until a full run passes the
+verifier with the breaker active, or the breaker is made to ignore these
+transient spikes, the stud-fit results are evidence of progress, not of
+success.}
+
 \section{Limitations and future work}\label{sec:limits}
 
 \begin{itemize}
@@ -826,11 +947,10 @@ it alone and then helps B with S3's three supported steps.}
       the simulator. A camera-based estimator exists in the code base
       (\texttt{vision.py}, the FK aim mode) but the validated dual-arm runs do not use it.
 \item \textbf{Clutch model.} In the default cell a brick seats under its own weight
-      (0.6\,mm stud clearance) and the clutch is the snap check plus welds. The
-      opt-in \texttt{--stud-fit} mode requires a real push of 8.9\,N per stud,
-      with a force-controlled top press. The full pyramid builds under it; S3's
-      last, unsupported step still overloads a two-stud joint by about 3.5\%, so a
-      complete stud-fit S3 is open.
+      (0.6\,mm stud clearance) and the clutch is the snap check plus welds. With
+      real stud resistance (\S\ref{sec:studfit}) all 27 bricks have been placed
+      once, but no full run has passed the verifier yet. That mode also pauses the
+      joint breaker during supported presses and loosens some clearance limits.
 \item \textbf{Conservative stability model.} The LP ignores joint compliance, so a
       safety factor of 3 is used; for two of the four supports it cannot
       show a reduction in predicted load (\S\ref{sec:support}).
@@ -839,8 +959,10 @@ it alone and then helps B with S3's three supported steps.}
 \item \textbf{Sampled collision checks} are not a continuous-collision proof; the
       physics contact audit covers the gap in practice.
 \end{itemize}
-Natural next steps: camera-based brick pose in the dual-arm runs, a compliant
-joint model so the safety factor can drop, a support search that may grip the
+Natural next steps: a verified full stud-fit run with the newest recovery
+code, a joint breaker that ignores weld hand-over spikes instead of being
+paused, a fresh default-mode run on the current code, camera-based brick pose in
+the dual-arm runs, a compliant joint model so the safety factor can drop, a support search that may grip the
 critical pier joint from a second side, and transfer to the real cell.
 
 \section{Conclusion}

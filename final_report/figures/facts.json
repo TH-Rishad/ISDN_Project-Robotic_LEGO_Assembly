@@ -212,5 +212,103 @@
     ""
    ]
   ]
- }
+ },
+ "studfit_runs": [
+  [
+   "001",
+   8,
+   9,
+   "clearance guard stopped an arm"
+  ],
+  [
+   "003",
+   9,
+   10,
+   "a stud joint broke"
+  ],
+  [
+   "004",
+   11,
+   11,
+   "brick missed the snap check"
+  ],
+  [
+   "005",
+   11,
+   13,
+   "brick missed the snap check"
+  ],
+  [
+   "006",
+   9,
+   10,
+   "clearance guard stopped an arm"
+  ],
+  [
+   "007",
+   11,
+   14,
+   "no collision-free path"
+  ],
+  [
+   "008",
+   11,
+   14,
+   "no collision-free path"
+  ],
+  [
+   "009",
+   11,
+   14,
+   "no collision-free path"
+  ],
+  [
+   "010",
+   11,
+   13,
+   "support grip not established"
+  ],
+  [
+   "011",
+   11,
+   13,
+   "scheduler wait timed out"
+  ],
+  [
+   "012",
+   9,
+   10,
+   "brick missed the snap check"
+  ],
+  [
+   "013",
+   9,
+   9,
+   "brick missed the snap check"
+  ],
+  [
+   "014",
+   11,
+   13,
+   "support grip lost"
+  ],
+  [
+   "015",
+   11,
+   14,
+   "support grip lost"
+  ],
+  [
+   "016",
+   9,
+   11,
+   "brick missed the snap check"
+  ],
+  [
+   "017",
+   11,
+   16,
+   "all placed; verifier: displaced, unintended"
+  ]
+ ]
 }
