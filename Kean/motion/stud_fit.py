@@ -184,13 +184,26 @@ def brace_search_guard_trial(ex):
 
     studfit_026: brace-in into a rejected column nudged B_b_010/012 by 2–3 mm
     before GUARD STOP. studfit_027: the same scrape scored displaced on the
-    lift/retract after abandon because on_guard_abandon was already cleared."""
+    lift/retract after abandon because on_guard_abandon was already cleared.
+    studfit_029: brace_search installs on Build views, so DualExample.step must
+    inspect views — checking only the cell never saw on_guard_abandon."""
     if getattr(ex, 'stud_fit', None) is None:
         return False
+    views = getattr(ex, 'views', None)
+    if views:
+        return any(_brace_search_guard_view(v) for v in views.values())
+    return _brace_search_guard_view(ex)
+
+
+def _brace_search_guard_view(ex):
     if getattr(ex, 'brace_search_retreating', False):
         return True
     if getattr(ex, 'on_guard_abandon', None) is None:
         return False
+    # Build view: helper is .A. Unit fixtures may use .arms.
+    helper = getattr(ex, 'A', None)
+    if helper is not None and getattr(helper, 'phase', None) in ('brace-in', 'brace-guard'):
+        return True
     arms = getattr(ex, 'arms', None) or {}
     return any(getattr(arms.get(a), 'phase', None) in ('brace-in', 'brace-guard') for a in 'AB')
 
