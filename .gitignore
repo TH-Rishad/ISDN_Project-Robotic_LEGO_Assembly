@@ -11,13 +11,10 @@ Kean/kean.id
 Kean/AGENTS.md
 Kean/.cursor/
 Kean/config/
-Kean/config/hpc/
-**/hpc4.json
-**/hpc-slurm/
 
 # Kean run artifacts. JSON evidence stays; recorder dumps do not.
 Kean/results/**/*.npz
 
-# HPC skill scratch on the remote tree. Not part of the shared repo.
+# Remote scratch dirs on a shared checkout. Not part of the shared repo.
 /runs/
 /transfer-tests/

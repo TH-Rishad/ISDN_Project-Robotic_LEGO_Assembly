@@ -40,12 +40,8 @@ scratch/
 *.md.bak
 todo-personal.md
 
-# Identity only: local agent instructions. Do not push. kean.id is ignored
-# at the repository root .gitignore.
+# Identity and local tooling. Do not push. kean.id is ignored at the
+# repository root .gitignore.
 AGENTS.md
-
-# Never commit local agent tooling or cluster account config.
 .cursor/
-config/hpc/
-**/hpc4.json
-**/hpc-slurm/
+config/
