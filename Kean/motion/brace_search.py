@@ -148,7 +148,7 @@ def check_approach(ex, planner, world, carried, D):
     raise PlannerUnavailable('; '.join(failures))
 
 
-def _retreat_helper(ex, D, then, *, open_first, back_scale=1., lift_first=False):
+def _retreat_helper(ex, D, then, *, open_first, back_scale=1., lateral_first=False):
     """Park the helper and continue the candidate loop. B stays at stage."""
     # Drop a waiting hold/close (studfit_011: cur stayed on hold's retracted-wait,
     # so the queued open never started and B hit wait_timeout:stage).
@@ -162,13 +162,14 @@ def _retreat_helper(ex, D, then, *, open_first, back_scale=1., lift_first=False)
     tool = D.rotate(D.qrot(tilt), np.array([0., 0., -1.]))
     # guard_stop leaves open fingers already in the scrape: dwell-open there
     # then short retract displaced B_b_010 (studfit_018). Pull farther back.
-    # studfit_021: tool-axis-only retract still scraped B_b_010/008 (displaced
-    # max_move 1.89/1.55 mm over STUD_FIT_DISPLACED). Lift world +Z first.
+    # studfit_022: world +Z lift still displaced B_b_010/008 — pads were hooked
+    # beside studs. Step out along Y away from the plate center first.
     p = np.asarray(p, float)
-    if lift_first:
-        lift = p + np.array([0., 0., 0.025])
-        ex.A.push('retract', lift, yaw, grip, .35, tilt=tilt)
-        p = lift
+    if lateral_first:
+        y_away = float(np.sign(p[1]) or -1.0) * 0.04
+        escape = p + np.array([0., y_away, 0.01])
+        ex.A.push('retract', escape, yaw, grip, .35, tilt=tilt)
+        p = escape
     back = p - (D.BRACE_BACK * float(back_scale)) * tool
     if open_first:
         g_open = D.BRACE_HALF_W + D.BRACE_CLEAR
@@ -269,11 +270,11 @@ def install(ex, planner, world, carried, D):
                 self.on_guard_abandon = None
                 self.pending_hold = None
                 # guard_stop: fingers are still open in the scrape — do not dwell
-                # an open move there; lift clear then pull back farther
-                # (studfit_018 / studfit_021).
+                # an open move there; step out laterally then pull back farther
+                # (studfit_018 / studfit_021 / studfit_022).
                 guard = reason == 'guard_stop'
                 _retreat_helper(self, D, attempt, open_first=not guard,
-                                back_scale=2.5 if guard else 1., lift_first=guard)
+                                back_scale=2.5 if guard else 1., lateral_first=guard)
                 return True
 
             # Armed before the approach so a GUARD STOP on brace-in/brace-guard
@@ -286,6 +287,12 @@ def install(ex, planner, world, carried, D):
                     self.check_helper_approach(self.A.moves)
                 except PlannerUnavailable as exc:
                     record['error'] = 'helper approach: ' + str(exc)
+                    # Closed-finger reject at this column: a nearby Y twin often
+                    # GUARD STOPs into the same scrape, and the retreat displaces
+                    # neighbours (studfit_021/022 step 13: -0.188 plan → -0.19
+                    # GUARD STOP → B_b_010/008 displaced).
+                    skip_poses.add(pose_key(pick))
+                    avoid_ys.append(float(pick['brace_pose'][1]))
                     self.A.moves.clear()
                     self.on_guard_abandon = None
                     print('brace search rejected helper approach step %d: %s' % (n, str(exc)[-300:]), flush=True)

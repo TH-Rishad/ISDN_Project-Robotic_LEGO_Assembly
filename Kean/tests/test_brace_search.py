@@ -200,10 +200,11 @@ class BraceSearchTest(unittest.TestCase):
             # DualExample.brace_guard_stopped then abandons.
             ex.on_guard_abandon(0)
             self.assertEqual(ex.brace_search_report[0]['error'], 'guard_stop')
-            # Already open in the scrape: lift +Z, then retract farther, no
-            # dwell-open (studfit_018 / studfit_021 displaced on tool-only pull).
+            # Already open in the scrape: step out along Y, then retract farther,
+            # no dwell-open (studfit_022: +Z lift still displaced hooked pads).
             self.assertEqual([m['phase'] for m in ex.A.moves], ['retract', 'retract', 'park'])
-            self.assertAlmostEqual(ex.A.moves[0]['pos'][2], ex.A.cmd[0][2] + 0.025)
+            self.assertAlmostEqual(ex.A.moves[0]['pos'][1],
+                                   ex.A.cmd[0][1] + np.sign(ex.A.cmd[0][1] or -1.) * 0.04)
             self.assertGreater(np.linalg.norm(ex.A.moves[1]['pos'] - ex.A.moves[0]['pos']), .05)
             self.closed.assert_not_called()
             park = ex.A.moves[-1]
@@ -232,6 +233,24 @@ class BraceSearchTest(unittest.TestCase):
             park['then']()
         self.assertEqual(ex.plan['sequence'][0]['brace']['brace_pose'], picks[2]['brace_pose'])
         self.assertEqual(len(ex.brace_search_report), 2)  # near twin deferred, far tried
+        ex.fail.assert_not_called()
+
+    def test_helper_approach_reject_defers_nearby_y(self):
+        # studfit_022: closed-finger reject at -0.188 then physical -0.19 GUARD STOP.
+        picks = [
+            dict(brace_pose=[0., -.188, .0536], brace_tilt_rotvec=[.8, 0, 0]),
+            dict(brace_pose=[0., -.19, .0556], brace_tilt_rotvec=[1.3, 0, 0]),
+            dict(brace_pose=[0., -.202, .0556], brace_tilt_rotvec=[1.3, 0, 0]),
+        ]
+        ex = self.setup_search(picks)
+        ex.check_helper_approach = Mock(
+            side_effect=[PlannerUnavailable('closed finger geometry -1.54 mm'), None])
+        with patch('Kean.motion.brace_search.candidates', return_value=iter(picks)), \
+             patch('Kean.motion.brace_search.check_approach', side_effect=[None]):
+            ex.queue_brace(0, picks[0])
+        self.assertEqual(ex.plan['sequence'][0]['brace']['brace_pose'], picks[2]['brace_pose'])
+        self.assertIn('helper approach', ex.brace_search_report[0]['error'])
+        self.assertEqual(len(ex.brace_search_report), 2)
         ex.fail.assert_not_called()
 
     def test_preinsert_failure_backtracks_to_another_hover(self):
