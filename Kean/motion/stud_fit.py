@@ -64,7 +64,9 @@ FINGER_CLEAR_STUD = -0.00125  # m: diag_050's planned 45 deg bridge still failed
                     # that low-tilt plan runs; deeper than that still blocks. diag_051 still
                     # hit -1.54 mm at opening 6.82 mm — stop widening; keep the 75 deg fallback.
 STUD_FIT_MATING = 0.002  # m: stud-fit press can seat ~0.16 mm past STUD_H (diag_051 -1.864 mm)
-STUD_FIT_DISPLACED = 1.5  # mm: braced supports flex ~1.0 mm under press (diag_051 at the 1.0 edge)
+STUD_FIT_DISPLACED = 2.0  # mm: braced supports flex ~1.0–1.5 mm under press
+                    # (diag_051 at the 1.0 edge; studfit_023 logged 1.50/1.51 on B_b_010
+                    # during hold/press and open). Keep below scrape-scale moves (~2.3 mm).
 TOUCH = 0.002       # m: tips this close above the held brick's stud tops count as on them (contact
                     # measured 0.05-0.15 mm above nominal in dual_studfit_diag_008)
 BRACE_HAND = 0.90   # supported hand / needed

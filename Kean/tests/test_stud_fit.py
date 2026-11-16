@@ -219,7 +219,7 @@ class StudFitTest(unittest.TestCase):
         from Kean.motion.stud_fit import STUD_FIT_DISPLACED, STUD_FIT_MATING
         from Kean.motion.contact_policy import stud_mating
         self.assertAlmostEqual(STUD_FIT_MATING, 0.002)
-        self.assertAlmostEqual(STUD_FIT_DISPLACED, 1.5)
+        self.assertAlmostEqual(STUD_FIT_DISPLACED, 2.0)
         # diag_051 crown press at -1.864 mm is stud mating under stud-fit, not penetration.
         at_stud = (0.004, 0.004, 0.0105)  # on a 2x4 stud centre, above the shell
         self.assertTrue(stud_mating('press', 'lo', ('lo',), -0.001864, 8, 8, 0.01035,

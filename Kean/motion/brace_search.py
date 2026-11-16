@@ -162,14 +162,17 @@ def _retreat_helper(ex, D, then, *, open_first, back_scale=1., lateral_first=Fal
     tool = D.rotate(D.qrot(tilt), np.array([0., 0., -1.]))
     # guard_stop leaves open fingers already in the scrape: dwell-open there
     # then short retract displaced B_b_010 (studfit_018). Pull farther back.
-    # studfit_022: world +Z lift still displaced B_b_010/008 — pads were hooked
-    # beside studs. Step out along Y away from the plate center first.
+    # studfit_022: world +Z lift dragged hooked pads. studfit_023: 40 mm Y
+    # escape still displaced freshly seated B_b_012 (2.34 mm) — step out
+    # farther in Y, then up, before the tool-axis retract.
     p = np.asarray(p, float)
     if lateral_first:
-        y_away = float(np.sign(p[1]) or -1.0) * 0.04
-        escape = p + np.array([0., y_away, 0.01])
-        ex.A.push('retract', escape, yaw, grip, .35, tilt=tilt)
-        p = escape
+        y_away = float(np.sign(p[1]) or -1.0) * 0.06
+        side = p + np.array([0., y_away, 0.])
+        ex.A.push('retract', side, yaw, grip, .3, tilt=tilt)
+        up = side + np.array([0., 0., 0.04])
+        ex.A.push('retract', up, yaw, grip, .35, tilt=tilt)
+        p = up
     back = p - (D.BRACE_BACK * float(back_scale)) * tool
     if open_first:
         g_open = D.BRACE_HALF_W + D.BRACE_CLEAR
@@ -315,9 +318,13 @@ def install(ex, planner, world, carried, D):
                     record['error'] = str(exc)
                     print('brace search rejected step %d: %s' % (n, exc), flush=True)
                     self.on_guard_abandon = None
-                    # A has not closed. Discard close/hold, retreat with the
-                    # shared controller, and try again only after parking.
-                    _retreat_helper(self, D, attempt, open_first=False)
+                    # Physically arrived then rejected: same scrape risk as a
+                    # GUARD STOP (studfit_023 step 14 at -0.156 then -0.182).
+                    # Defer nearby Y but allow a tilt twin at this TCP (pose_key
+                    # is XY Z only).
+                    avoid_ys.append(float(pick['brace_pose'][1]))
+                    _retreat_helper(self, D, attempt, open_first=False,
+                                    back_scale=2.5, lateral_first=True)
                     return
                 record['accepted'] = True
                 print('brace search accepted step %d before closing' % n, flush=True)
