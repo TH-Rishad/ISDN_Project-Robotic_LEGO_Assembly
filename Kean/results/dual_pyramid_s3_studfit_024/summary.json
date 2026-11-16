@@ -1,0 +1,1032 @@
+{
+  "done": false,
+  "failure": "command_clearance:A:B_b_008",
+  "error": null,
+  "frames": 25477,
+  "builds": {
+    "A": {
+      "structure": "pyramid",
+      "placed": 11,
+      "preplaced": 0,
+      "total": 11,
+      "completed_steps": 11,
+      "supports": [],
+      "brace_search": []
+    },
+    "B": {
+      "structure": "S3",
+      "placed": 14,
+      "preplaced": 0,
+      "total": 16,
+      "completed_steps": 14,
+      "supports": [
+        {
+          "step": 9,
+          "requested": true,
+          "planned_feasible": true,
+          "executed": true,
+          "brace_infeasible": false,
+          "guard_stop": false,
+          "guard_frame": null,
+          "realised_grip_N": [
+            35.26,
+            37.04
+          ],
+          "grip_samples": 847,
+          "contacted": [
+            "B_b_007",
+            "B_b_009"
+          ],
+          "gripped_bricks": [
+            "B_b_007",
+            "B_b_009"
+          ],
+          "max_F_N": {
+            "B_b_007": 4.49,
+            "B_b_009": 2.79
+          },
+          "max_M_Nm": {
+            "B_b_007": 0.0353,
+            "B_b_009": 0.0196
+          }
+        },
+        {
+          "step": 11,
+          "requested": true,
+          "planned_feasible": true,
+          "executed": true,
+          "brace_infeasible": false,
+          "guard_stop": false,
+          "guard_frame": null,
+          "realised_grip_N": [
+            35.52,
+            36.84
+          ],
+          "grip_samples": 891,
+          "contacted": [
+            "B_b_009",
+            "B_b_011"
+          ],
+          "gripped_bricks": [
+            "B_b_009",
+            "B_b_011"
+          ],
+          "max_F_N": {
+            "B_b_011": 2.99,
+            "B_b_009": 3.91
+          },
+          "max_M_Nm": {
+            "B_b_011": 0.0201,
+            "B_b_009": 0.0353
+          }
+        },
+        {
+          "step": 13,
+          "requested": true,
+          "planned_feasible": true,
+          "executed": true,
+          "brace_infeasible": false,
+          "guard_stop": false,
+          "guard_frame": null,
+          "realised_grip_N": [
+            39.72,
+            38.71
+          ],
+          "grip_samples": 1006,
+          "contacted": [
+            "B_b_008",
+            "B_b_010"
+          ],
+          "gripped_bricks": [
+            "B_b_008",
+            "B_b_010"
+          ],
+          "max_F_N": {
+            "B_b_008": 22.41,
+            "B_b_010": 19.35
+          },
+          "max_M_Nm": {
+            "B_b_008": 0.1738,
+            "B_b_010": 0.3279
+          }
+        },
+        {
+          "step": 14,
+          "requested": true,
+          "planned_feasible": true,
+          "executed": false,
+          "brace_infeasible": false,
+          "guard_stop": false,
+          "guard_frame": null,
+          "realised_grip_N": null,
+          "grip_samples": 0,
+          "contacted": [],
+          "gripped_bricks": [
+            "B_b_010",
+            "B_b_012"
+          ],
+          "max_F_N": {},
+          "max_M_Nm": {}
+        }
+      ],
+      "brace_search": [
+        {
+          "step": 9,
+          "pose": [
+            0.0,
+            -0.132,
+            0.0416
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry -1.33 mm at B_b_005 (opening 7.14 mm)"
+        },
+        {
+          "step": 9,
+          "pose": [
+            0.0,
+            -0.118,
+            0.046
+          ],
+          "tilt": [
+            -1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": true
+        },
+        {
+          "step": 11,
+          "pose": [
+            0.0,
+            -0.132,
+            0.0152
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry -1.33 mm at B_b_005 (opening 7.14 mm)"
+        },
+        {
+          "step": 11,
+          "pose": [
+            0.0,
+            -0.118,
+            0.0556
+          ],
+          "tilt": [
+            -1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": true
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.188,
+            0.0536
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry -1.54 mm at B_b_006 (opening 6.82 mm)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.202,
+            0.0556
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": true
+        },
+        {
+          "step": 14,
+          "pose": [
+            0.0,
+            -0.156,
+            0.0632
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "hover [0.16, -0.136, 0.1696]: boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: path clearance 0.75 mm at other arm (sample 25/71); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); hover [0.16, -0.136, 0.2496]: boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: path clearance -0.00 mm at other arm (sample 28/71); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); hover [0.16, -0.136, 0.3296]: boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: path clearance -1.51 mm at other arm (sample 31/71); full-sphere-filter goal [0.0, -0.1301, 0.1097]: path clearance 0.50 mm at other arm (sample 85/94); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); hover [0.08, -0.136, 0.2496]: boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: path clearance 0.01 mm at other arm (sample 36/63); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); hover [0.0, -0.136, 0.3296]: boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: path clearance 0.89 mm at other arm (sample 60/75); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility)"
+        }
+      ]
+    }
+  },
+  "contacts": {
+    "neighbour_rub": {
+      "count": 48,
+      "examples": [
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:A_b_000#28",
+          "phase": {
+            "A": "press",
+            "B": "press"
+          },
+          "start_frame": 860,
+          "max_pen_mm": -1.475,
+          "peak_force_n": 0.89,
+          "end_frame": 889,
+          "duration_frames": 30,
+          "contact_frames": 30,
+          "fragments": 1
+        },
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:B_b_000#39",
+          "phase": {
+            "A": "press",
+            "B": "press"
+          },
+          "start_frame": 933,
+          "max_pen_mm": -1.477,
+          "peak_force_n": 7.76,
+          "end_frame": 1022,
+          "duration_frames": 90,
+          "contact_frames": 90,
+          "fragments": 1
+        },
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:A_b_001#29",
+          "phase": {
+            "A": "press",
+            "B": "press"
+          },
+          "start_frame": 2616,
+          "max_pen_mm": -1.477,
+          "peak_force_n": 27.72,
+          "end_frame": 2700,
+          "duration_frames": 85,
+          "contact_frames": 85,
+          "fragments": 1
+        },
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:B_b_001#40",
+          "phase": {
+            "A": "press",
+            "B": "press"
+          },
+          "start_frame": 2672,
+          "max_pen_mm": -1.476,
+          "peak_force_n": 8.08,
+          "end_frame": 2702,
+          "duration_frames": 31,
+          "contact_frames": 31,
+          "fragments": 1
+        },
+        {
+          "class": "neighbour_rub",
+          "a": "brick:A_b_000#28",
+          "b": "brick:A_b_002#30",
+          "phase": {
+            "A": "release",
+            "B": "release"
+          },
+          "start_frame": 4187,
+          "max_pen_mm": -0.192,
+          "peak_force_n": 0.01,
+          "end_frame": 4192,
+          "duration_frames": 6,
+          "contact_frames": 4,
+          "fragments": 3
+        }
+      ]
+    },
+    "stud_mating": {
+      "count": 20,
+      "examples": [
+        {
+          "class": "stud_mating",
+          "a": "brick:B_b_000#39",
+          "b": "brick:B_b_002#41",
+          "phase": {
+            "A": "press",
+            "B": "press"
+          },
+          "start_frame": 4354,
+          "max_pen_mm": -1.676,
+          "peak_force_n": 0.32,
+          "end_frame": 4430,
+          "geometry": {
+            "upper": "B_b_002",
+            "lower": "B_b_000",
+            "stud_shape": 258,
+            "upper_shape": 281,
+            "stud_type": 8,
+            "upper_type": 7,
+            "stud_local_z": 0.0,
+            "contact_frame": 4430,
+            "contact_world": [
+              -0.006035972386598587,
+              -0.19635723531246185,
+              0.013702671974897385
+            ],
+            "contact_local": [
+              -0.006032422951809131,
+              -0.004356428883131654,
+              0.01050536585772018
+            ],
+            "lower_dims": [
+              0.016,
+              0.016
+            ]
+          },
+          "duration_frames": 77,
+          "contact_frames": 77,
+          "fragments": 1
+        },
+        {
+          "class": "stud_mating",
+          "a": "brick:B_b_001#40",
+          "b": "brick:B_b_003#42",
+          "phase": {
+            "A": "press",
+            "B": "press"
+          },
+          "start_frame": 6185,
+          "max_pen_mm": -1.684,
+          "peak_force_n": 0.32,
+          "end_frame": 6261,
+          "geometry": {
+            "upper": "B_b_003",
+            "lower": "B_b_001",
+            "stud_shape": 268,
+            "upper_shape": 293,
+            "stud_type": 8,
+            "upper_type": 7,
+            "stud_local_z": 0.0,
+            "contact_frame": 6261,
+            "contact_world": [
+              0.004614599049091339,
+              -0.13408049941062927,
+              0.013703843578696251
+            ],
+            "contact_local": [
+              0.004619054174824977,
+              -0.006078743991257395,
+              0.010503445055536829
+            ],
+            "lower_dims": [
+              0.016,
+              0.016
+            ]
+          },
+          "duration_frames": 77,
+          "contact_frames": 77,
+          "fragments": 1
+        },
+        {
+          "class": "stud_mating",
+          "a": "brick:B_b_002#41",
+          "b": "brick:B_b_004#43",
+          "phase": {
+            "A": "insert",
+            "B": "press"
+          },
+          "start_frame": 7983,
+          "max_pen_mm": -1.678,
+          "peak_force_n": 0.32,
+          "end_frame": 7999,
+          "geometry": {
+            "upper": "B_b_004",
+            "lower": "B_b_002",
+            "stud_shape": 278,
+            "upper_shape": 301,
+            "stud_type": 8,
+            "upper_type": 7,
+            "stud_local_z": 0.0,
+            "contact_frame": 7999,
+            "contact_world": [
+              -0.006403867620974779,
+              -0.19632017612457275,
+              0.02328915148973465
+            ],
+            "contact_local": [
+              -0.006379617575331384,
+              -0.004310802122009258,
+              0.010504065969792033
+            ],
+            "lower_dims": [
+              0.016,
+              0.016
+            ]
+          },
+          "duration_frames": 17,
+          "contact_frames": 17,
+          "fragments": 1
+        },
+        {
+          "class": "stud_mating",
+          "a": "brick:B_b_003#42",
+          "b": "brick:B_b_005#44",
+          "phase": {
+            "A": "press",
+            "B": "press"
+          },
+          "start_frame": 9758,
+          "max_pen_mm": -1.678,
+          "peak_force_n": 0.32,
+          "end_frame": 9797,
+          "geometry": {
+            "upper": "B_b_005",
+            "lower": "B_b_003",
+            "stud_shape": 288,
+            "upper_shape": 313,
+            "stud_type": 8,
+            "upper_type": 7,
+            "stud_local_z": 0.0,
+            "contact_frame": 9797,
+            "contact_world": [
+              0.004306592978537083,
+              -0.13438157737255096,
+              0.023304589092731476
+            ],
+            "contact_local": [
+              0.004311543079172916,
+              -0.006379373952594228,
+              0.010504625683318258
+            ],
+            "lower_dims": [
+              0.016,
+              0.016
+            ]
+          },
+          "duration_frames": 40,
+          "contact_frames": 40,
+          "fragments": 1
+        },
+        {
+          "class": "stud_mating",
+          "a": "brick:A_b_003#31",
+          "b": "brick:A_b_006#33",
+          "phase": {
+            "A": "press",
+            "B": "press"
+          },
+          "start_frame": 9837,
+          "max_pen_mm": -1.667,
+          "peak_force_n": 0.16,
+          "end_frame": 9884,
+          "geometry": {
+            "upper": "A_b_006",
+            "lower": "A_b_003",
+            "stud_shape": 188,
+            "upper_shape": 217,
+            "stud_type": 8,
+            "upper_type": 7,
+            "stud_local_z": 0.0,
+            "contact_frame": 9884,
+            "contact_world": [
+              0.008920110762119293,
+              0.1499534249305725,
+              0.013704270124435425
+            ],
+            "contact_local": [
+              -0.006046425977906263,
+              -0.004918307925401405,
+              0.010505465755272538
+            ],
+            "lower_dims": [
+              0.032,
+              0.016
+            ]
+          },
+          "duration_frames": 48,
+          "contact_frames": 48,
+          "fragments": 1
+        }
+      ]
+    }
+  },
+  "parallel_frames": 1433,
+  "diagnostic": false,
+  "motion": {
+    "strict": true,
+    "workarounds": [],
+    "failures": [
+      {
+        "error": "arm clearance 0.84 mm",
+        "step": 25,
+        "phases": {
+          "A builder": "retract",
+          "B builder": "stage"
+        },
+        "modes": {
+          "A builder": "idle",
+          "B builder": "idle"
+        },
+        "measured_q": [
+          -1.2974668741226196,
+          0.6869748830795288,
+          0.7396289110183716,
+          -2.1583805084228516,
+          0.24095939099788666,
+          2.208116054534912,
+          -1.5600988864898682,
+          0.009999518282711506,
+          0.010000481270253658,
+          -0.6920465230941772,
+          -0.9892631769180298,
+          0.5630333423614502,
+          -2.706482172012329,
+          0.4753751754760742,
+          1.7697434425354004,
+          -1.2412183284759521,
+          0.007992035709321499,
+          0.007992032915353775
+        ],
+        "target_q": [
+          -1.3078539371490479,
+          0.7040655612945557,
+          0.7122665643692017,
+          -2.103938341140747,
+          0.21933947503566742,
+          2.1665472984313965,
+          -1.5676522254943848,
+          0.009999999776482582,
+          0.009999999776482582,
+          -0.6920760273933411,
+          -0.9892084002494812,
+          0.5630289316177368,
+          -2.7064995765686035,
+          0.4753817021846771,
+          1.7697314023971558,
+          -1.2411985397338867,
+          0.006500000134110451,
+          0.006500000134110451
+        ],
+        "fraction": 0.3333333333333333
+      },
+      {
+        "error": "arm clearance 0.96 mm",
+        "step": 25,
+        "phases": {
+          "A builder": "retract",
+          "B builder": "stage"
+        },
+        "modes": {
+          "A builder": "stopped",
+          "B builder": "stopped"
+        },
+        "measured_q": [
+          -1.2992507219314575,
+          0.6886636018753052,
+          0.7370014190673828,
+          -2.152853488922119,
+          0.24047788977622986,
+          2.2074708938598633,
+          -1.5603229999542236,
+          0.010001320391893387,
+          0.009998681023716927,
+          -0.6920465230941772,
+          -0.9892631769180298,
+          0.5630333423614502,
+          -2.706482172012329,
+          0.4753751754760742,
+          1.7697434425354004,
+          -1.2412183284759521,
+          0.007986830547451973,
+          0.007986828684806824
+        ],
+        "target_q": [
+          -1.2992507219314575,
+          0.6886636018753052,
+          0.7370014190673828,
+          -2.152853488922119,
+          0.24047788977622986,
+          2.2074708938598633,
+          -1.5603229999542236,
+          0.009999999776482582,
+          0.009999999776482582,
+          -0.6920465230941772,
+          -0.9892631769180298,
+          0.5630333423614502,
+          -2.706482172012329,
+          0.4753751754760742,
+          1.7697434425354004,
+          -1.2412183284759521,
+          0.006500000134110451,
+          0.006500000134110451
+        ],
+        "fraction": 0.0
+      },
+      {
+        "error": "arm clearance 0.42 mm",
+        "step": 25,
+        "phases": {
+          "A builder": "retract",
+          "B builder": "stage"
+        },
+        "modes": {
+          "A builder": "stopped",
+          "B builder": "stopped"
+        },
+        "measured_q": [
+          -1.300274133682251,
+          0.688676655292511,
+          0.7362692356109619,
+          -2.1519856452941895,
+          0.2404898703098297,
+          2.207533836364746,
+          -1.5603251457214355,
+          0.0100001385435462,
+          0.009999862872064114,
+          -0.6920465230941772,
+          -0.9892631769180298,
+          0.5630333423614502,
+          -2.706482172012329,
+          0.4753751754760742,
+          1.7697434425354004,
+          -1.2412183284759521,
+          0.008065140806138515,
+          0.008065136149525642
+        ],
+        "target_q": [
+          -1.300274133682251,
+          0.688676655292511,
+          0.7362692356109619,
+          -2.1519856452941895,
+          0.2404898703098297,
+          2.207533836364746,
+          -1.5603251457214355,
+          0.009999999776482582,
+          0.009999999776482582,
+          -0.6920465230941772,
+          -0.9892631769180298,
+          0.5630333423614502,
+          -2.706482172012329,
+          0.4753751754760742,
+          1.7697434425354004,
+          -1.2412183284759521,
+          0.006500000134110451,
+          0.006500000134110451
+        ],
+        "fraction": 0.0
+      },
+      {
+        "error": "arm clearance 0.43 mm",
+        "step": 25,
+        "phases": {
+          "A builder": "retract",
+          "B builder": "stage"
+        },
+        "modes": {
+          "A builder": "stopped",
+          "B builder": "stopped"
+        },
+        "measured_q": [
+          -1.3011223077774048,
+          0.6886037588119507,
+          0.7356856465339661,
+          -2.1514852046966553,
+          0.2404962182044983,
+          2.20755934715271,
+          -1.5603251457214355,
+          0.01000034250319004,
+          0.009999658912420273,
+          -0.6920465230941772,
+          -0.9892631769180298,
+          0.5630333423614502,
+          -2.706482172012329,
+          0.4753751754760742,
+          1.7697434425354004,
+          -1.2412183284759521,
+          0.008069302886724472,
+          0.008069301024079323
+        ],
+        "target_q": [
+          -1.3011223077774048,
+          0.6886037588119507,
+          0.7356856465339661,
+          -2.1514852046966553,
+          0.2404962182044983,
+          2.20755934715271,
+          -1.5603251457214355,
+          0.009999999776482582,
+          0.009999999776482582,
+          -0.6920465230941772,
+          -0.9892631769180298,
+          0.5630333423614502,
+          -2.706482172012329,
+          0.4753751754760742,
+          1.7697434425354004,
+          -1.2412183284759521,
+          0.006500000134110451,
+          0.006500000134110451
+        ],
+        "fraction": 0.0
+      },
+      {
+        "error": "arm clearance 0.56 mm",
+        "step": 25,
+        "phases": {
+          "A builder": "retract",
+          "B builder": "stage"
+        },
+        "modes": {
+          "A builder": "stopped",
+          "B builder": "stopped"
+        },
+        "measured_q": [
+          -1.301801323890686,
+          0.6885284781455994,
+          0.7352205514907837,
+          -2.1511735916137695,
+          0.24050047993659973,
+          2.207573890686035,
+          -1.5603251457214355,
+          0.010000212118029594,
+          0.009999789297580719,
+          -0.6920465230941772,
+          -0.9892631769180298,
+          0.5630333423614502,
+          -2.706482172012329,
+          0.4753751754760742,
+          1.7697434425354004,
+          -1.2412183284759521,
+          0.008073809556663036,
+          0.008073792792856693
+        ],
+        "target_q": [
+          -1.301801323890686,
+          0.6885284781455994,
+          0.7352205514907837,
+          -2.1511735916137695,
+          0.24050047993659973,
+          2.207573890686035,
+          -1.5603251457214355,
+          0.009999999776482582,
+          0.009999999776482582,
+          -0.6920465230941772,
+          -0.9892631769180298,
+          0.5630333423614502,
+          -2.706482172012329,
+          0.4753751754760742,
+          1.7697434425354004,
+          -1.2412183284759521,
+          0.006500000134110451,
+          0.006500000134110451
+        ],
+        "fraction": 0.0
+      },
+      {
+        "error": "arm clearance 0.68 mm",
+        "step": 25,
+        "phases": {
+          "A builder": "retract",
+          "B builder": "stage"
+        },
+        "modes": {
+          "A builder": "stopped",
+          "B builder": "stopped"
+        },
+        "measured_q": [
+          -1.30233633518219,
+          0.6884760856628418,
+          0.7348544597625732,
+          -2.1509716510772705,
+          0.24050365388393402,
+          2.2075843811035156,
+          -1.5603251457214355,
+          0.010000132024288177,
+          0.009999868459999561,
+          -0.6920465230941772,
+          -0.9892631769180298,
+          0.5630333423614502,
+          -2.706482172012329,
+          0.4753751754760742,
+          1.7697434425354004,
+          -1.2412183284759521,
+          0.008078540675342083,
+          0.008078531362116337
+        ],
+        "target_q": [
+          -1.30233633518219,
+          0.6884760856628418,
+          0.7348544597625732,
+          -2.1509716510772705,
+          0.24050365388393402,
+          2.2075843811035156,
+          -1.5603251457214355,
+          0.009999999776482582,
+          0.009999999776482582,
+          -0.6920465230941772,
+          -0.9892631769180298,
+          0.5630333423614502,
+          -2.706482172012329,
+          0.4753751754760742,
+          1.7697434425354004,
+          -1.2412183284759521,
+          0.006500000134110451,
+          0.006500000134110451
+        ],
+        "fraction": 0.0
+      },
+      {
+        "error": "arm clearance 0.79 mm",
+        "step": 25,
+        "phases": {
+          "A builder": "retract",
+          "B builder": "stage"
+        },
+        "modes": {
+          "A builder": "stopped",
+          "B builder": "stopped"
+        },
+        "measured_q": [
+          -1.3027530908584595,
+          0.6884505748748779,
+          0.7345703840255737,
+          -2.1508398056030273,
+          0.240506112575531,
+          2.207592010498047,
+          -1.5603251457214355,
+          0.010000055655837059,
+          0.009999945759773254,
+          -0.6920465230941772,
+          -0.9892631769180298,
+          0.5630333423614502,
+          -2.706482172012329,
+          0.4753751754760742,
+          1.7697434425354004,
+          -1.2412183284759521,
+          0.008083057589828968,
+          0.008083040826022625
+        ],
+        "target_q": [
+          -1.3027530908584595,
+          0.6884505748748779,
+          0.7345703840255737,
+          -2.1508398056030273,
+          0.240506112575531,
+          2.207592010498047,
+          -1.5603251457214355,
+          0.009999999776482582,
+          0.009999999776482582,
+          -0.6920465230941772,
+          -0.9892631769180298,
+          0.5630333423614502,
+          -2.706482172012329,
+          0.4753751754760742,
+          1.7697434425354004,
+          -1.2412183284759521,
+          0.006500000134110451,
+          0.006500000134110451
+        ],
+        "fraction": 0.0
+      },
+      {
+        "error": "arm clearance 0.88 mm",
+        "step": 25,
+        "phases": {
+          "A builder": "retract",
+          "B builder": "stage"
+        },
+        "modes": {
+          "A builder": "stopped",
+          "B builder": "stopped"
+        },
+        "measured_q": [
+          -1.3030729293823242,
+          0.6884437799453735,
+          0.7343525886535645,
+          -2.150759696960449,
+          0.2405080944299698,
+          2.2075982093811035,
+          -1.5603251457214355,
+          0.009999996051192284,
+          0.010000004433095455,
+          -0.6920465230941772,
+          -0.9892631769180298,
+          0.5630333423614502,
+          -2.706482172012329,
+          0.4753751754760742,
+          1.7697434425354004,
+          -1.2412183284759521,
+          0.008089429698884487,
+          0.008089412935078144
+        ],
+        "target_q": [
+          -1.3030729293823242,
+          0.6884437799453735,
+          0.7343525886535645,
+          -2.150759696960449,
+          0.2405080944299698,
+          2.2075982093811035,
+          -1.5603251457214355,
+          0.009999999776482582,
+          0.009999999776482582,
+          -0.6920465230941772,
+          -0.9892631769180298,
+          0.5630333423614502,
+          -2.706482172012329,
+          0.4753751754760742,
+          1.7697434425354004,
+          -1.2412183284759521,
+          0.006500000134110451,
+          0.006500000134110451
+        ],
+        "fraction": 0.0
+      },
+      {
+        "error": "arm clearance 0.96 mm",
+        "step": 25,
+        "phases": {
+          "A builder": "retract",
+          "B builder": "stage"
+        },
+        "modes": {
+          "A builder": "stopped",
+          "B builder": "stopped"
+        },
+        "measured_q": [
+          -1.3033138513565063,
+          0.6884421110153198,
+          0.7341870665550232,
+          -2.1507205963134766,
+          0.24050967395305634,
+          2.207602024078369,
+          -1.5603251457214355,
+          0.009999951347708702,
+          0.010000048205256462,
+          -0.6920465230941772,
+          -0.9892631769180298,
+          0.5630333423614502,
+          -2.706482172012329,
+          0.4753751754760742,
+          1.7697434425354004,
+          -1.2412183284759521,
+          0.008093729615211487,
+          0.008093749172985554
+        ],
+        "target_q": [
+          -1.3033138513565063,
+          0.6884421110153198,
+          0.7341870665550232,
+          -2.1507205963134766,
+          0.24050967395305634,
+          2.207602024078369,
+          -1.5603251457214355,
+          0.009999999776482582,
+          0.009999999776482582,
+          -0.6920465230941772,
+          -0.9892631769180298,
+          0.5630333423614502,
+          -2.706482172012329,
+          0.4753751754760742,
+          1.7697434425354004,
+          -1.2412183284759521,
+          0.006500000134110451,
+          0.006500000134110451
+        ],
+        "fraction": 0.0
+      }
+    ],
+    "plans": 182,
+    "plan_failures": 9,
+    "captures": 0,
+    "segments": 182,
+    "min_clearance_m": 0.0006765865078992815,
+    "clearance_scope": "executed joints during planned playback; full spheres, measured fingers"
+  },
+  "reserved_parallel_frames": 3351,
+  "initial_settling_xy_m": 4.544854164123535e-07,
+  "ok": false,
+  "full_build": false
+}

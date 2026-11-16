@@ -1,0 +1,17 @@
+{
+  "frame": 25440,
+  "sim_time": 424.99999999994213,
+  "phases": {
+    "A": "retract",
+    "B": "stage"
+  },
+  "modes": {
+    "A": "stopped",
+    "B": "stopped"
+  },
+  "steps": {
+    "A": 11,
+    "B": 14
+  },
+  "pending": {}
+}

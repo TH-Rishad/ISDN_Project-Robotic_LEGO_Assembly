@@ -1,0 +1,346 @@
+studfit: out=Kean/results/dual_studfit_diag_039 start A=11 B=13 step_limit=3 gpu=0
+Warp 1.13.0 initialized:
+   CUDA Toolkit 12.9, Driver 12.8
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA GeForce RTX 4090 D" (22 GiB, sm_89, mempool enabled)
+   Kernel cache:
+     /home/mlieq/.cache/warp/1.13.0
+Module newton._src.geometry.inertia a7ff42e load on device 'cuda:0' took 8.40 ms  (cached)
+Module newton._src.utils.mesh 1476c2a load on device 'cpu' took 35.55 ms  (cached)
+Module validate_and_correct_inertia_kernel_524fb5ef 524fb5e load on device 'cuda:0' took 8.31 ms  (cached)
+Module newton._src.sim.ik.ik_solver d9f8ff8 load on device 'cuda:0' took 8.87 ms  (cached)
+Module IKOptimizerLM___build_specialized__locals___fk_local_a9d6f4f5 a9d6f4f load on device 'cuda:0' took 8.73 ms  (cached)
+Module newton._src.sim.ik.ik_common ec7ac17 load on device 'cuda:0' took 8.96 ms  (cached)
+Module newton._src.sim.ik.ik_objectives 2ab3ea8 load on device 'cuda:0' took 8.98 ms  (cached)
+Module IKOptimizerLM___build_specialized__locals___compute_motion_subspace_2d_28061874 2806187 load on device 'cuda:0' took 13.07 ms  (cached)
+Module _lm_solve_tiled_9_15_71b73c32 641c3f9 load on device 'cuda:0' took 169.50 ms  (cached)
+Module newton._src.sim.ik.ik_lm_optimizer d941fd7 load on device 'cuda:0' took 9.04 ms  (cached)
+Module newton._src.geometry.sdf_utils 30505d5 load on device 'cuda:0' took 9.37 ms  (cached)
+Module newton._src.geometry.sdf_texture ba97079 load on device 'cuda:0' took 12.36 ms  (cached)
+Module newton._src.sim.graph_coloring 95273ab load on device 'cpu' took 6.77 ms  (cached)
+Module newton._src.solvers.mujoco.kernels f5ae6c7 load on device 'cuda:0' took 12.18 ms  (cached)
+Module mujoco_warp._src.io 00dd7e1 load on device 'cuda:0' took 10.08 ms  (cached)
+Module mujoco_warp._src.smooth 976a5d7 load on device 'cuda:0' took 9.17 ms  (cached)
+Module _solve_LD_sparse_fused__locals__kernel_db9f1437 5e36655 load on device 'cuda:0' took 7.72 ms  (cached)
+Module newton._src.sim.articulation 9875313 load on device 'cuda:0' took 9.22 ms  (cached)
+Module newton._src.viewer.kernels 6eaf52b load on device 'cuda:0' took 8.51 ms  (cached)
+Module newton._src.sim.collide 0e6be4c load on device 'cuda:0' took 7.41 ms  (cached)
+Module newton._src.geometry.broad_phase_sap 7baa1de load on device 'cuda:0' took 8.06 ms  (cached)
+Module narrow_phase_primitive_write_contact e070310 load on device 'cuda:0' took 9.00 ms  (cached)
+Module narrow_phase_gjk_mpr_True_write_contact_default_default 00fbe52 load on device 'cuda:0' took 9.36 ms  (cached)
+Module newton._src.geometry.narrow_phase f722f21 load on device 'cuda:0' took 28.48 ms  (cached)
+Module newton._src.geometry.contact_reduction_global 5c84d97 load on device 'cuda:0' took 6.84 ms  (cached)
+Module newton._src.geometry.narrow_phase e577950 load on device 'cuda:0' took 9.32 ms  (cached)
+Module newton._src.geometry.sdf_contact 1cfb221 load on device 'cuda:0' took 8.24 ms  (cached)
+Module narrow_phase_mesh_plane_write_contact_to_reducer_True 0316777 load on device 'cuda:0' took 6.74 ms  (cached)
+Module mesh_triangle_contacts_to_reducer_kernel_98f62989 13e0243 load on device 'cuda:0' took 8.72 ms  (cached)
+Module newton._src.geometry.contact_reduction_global 5db63a2 load on device 'cuda:0' took 8.27 ms  (cached)
+Module sdf_contact_write_contact_to_reducer_False_True e0d3f15 load on device 'cuda:0' took 7.67 ms  (cached)
+Module export_reduced_contacts_write_contact c5c25a3 load on device 'cuda:0' took 8.01 ms  (cached)
+Module dual_arm_sim 83cffed load on device 'cuda:0' took 62.88 ms  (cached)
+Module mujoco_warp._src.constraint eb0e24d load on device 'cuda:0' took 9.06 ms  (cached)
+Module _efc_contact_init__locals__kernel_c7a6ce3a c7a6ce3 load on device 'cuda:0' took 7.84 ms  (cached)
+Module _efc_contact_jac_sparse__locals__kernel_7bafc28b 7bafc28 load on device 'cuda:0' took 6.59 ms  (cached)
+Module _efc_contact_update__locals__kernel_b43fbfe7 b43fbfe load on device 'cuda:0' took 8.66 ms  (cached)
+Module mujoco_warp._src.forward a76b6a3 load on device 'cuda:0' took 8.80 ms  (cached)
+Module mujoco_warp._src.passive 616927b load on device 'cuda:0' took 10.89 ms  (cached)
+Module mujoco_warp._src.forward 398750d load on device 'cuda:0' took 10.50 ms  (cached)
+Module mujoco_warp._src.support f32a4f8 load on device 'cuda:0' took 8.79 ms  (cached)
+Module mujoco_warp._src.solver 7df28c9 load on device 'cuda:0' took 8.24 ms  (cached)
+Module solve_init_jaref__locals__kernel_c16f89ba c16f89b load on device 'cuda:0' took 7.89 ms  (cached)
+Module mul_m_sparse__locals___mul_m_sparse_32fa3590 32fa359 load on device 'cuda:0' took 8.49 ms  (cached)
+Module update_constraint_efc__locals__kernel_6bfb2757 6bfb275 load on device 'cuda:0' took 8.49 ms  (cached)
+Module update_constraint_gauss_cost__locals__kernel_f44c2fe7 f44c2fe load on device 'cuda:0' took 8.28 ms  (cached)
+Module update_gradient_cholesky_blocked__locals__kernel_70c789cb c505d54 load on device 'cuda:0' took 210.48 ms  (cached)
+Module linesearch_jv_fused__locals__kernel_e1239d31 e1239d3 load on device 'cuda:0' took 7.28 ms  (cached)
+Module linesearch_iterative__locals__kernel_6131c716 3698647 load on device 'cuda:0' took 6.50 ms  (cached)
+Module mujoco_warp._src.sensor bee2d80 load on device 'cuda:0' took 9.52 ms  (cached)
+Module mujoco_warp._src.derivative f06cf21 load on device 'cuda:0' took 7.98 ms  (cached)
+dual: 27 bricks, 5 braced (weakest_joint), 30 clutch welds
+brick spheres: 8 inscribed (morphit skipped)
+pickup clearance B_b_012: [0.0, -6.5, 1.25] mm
+brace transport: hover 160 mm toward B, clear of A
+coordinator: {'event': 'support_requested', 'arm': 'B', 'step': 13, 'time': 1.1166666666666676}
+coordinator: {'event': 'support_granted', 'arm': 'B', 'step': 13, 'time': 1.1166666666666676, 'helper': 'A'}
+coordinator: {'event': 'helper_ready', 'arm': 'B', 'step': 13, 'time': 1.1166666666666676, 'helper': 'A'}
+brick spheres: 8 inscribed (morphit skipped)
+brace search step 13: pose [0.0, -0.188, 0.0536] tilt [0.7854, 0.0, 0.0]
+brace search rejected helper approach step 13: closed finger geometry -0.91 mm at B_b_006 (opening 7.45 mm)
+brace search step 13: pose [0.0, -0.188, 0.0536] tilt [0.7854, 0.0, 0.0]
+brace search rejected helper approach step 13: closed finger geometry -0.91 mm at B_b_006 (opening 7.45 mm)
+brace search step 13: pose [0.0, -0.188, 0.0536] tilt [-0.7854, 0.0, 0.0]
+brace search rejected helper approach step 13: helper obstructs carried-brick insertion corridor: -25.55 mm (hand)
+brace search step 13: pose [0.0, -0.188, 0.0536] tilt [-0.7854, 0.0, 0.0]
+brace search rejected helper approach step 13: helper obstructs carried-brick insertion corridor: -25.55 mm (hand)
+brace search step 13: pose [0.0, -0.19, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)
+brace search step 13: pose [0.0, -0.186, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)
+brace search step 13: pose [0.0, -0.188, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)
+brace search step 13: pose [0.0, -0.202, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 8.73 mm opening: path clearance 1.07 mm at B_b_006 (sample 0/0)
+brace search step 13: pose [0.0, -0.2, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)
+brace search step 13: pose [0.0, -0.198, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)
+brace search step 13: pose [0.0, -0.196, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)
+brace search step 13: pose [0.0, -0.194, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)
+brace search step 13: pose [0.0, -0.192, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)
+brace search step 13: pose [0.0, -0.19, 0.0556] tilt [1.309, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search accepted step 13 before closing
+coordinator: {'event': 'support_held', 'arm': 'B', 'step': 13, 'time': 20.350000000000126, 'helper': 'A'}
+stud fit: {'brick': 'B_b_012', 'event': 'held', 'time': 27.367, 'dz_mm': 1.84, 'needed_N': 53.4}
+stud fit: {'brick': 'B_b_012', 'event': 'pushed_through', 'time': 30.183, 'peak_N': 55.7, 'needed_N': 53.4, 'hand_N': 39.3}
+  step 13 B_b_012 SNAP  {'brick': 'B_b_012', 'lateral_mm': 0.16, 'dz_mm': -0.24, 'yaw_deg': 0.06, 'tilt_deg': 0.84}
+pickup clearance B_b_014: [0.0, 5.5, 1.25] mm
+brace transport: hover 160 mm toward B, clear of A
+coordinator: {'event': 'step_complete', 'arm': 'B', 'step': 13, 'time': 38.59999999999909}
+coordinator: {'event': 'support_released', 'arm': 'B', 'step': 13, 'time': 38.59999999999909, 'helper': 'A'}
+coordinator: {'event': 'support_requested', 'arm': 'B', 'step': 14, 'time': 38.59999999999909}
+coordinator: {'event': 'support_granted', 'arm': 'B', 'step': 14, 'time': 38.59999999999909, 'helper': 'A'}
+coordinator: {'event': 'helper_ready', 'arm': 'B', 'step': 14, 'time': 38.59999999999909, 'helper': 'A'}
+brace search step 14: pose [0.0, -0.156, 0.0632] tilt [0.7854, 0.0, 0.0]
+  GUARD STOP step 14: A stops at frame 3140
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 53.2 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 53.2 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+brace search rejected step 14: hover [0.16, -0.136, 0.1696]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance -0.62 mm at other arm (sample 25/67); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); hover [0.16, -0.136, 0.2496]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance 0.88 mm at other arm (sample 31/65); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); hover [0.16, -0.136, 0.3296]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance 0.79 mm at other arm (sample 45/88); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); hover [0.08, -0.136, 0.2496]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance 0.97 mm at other arm (sample 14/57); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); hover [0.0, -0.136, 0.3296]: boxed goal [0.0, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.3306]: path clearance -0.92 mm at other arm (sample 52/55); full-sphere-filter goal [0.0, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility)
+  GUARD STOP step 14: A stops at frame 3142
+brace search step 14: pose [0.0, -0.156, 0.0632] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+planner recovery: avoid other-arm sphere 2, radius 53.2 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+planner recovery: avoid other-arm sphere 2, radius 55.0 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 42.9 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 58.6 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 53.2 mm
+brace search rejected step 14: hover [0.16, -0.136, 0.1696]: boxed goal [0.16, -0.1299, 0.1706]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.16, -0.1299, 0.1706]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.16, -0.1299, 0.1706]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.16, -0.1299, 0.1706]: path clearance 0.33 mm at other arm (sample 20/57); full-sphere-filter goal [0.16, -0.1299, 0.1706]: path clearance 0.14 mm at other arm (sample 47/54); full-sphere-filter goal [0.16, -0.1299, 0.1706]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.16, -0.1299, 0.1706]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.16, -0.1299, 0.1706]: cuRobo plan failed: no result (IK/start feasibility); hover [0.16, -0.136, 0.2496]: boxed goal [0.16, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.16, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.16, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.16, -0.1299, 0.2506]: path clearance 0.56 mm at other arm (sample 18/39); full-sphere-filter goal [0.16, -0.1299, 0.2506]: path clearance 0.92 mm at other arm (sample 28/39); full-sphere-filter goal [0.16, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.16, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.16, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); hover [0.16, -0.136, 0.3296]: boxed goal [0.16, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.16, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.16, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.16, -0.1299, 0.3306]: path clearance 0.04 mm at other arm (sample 17/26); full-sphere-filter goal [0.16, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.16, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.16, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); hover [0.08, -0.136, 0.2496]: boxed goal [0.08, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.08, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.08, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.08, -0.1299, 0.2506]: path clearance 0.48 mm at other arm (sample 16/39); full-sphere-filter goal [0.08, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.08, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.08, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); hover [0.0, -0.136, 0.3296]: boxed goal [0.0, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.3306]: path clearance -0.75 mm at other arm (sample 17/55); full-sphere-filter goal [0.0, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility)
+brace search step 14: pose [0.0, -0.156, 0.0632] tilt [-0.7854, 0.0, 0.0]
+brace search rejected helper approach step 14: helper obstructs carried-brick insertion corridor: -22.10 mm (hand)
+brace search step 14: pose [0.0, -0.156, 0.0632] tilt [-0.7854, 0.0, 0.0]
+brace search rejected helper approach step 14: helper obstructs carried-brick insertion corridor: -18.93 mm (hand)
+brace search step 14: pose [0.0, -0.158, 0.0652] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+planner recovery: avoid other-arm sphere 2, radius 53.2 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 42.9 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 42.9 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 58.6 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 53.2 mm
+brace search rejected step 14: hover [0.16, -0.136, 0.1696]: boxed goal [0.16, -0.1299, 0.1706]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.16, -0.1299, 0.1706]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.16, -0.1299, 0.1706]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.16, -0.1299, 0.1706]: path clearance 0.07 mm at other arm (sample 23/57); full-sphere-filter goal [0.16, -0.1299, 0.1706]: path clearance 0.64 mm at other arm (sample 48/54); full-sphere-filter goal [0.16, -0.1299, 0.1706]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.16, -0.1299, 0.1706]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.16, -0.1299, 0.1706]: cuRobo plan failed: no result (IK/start feasibility); hover [0.16, -0.136, 0.2496]: boxed goal [0.16, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.16, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.16, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.16, -0.1299, 0.2506]: path clearance -0.77 mm at other arm (sample 22/39); full-sphere-filter goal [0.16, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.16, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.16, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); hover [0.16, -0.136, 0.3296]: boxed goal [0.16, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.16, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.16, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.16, -0.1299, 0.3306]: path clearance 0.50 mm at other arm (sample 19/26); full-sphere-filter goal [0.16, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.16, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.16, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); hover [0.08, -0.136, 0.2496]: boxed goal [0.08, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.08, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.08, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.08, -0.1299, 0.2506]: path clearance -3.85 mm at other arm (sample 18/39); full-sphere-filter goal [0.08, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.08, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.08, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); hover [0.0, -0.136, 0.3296]: boxed goal [0.0, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.3306]: path clearance 0.54 mm at other arm (sample 17/53); full-sphere-filter goal [0.0, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility)
+brace search step 14: pose [0.0, -0.156, 0.0652] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 55.0 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 53.2 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 55.0 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 53.2 mm
+brace search rejected step 14: hover [0.16, -0.136, 0.1696]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance 0.86 mm at other arm (sample 11/61); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); hover [0.16, -0.136, 0.2496]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance -0.05 mm at other arm (sample 6/63); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); hover [0.16, -0.136, 0.3296]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance -1.21 mm at other arm (sample 12/88); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); hover [0.08, -0.136, 0.2496]: boxed goal [0.08, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.08, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.08, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.08, -0.1299, 0.2506]: path clearance -4.61 mm at other arm (sample 24/39); full-sphere-filter goal [0.08, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.08, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.08, -0.1299, 0.2506]: cuRobo plan failed: no result (IK/start feasibility); hover [0.0, -0.136, 0.3296]: boxed goal [0.0, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.3306]: path clearance -3.22 mm at other arm (sample 29/55); full-sphere-filter goal [0.0, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.3306]: cuRobo plan failed: no result (IK/start feasibility)
+brace search step 14: pose [0.0, -0.182, 0.0652] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 14: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_008 (sample 0/0)
+brace search step 14: pose [0.0, -0.18, 0.0652] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 14: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_008 (sample 0/0)
+brace search step 14: pose [0.0, -0.178, 0.0652] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 14: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_008 (sample 0/0)
+brace search step 14: pose [0.0, -0.176, 0.0652] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 14: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_008 (sample 0/0)
+brace search step 14: pose [0.0, -0.17, 0.0652] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 14: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_008 (sample 0/0)
+brace search step 14: pose [0.0, -0.168, 0.0652] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 14: closed helper at 9.05 mm opening: path clearance 0.94 mm at B_b_008 (sample 0/0)
+brace search step 14: pose [0.0, -0.166, 0.0652] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+brace search rejected step 14: hover [0.16, -0.136, 0.1696]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance 0.06 mm at other arm (sample 26/61); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); hover [0.16, -0.136, 0.2496]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance 0.98 mm at other arm (sample 34/63); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); hover [0.16, -0.136, 0.3296]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance 0.04 mm at other arm (sample 65/88); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); hover [0.08, -0.136, 0.2496]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance 0.91 mm at other arm (sample 35/57); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); hover [0.0, -0.136, 0.3296]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance 0.86 mm at other arm (sample 42/55); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility)
+brace search step 14: pose [0.0, -0.164, 0.0652] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+brace search rejected step 14: hover [0.16, -0.136, 0.1696]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance -0.44 mm at other arm (sample 31/59); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); hover [0.16, -0.136, 0.2496]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance -1.10 mm at other arm (sample 30/65); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); hover [0.16, -0.136, 0.3296]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance 0.85 mm at other arm (sample 50/88); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); hover [0.08, -0.136, 0.2496]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance 0.89 mm at other arm (sample 51/61); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); hover [0.0, -0.136, 0.3296]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance 0.87 mm at other arm (sample 42/55); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility)
+brace search step 14: pose [0.0, -0.162, 0.0652] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+brace search rejected step 14: hover [0.16, -0.136, 0.1696]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance 0.80 mm at other arm (sample 34/61); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); hover [0.16, -0.136, 0.2496]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance 0.67 mm at other arm (sample 29/63); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); hover [0.16, -0.136, 0.3296]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance -0.40 mm at other arm (sample 62/88); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); hover [0.08, -0.136, 0.2496]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance 0.99 mm at other arm (sample 29/57); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); hover [0.0, -0.136, 0.3296]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance 0.76 mm at other arm (sample 39/55); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility)
+brace search step 14: pose [0.0, -0.16, 0.0652] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 46.5 mm
+brace search rejected step 14: hover [0.16, -0.136, 0.1696]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance 0.54 mm at other arm (sample 29/61); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); hover [0.16, -0.136, 0.2496]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance 0.26 mm at other arm (sample 27/63); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); hover [0.16, -0.136, 0.3296]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance -0.44 mm at other arm (sample 61/88); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); hover [0.08, -0.136, 0.2496]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance 0.26 mm at other arm (sample 27/57); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); hover [0.0, -0.136, 0.3296]: boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: path clearance 0.34 mm at other arm (sample 34/55); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1299, 0.1094]: cuRobo plan failed: no result (IK/start feasibility)
+brace search step 14: pose [0.0, -0.158, 0.0652] tilt [1.309, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+brace search rejected helper approach step 14: sphere-filter goal [0.0, -0.158, 0.0652]: path clearance 0.90 mm at B_b_010 (sample 10/20); contact-full-sphere-filter goal [0.0, -0.158, 0.0652]: path clearance 0.90 mm at B_b_010 (sample 10/20); contact-full-sphere-filter goal [0.0, -0.158, 0.0652]: path clearance 0.90 mm at B_b_010 (sample 10/20)
+brace search step 14: pose [0.0, -0.156, 0.0652] tilt [1.309, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+brace search rejected helper approach step 14: ll-sphere-filter goal [0.0, -0.156, 0.0652]: path clearance 1.07 mm at B_b_010 (sample 8/20); contact-full-sphere-filter goal [0.0, -0.156, 0.0652]: path clearance 1.07 mm at B_b_010 (sample 8/20); contact-full-sphere-filter goal [0.0, -0.156, 0.0652]: path clearance 1.07 mm at B_b_010 (sample 8/20)
+brace search step 14: pose [0.0, -0.182, 0.0652] tilt [1.309, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+  GUARD STOP step 14: A stops at frame 8631
+brace search accepted step 14 before closing
+coordinator: {'event': 'support_held', 'arm': 'B', 'step': 14, 'time': 147.63333333334296, 'helper': 'A'}
+stud fit: {'brick': 'B_b_014', 'event': 'held', 'time': 154.617, 'dz_mm': 1.88, 'needed_N': 53.4}
+stud fit: {'brick': 'B_b_014', 'event': 'pushed_through', 'time': 157.45, 'peak_N': 56.4, 'needed_N': 53.4, 'hand_N': 34.7}
+  step 14 B_b_014 SNAP  {'brick': 'B_b_014', 'lateral_mm': 0.11, 'dz_mm': 0.0, 'yaw_deg': 0.08, 'tilt_deg': 0.06}
+pickup clearance B_b_015: [0.0, 0.0, 1.25] mm
+brace transport: hover 160 mm toward B, clear of A
+coordinator: {'event': 'step_complete', 'arm': 'B', 'step': 14, 'time': 164.91666666669005}
+coordinator: {'event': 'support_released', 'arm': 'B', 'step': 14, 'time': 164.91666666669005, 'helper': 'A'}
+coordinator: {'event': 'support_requested', 'arm': 'B', 'step': 15, 'time': 164.91666666669005}
+coordinator: {'event': 'support_granted', 'arm': 'B', 'step': 15, 'time': 164.91666666669005, 'helper': 'A'}
+coordinator: {'event': 'helper_ready', 'arm': 'B', 'step': 15, 'time': 164.91666666669005, 'helper': 'A'}
+brace search step 15: pose [0.0, -0.156, 0.0728] tilt [0.7854, 0.0, 0.0]
+brace search rejected helper approach step 15: closed finger geometry -0.91 mm at B_b_010 (opening 7.45 mm)
+brace search step 15: pose [0.0, -0.156, 0.0728] tilt [0.7854, 0.0, 0.0]
+brace search rejected helper approach step 15: closed finger geometry -0.91 mm at B_b_010 (opening 7.45 mm)
+brace search step 15: pose [0.0, -0.156, 0.0728] tilt [-0.7854, 0.0, 0.0]
+brace search rejected helper approach step 15: helper obstructs carried-brick insertion corridor: -22.10 mm (hand)
+brace search step 15: pose [0.0, -0.156, 0.0728] tilt [-0.7854, 0.0, 0.0]
+brace search rejected helper approach step 15: helper obstructs carried-brick insertion corridor: -18.93 mm (hand)
+brace search step 15: pose [0.0, -0.158, 0.0748] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 15: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_010 (sample 0/0)
+brace search step 15: pose [0.0, -0.156, 0.0748] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 15: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_010 (sample 0/0)
+brace search step 15: pose [0.0, -0.158, 0.0748] tilt [1.309, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+  BREAK B_b_014 on B_b_012: u 2.173, frame 10753, step 26
+  GUARD STOP step 15: A stops at frame 10753
+verification: ['recorded broken joint', 'recorded execution failure: joint_break', 'B: incomplete/nonmonotonic own-build progress', 'B step 15: no recorded mating', 'B step 15: no insertion frames', 'B step 15: no measured two-finger support force', 'unserved support request', 'contact monitor: unintended', 'contact monitor: displaced', 'detailed contact evidence: displaced', 'detailed contact evidence: displaced', 'detailed contact evidence: displaced', 'detailed contact evidence: unintended', 'detailed contact evidence: displaced', 'detailed contact evidence: displaced', 'execution did not finish cleanly']
+dual build: {"ok": false, "done": false, "failure": "joint_break", "frames": 10933, "parallel_frames": 0}

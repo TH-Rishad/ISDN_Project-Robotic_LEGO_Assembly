@@ -1,0 +1,182 @@
+studfit: out=Kean/results/dual_studfit_diag_038 start A=11 B=13 step_limit=3 gpu=0
+Warp 1.13.0 initialized:
+   CUDA Toolkit 12.9, Driver 12.8
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA GeForce RTX 4090 D" (22 GiB, sm_89, mempool enabled)
+   Kernel cache:
+     /home/mlieq/.cache/warp/1.13.0
+Module newton._src.geometry.inertia a7ff42e load on device 'cuda:0' took 1.50 ms  (cached)
+Module newton._src.utils.mesh 1476c2a load on device 'cpu' took 2.75 ms  (cached)
+Module validate_and_correct_inertia_kernel_524fb5ef 524fb5e load on device 'cuda:0' took 1.13 ms  (cached)
+Module newton._src.sim.ik.ik_solver d9f8ff8 load on device 'cuda:0' took 1.37 ms  (cached)
+Module IKOptimizerLM___build_specialized__locals___fk_local_a9d6f4f5 a9d6f4f load on device 'cuda:0' took 1.15 ms  (cached)
+Module newton._src.sim.ik.ik_common ec7ac17 load on device 'cuda:0' took 1.29 ms  (cached)
+Module newton._src.sim.ik.ik_objectives 2ab3ea8 load on device 'cuda:0' took 1.36 ms  (cached)
+Module IKOptimizerLM___build_specialized__locals___compute_motion_subspace_2d_28061874 2806187 load on device 'cuda:0' took 5.62 ms  (cached)
+Module _lm_solve_tiled_9_15_71b73c32 641c3f9 load on device 'cuda:0' took 146.96 ms  (cached)
+Module newton._src.sim.ik.ik_lm_optimizer d941fd7 load on device 'cuda:0' took 1.65 ms  (cached)
+Module newton._src.geometry.sdf_utils 30505d5 load on device 'cuda:0' took 1.91 ms  (cached)
+Module newton._src.geometry.sdf_texture ba97079 load on device 'cuda:0' took 2.62 ms  (cached)
+Module newton._src.sim.graph_coloring 95273ab load on device 'cpu' took 1.24 ms  (cached)
+Module newton._src.solvers.mujoco.kernels f5ae6c7 load on device 'cuda:0' took 2.08 ms  (cached)
+Module mujoco_warp._src.io 00dd7e1 load on device 'cuda:0' took 1.61 ms  (cached)
+Module mujoco_warp._src.smooth 976a5d7 load on device 'cuda:0' took 1.51 ms  (cached)
+Module _solve_LD_sparse_fused__locals__kernel_db9f1437 5e36655 load on device 'cuda:0' took 1.73 ms  (cached)
+Module newton._src.sim.articulation 9875313 load on device 'cuda:0' took 1.38 ms  (cached)
+Module newton._src.viewer.kernels 6eaf52b load on device 'cuda:0' took 1.37 ms  (cached)
+Module newton._src.sim.collide 0e6be4c load on device 'cuda:0' took 1.10 ms  (cached)
+Module newton._src.geometry.broad_phase_sap 7baa1de load on device 'cuda:0' took 1.11 ms  (cached)
+Module narrow_phase_primitive_write_contact e070310 load on device 'cuda:0' took 1.33 ms  (cached)
+Module narrow_phase_gjk_mpr_True_write_contact_default_default 00fbe52 load on device 'cuda:0' took 1.40 ms  (cached)
+Module newton._src.geometry.narrow_phase f722f21 load on device 'cuda:0' took 1.19 ms  (cached)
+Module newton._src.geometry.contact_reduction_global 5c84d97 load on device 'cuda:0' took 1.06 ms  (cached)
+Module newton._src.geometry.narrow_phase e577950 load on device 'cuda:0' took 1.30 ms  (cached)
+Module newton._src.geometry.sdf_contact 1cfb221 load on device 'cuda:0' took 1.15 ms  (cached)
+Module narrow_phase_mesh_plane_write_contact_to_reducer_True 0316777 load on device 'cuda:0' took 1.16 ms  (cached)
+Module mesh_triangle_contacts_to_reducer_kernel_98f62989 13e0243 load on device 'cuda:0' took 1.32 ms  (cached)
+Module newton._src.geometry.contact_reduction_global 5db63a2 load on device 'cuda:0' took 1.29 ms  (cached)
+Module sdf_contact_write_contact_to_reducer_False_True e0d3f15 load on device 'cuda:0' took 1.33 ms  (cached)
+Module export_reduced_contacts_write_contact c5c25a3 load on device 'cuda:0' took 1.10 ms  (cached)
+Module dual_arm_sim 83cffed load on device 'cuda:0' took 1.10 ms  (cached)
+Module mujoco_warp._src.constraint eb0e24d load on device 'cuda:0' took 1.33 ms  (cached)
+Module _efc_contact_init__locals__kernel_c7a6ce3a c7a6ce3 load on device 'cuda:0' took 1.20 ms  (cached)
+Module _efc_contact_jac_sparse__locals__kernel_7bafc28b 7bafc28 load on device 'cuda:0' took 1.05 ms  (cached)
+Module _efc_contact_update__locals__kernel_b43fbfe7 b43fbfe load on device 'cuda:0' took 1.30 ms  (cached)
+Module mujoco_warp._src.forward a76b6a3 load on device 'cuda:0' took 1.32 ms  (cached)
+Module mujoco_warp._src.passive 616927b load on device 'cuda:0' took 1.19 ms  (cached)
+Module mujoco_warp._src.forward 398750d load on device 'cuda:0' took 2.89 ms  (cached)
+Module mujoco_warp._src.support f32a4f8 load on device 'cuda:0' took 1.21 ms  (cached)
+Module mujoco_warp._src.solver 7df28c9 load on device 'cuda:0' took 1.39 ms  (cached)
+Module solve_init_jaref__locals__kernel_c16f89ba c16f89b load on device 'cuda:0' took 1.19 ms  (cached)
+Module mul_m_sparse__locals___mul_m_sparse_32fa3590 32fa359 load on device 'cuda:0' took 1.23 ms  (cached)
+Module update_constraint_efc__locals__kernel_6bfb2757 6bfb275 load on device 'cuda:0' took 1.17 ms  (cached)
+Module update_constraint_gauss_cost__locals__kernel_f44c2fe7 f44c2fe load on device 'cuda:0' took 1.20 ms  (cached)
+Module update_gradient_cholesky_blocked__locals__kernel_70c789cb c505d54 load on device 'cuda:0' took 178.04 ms  (cached)
+Module linesearch_jv_fused__locals__kernel_e1239d31 e1239d3 load on device 'cuda:0' took 1.27 ms  (cached)
+Module linesearch_iterative__locals__kernel_6131c716 3698647 load on device 'cuda:0' took 1.27 ms  (cached)
+Module mujoco_warp._src.sensor bee2d80 load on device 'cuda:0' took 1.35 ms  (cached)
+Module mujoco_warp._src.derivative f06cf21 load on device 'cuda:0' took 1.34 ms  (cached)
+dual: 27 bricks, 5 braced (weakest_joint), 30 clutch welds
+brick spheres: 8 inscribed (morphit skipped)
+pickup clearance B_b_012: [0.0, -6.5, 1.25] mm
+brace transport: hover 160 mm toward B, clear of A
+coordinator: {'event': 'support_requested', 'arm': 'B', 'step': 13, 'time': 1.1166666666666676}
+coordinator: {'event': 'support_granted', 'arm': 'B', 'step': 13, 'time': 1.1166666666666676, 'helper': 'A'}
+coordinator: {'event': 'helper_ready', 'arm': 'B', 'step': 13, 'time': 1.1166666666666676, 'helper': 'A'}
+brick spheres: 8 inscribed (morphit skipped)
+brace search step 13: pose [0.0, -0.188, 0.0536] tilt [0.7854, 0.0, 0.0]
+brace search rejected helper approach step 13: closed finger geometry -0.91 mm at B_b_006 (opening 7.45 mm)
+brace search step 13: pose [0.0, -0.188, 0.0536] tilt [0.7854, 0.0, 0.0]
+brace search rejected helper approach step 13: closed finger geometry -0.91 mm at B_b_006 (opening 7.45 mm)
+brace search step 13: pose [0.0, -0.19, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)
+brace search step 13: pose [0.0, -0.19, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)
+brace search step 13: pose [0.0, -0.19, 0.0556] tilt [-0.7854, 0.0, 0.0]
+brace search rejected helper approach step 13: helper obstructs carried-brick insertion corridor: -25.34 mm (hand)
+brace search step 13: pose [0.0, -0.19, 0.0556] tilt [-0.7854, 0.0, 0.0]
+brace search rejected helper approach step 13: helper obstructs carried-brick insertion corridor: -25.55 mm (hand)
+brace search step 13: pose [0.0, -0.186, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)
+brace search step 13: pose [0.0, -0.186, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)
+brace search step 13: pose [0.0, -0.186, 0.0556] tilt [-0.7854, 0.0, 0.0]
+brace search rejected helper approach step 13: helper obstructs carried-brick insertion corridor: -25.34 mm (hand)
+brace search step 13: pose [0.0, -0.186, 0.0556] tilt [-0.7854, 0.0, 0.0]
+brace search rejected helper approach step 13: helper obstructs carried-brick insertion corridor: -24.44 mm (hand)
+brace search step 13: pose [0.0, -0.188, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)
+brace search step 13: pose [0.0, -0.188, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)
+brace search step 13: pose [0.0, -0.188, 0.0556] tilt [-0.7854, 0.0, 0.0]
+brace search rejected helper approach step 13: helper obstructs carried-brick insertion corridor: -25.34 mm (hand)
+brace search step 13: pose [0.0, -0.188, 0.0556] tilt [-0.7854, 0.0, 0.0]
+brace search rejected helper approach step 13: helper obstructs carried-brick insertion corridor: -25.55 mm (hand)
+brace search step 13: pose [0.0, -0.202, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 8.73 mm opening: path clearance 1.07 mm at B_b_006 (sample 0/0)
+brace search step 13: pose [0.0, -0.202, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 8.73 mm opening: path clearance 1.07 mm at B_b_006 (sample 0/0)
+brace search step 13: pose [0.0, -0.202, 0.0556] tilt [-0.7854, 0.0, 0.0]
+brace search rejected helper approach step 13: helper obstructs carried-brick insertion corridor: -25.34 mm (hand)
+brace search step 13: pose [0.0, -0.202, 0.0556] tilt [-0.7854, 0.0, 0.0]
+brace search rejected helper approach step 13: helper obstructs carried-brick insertion corridor: -25.55 mm (hand)
+brace search step 13: pose [0.0, -0.2, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)
+brace search step 13: pose [0.0, -0.2, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)
+brace search step 13: pose [0.0, -0.2, 0.0556] tilt [-0.7854, 0.0, 0.0]
+brace search rejected helper approach step 13: helper obstructs carried-brick insertion corridor: -25.34 mm (hand)
+brace search step 13: pose [0.0, -0.2, 0.0556] tilt [-0.7854, 0.0, 0.0]
+brace search rejected helper approach step 13: helper obstructs carried-brick insertion corridor: -25.55 mm (hand)
+brace search step 13: pose [0.0, -0.198, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)
+brace search step 13: pose [0.0, -0.198, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)
+brace search step 13: pose [0.0, -0.198, 0.0556] tilt [-0.7854, 0.0, 0.0]
+brace search rejected helper approach step 13: helper obstructs carried-brick insertion corridor: -25.34 mm (hand)
+brace search step 13: pose [0.0, -0.198, 0.0556] tilt [-0.7854, 0.0, 0.0]
+brace search rejected helper approach step 13: helper obstructs carried-brick insertion corridor: -25.55 mm (hand)
+brace search step 13: pose [0.0, -0.196, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)
+brace search step 13: pose [0.0, -0.196, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)
+brace search step 13: pose [0.0, -0.196, 0.0556] tilt [-0.7854, 0.0, 0.0]
+brace search rejected helper approach step 13: helper obstructs carried-brick insertion corridor: -25.34 mm (hand)
+brace search step 13: pose [0.0, -0.196, 0.0556] tilt [-0.7854, 0.0, 0.0]
+brace search rejected helper approach step 13: helper obstructs carried-brick insertion corridor: -25.55 mm (hand)
+brace search step 13: pose [0.0, -0.194, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner recovery: avoid other-arm sphere 1, radius 53.2 mm
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)
+brace search step 13: pose [0.0, -0.194, 0.0556] tilt [0.7854, 0.0, 0.0]
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: trying proposals checked against full other-arm spheres
+planner workaround: full-sphere validation accepted path without coarse other-arm boxes
+brace search rejected helper approach step 13: closed helper at 9.36 mm opening: path clearance 1.17 mm at B_b_006 (sample 0/0)
+verification: ['recorded execution failure: B:brace_search_exhausted', 'B: incomplete/nonmonotonic own-build progress', 'B step 13: no recorded mating', 'B step 13: no insertion frames', 'B step 13: no measured two-finger support force', 'B step 14: no recorded mating', 'B step 14: no insertion frames', 'B step 14: no measured two-finger support force', 'B step 14: support was not requested before pickup', 'B step 15: no recorded mating', 'B step 15: no insertion frames', 'B step 15: no measured two-finger support force', 'B step 15: support was not requested before pickup', 'unserved support request', 'execution did not finish cleanly']
+dual build: {"ok": false, "done": false, "failure": "B:brace_search_exhausted", "frames": 765, "parallel_frames": 0}
