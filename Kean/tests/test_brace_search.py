@@ -215,11 +215,11 @@ class BraceSearchTest(unittest.TestCase):
         ex.fail.assert_not_called()
 
     def test_guard_stop_defers_nearby_y_before_far_column(self):
-        # studfit_018: three near Y scrapes before the far hold at -0.202.
+        # studfit_018/026: near Y scrapes before a column ≥20 mm away.
         picks = [
             dict(brace_pose=[0., -.19, .0556], brace_tilt_rotvec=[1.3, 0, 0]),
             dict(brace_pose=[0., -.186, .0556], brace_tilt_rotvec=[1.3, 0, 0]),
-            dict(brace_pose=[0., -.202, .0556], brace_tilt_rotvec=[1.3, 0, 0]),
+            dict(brace_pose=[0., -.22, .0556], brace_tilt_rotvec=[1.3, 0, 0]),
         ]
         ex = self.setup_search(picks)
         ex.braced = set()
@@ -240,7 +240,7 @@ class BraceSearchTest(unittest.TestCase):
         picks = [
             dict(brace_pose=[0., -.188, .0536], brace_tilt_rotvec=[.8, 0, 0]),
             dict(brace_pose=[0., -.19, .0556], brace_tilt_rotvec=[1.3, 0, 0]),
-            dict(brace_pose=[0., -.202, .0556], brace_tilt_rotvec=[1.3, 0, 0]),
+            dict(brace_pose=[0., -.22, .0556], brace_tilt_rotvec=[1.3, 0, 0]),
         ]
         ex = self.setup_search(picks)
         ex.check_helper_approach = Mock(

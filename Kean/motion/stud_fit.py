@@ -179,6 +179,25 @@ def near_support_press(roles, arms):
     return False
 
 
+def brace_search_guard_trial(ex):
+    """True during a brace_search physical approach that may GUARD STOP.
+
+    studfit_026: brace-in into a rejected column nudged B_b_010/012 by 2–3 mm
+    before GUARD STOP; that is how the search discovers a scrape, not a
+    verification failure once the candidate is abandoned."""
+    if getattr(ex, 'stud_fit', None) is None or getattr(ex, 'on_guard_abandon', None) is None:
+        return False
+    arms = getattr(ex, 'arms', None) or {}
+    return any(getattr(arms.get(a), 'phase', None) in ('brace-in', 'brace-guard') for a in 'AB')
+
+
+def rebaseline_rest_for_guard_trial(monitor, body_q):
+    """Absorb brace-in GUARD contact motion into rest without logging displaced."""
+    import numpy as np
+    for body in monitor.rest:
+        monitor.rest[body] = np.asarray(body_q[body, :3], float).copy()
+
+
 def finger_blocked(gap, stud_fit):
     """True when a closing finger is too close to a placed brick.
 

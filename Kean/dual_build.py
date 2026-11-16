@@ -696,6 +696,13 @@ class DualExample(D.Example):
                     view.check_support()
 
     def step(self):
+        # brace_search GUARD STOP approaches may nudge neighbours before abandon
+        # (studfit_026 B_b_010/012 during brace-in). Rebaseline rest so that
+        # expected scrape discovery is not scored as displaced.
+        if self.monitor is not None:
+            from Kean.motion.stud_fit import brace_search_guard_trial, rebaseline_rest_for_guard_trial
+            if brace_search_guard_trial(self):
+                rebaseline_rest_for_guard_trial(self.monitor, self.state_0.body_q.numpy())
         super().step()
         if self.stud_fit is not None:
             self.stud_fit.update()

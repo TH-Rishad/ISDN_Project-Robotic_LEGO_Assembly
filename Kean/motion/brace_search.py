@@ -211,10 +211,12 @@ def install(ex, planner, world, carried, D):
         # Grip failures burn the TCP pose: a 180° yaw flip hits the same brick
         # face (studfit_014 step 13 → support_lost on the yaw twin).
         skip_poses = set()
-        # After a GUARD STOP, try columns ≥12 mm away before nearby twins
-        # (studfit_018 scraped -0.19/-0.186/-0.188 before -0.202 worked).
+        # After a GUARD STOP, try columns ≥20 mm away before nearby twins
+        # (studfit_018: 12 mm; studfit_026 still GUARD STOPed at -0.168 after
+        # -0.182, 14 mm away, and nudged B_b_012 during brace-in).
         avoid_ys = []
         deferred = []
+        avoid_y_tol = .02
 
         def pose_key(pick):
             return tuple(np.round(pick['brace_pose'], 5))
@@ -232,7 +234,7 @@ def install(ex, planner, world, carried, D):
                 if pose_key(pick) in skip_poses:
                     print('brace search skip same pose step %d: %s' % (n, pick['brace_pose']), flush=True)
                     continue
-                if avoid_ys and any(abs(pick['brace_pose'][1] - y) < .012 for y in avoid_ys):
+                if avoid_ys and any(abs(pick['brace_pose'][1] - y) < avoid_y_tol for y in avoid_ys):
                     deferred.append(pick)
                     print('brace search defer near guard-stop y step %d: %s' % (n, pick['brace_pose']), flush=True)
                     continue

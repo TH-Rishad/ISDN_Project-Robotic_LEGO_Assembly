@@ -289,6 +289,17 @@ class StudFitTest(unittest.TestCase):
         # studfit_025: helper retreat while B stages must NOT relax clearance.
         arms['A'], arms['B'] = NS(phase='retract'), NS(phase='stage')
         self.assertFalse(near_support_press({'A': 'supporter', 'B': 'builder'}, arms))
+        from Kean.motion.stud_fit import brace_search_guard_trial, rebaseline_rest_for_guard_trial
+        ex = NS(stud_fit=object(), on_guard_abandon=lambda *_: None,
+                arms={'A': NS(phase='brace-in'), 'B': NS(phase='stage')})
+        self.assertTrue(brace_search_guard_trial(ex))
+        ex.on_guard_abandon = None
+        self.assertFalse(brace_search_guard_trial(ex))
+        mon = NS(rest={0: np.zeros(3), 1: np.ones(3)})
+        body_q = np.array([[.01, .02, .03, 0, 0, 0, 1], [.04, .05, .06, 0, 0, 0, 1]])
+        rebaseline_rest_for_guard_trial(mon, body_q)
+        np.testing.assert_allclose(mon.rest[0], [.01, .02, .03])
+        np.testing.assert_allclose(mon.rest[1], [.04, .05, .06])
 
     def test_press_stops_at_the_grip_when_the_margin_would_overload_it(self):
         from Kean.motion.stud_fit import BRACE_HAND, BRACE_PUSH, BRACE_RAMP, brace_release, press_cap, press_ramp
