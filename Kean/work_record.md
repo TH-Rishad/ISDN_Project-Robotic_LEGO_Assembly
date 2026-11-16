@@ -1,5 +1,38 @@
 # Work Record — Kean
 
+**Identity:** Kean's Chinese name is Minjian LI; he was enrolled in this
+course under that Chinese name only.
+
+**Contribution:** Kean is the only contributor who used Cursor. Code and
+results produced with Cursor under `Kean/` are Kean's.
+
+## Assignment task and completion status
+
+Simulation work for this course assignment is **complete**. A physical robot
+is not in the package.
+
+### Course criteria
+
+1. Accept a target structure directly; image conversion is unnecessary.
+2. Automatically generate the assembly sequence and determine temporary-support locations.
+3. Autonomously assemble two different structures with both arms; each has at least eight LEGO bricks and at least one section requiring temporary support.
+
+### Status
+
+| Deliverable | Status | Evidence |
+|---|---|---|
+| Criteria 1–2 (direct input + auto plan/supports) | Done | Planner / bracing via acceptance and dual-build paths |
+| Criterion 3 — single-cell arch + S3 | Done | `results/instructor_run_001` + `results/verification_instructor_run_001` (verifier exit 0; arch 11/11 support 10; S3 16/16 supports 11, 13, 14) |
+| Dual-builder arch + S3 | Done | `results/dual_arch_s3_012` (`verify_dual` ok) |
+| Dual-builder pyramid + S3 | Done | `results/dual_pyramid_s3_006` (`verify_dual` ok) |
+| Dual-builder pyramid + S3 with `--stud-fit` | Done | `results/dual_pyramid_s3_studfit_030` (`verify_dual` ok/full_build; A 11/11, B 16/16; supports 9, 11, 13, 14, 15; job 2313901, rev `6be3fc9`) |
+| Instructor CPU verifier | Done | `scripts/verify_acceptance.py` / `verify_dual` |
+| Failed / intermediate runs | Archived | `results/archive/` (see `results/README.md`) |
+
+Detailed dated log of tests and fixes follows below.
+
+---
+
 **Date:** 2026-10-16
 **Purpose:** Track testing and verification work on Sakib's folder (brickassembly + related) to confirm code works.
 **Location of tests:** HPC compute node (Linux, NVIDIA A30, RoboFabEnv). Node name changes per allocation.

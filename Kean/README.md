@@ -2,6 +2,14 @@
 
 Sakib owns the environment, the Newton cell, and the sequence and support generators. Tanvir owns the tight-fit skill. Kean runs the generators on a structure id and finishes the arch and S3. Do not copy Tanvir's modules into `Kean/`.
 
+## Contribution note
+
+Kean's Chinese name is Minjian LI; he was enrolled in this course under
+that Chinese name only. Kean is the only contributor who used Cursor on
+this project. Code and results produced with Cursor under `Kean/`
+(including dual-builder / `--stud-fit` work, verification packages, and
+the trajectory recorded in these Markdown files) are Kean's contribution.
+
 ## Documentation and evidence (submission)
 
 These Markdown files are part of the assignment record (trajectory and
@@ -9,8 +17,7 @@ evidence). Only the local identity file `AGENTS.md` / `kean.id` stays private.
 
 | File | What it records |
 |---|---|
-| [task.md](task.md) | Instructor criteria, completion checklist, dual-builder stud-fit add-on |
-| [work_record.md](work_record.md) | Dated log of tests, fixes, HPC jobs, and outcomes |
+| [work_record.md](work_record.md) | Assignment criteria and completion status; dated log of tests, fixes, HPC jobs |
 | [review.md](review.md) | Reuse audit and current certified-package banner |
 | [DUAL_BUILDER_PLAN.md](DUAL_BUILDER_PLAN.md) | Dual-builder design, stud-fit path, validation tables |
 | [results/README.md](results/README.md) | Current packages vs `results/archive/` |

@@ -33,7 +33,7 @@ dist/
 *.npz
 
 # Personal scratch only (not assignment docs). Work trajectory Markdown —
-# README.md, work_record.md, task.md, review.md, DUAL_BUILDER_PLAN.md,
+# README.md, work_record.md, review.md, DUAL_BUILDER_PLAN.md,
 # results/**/*.md — stays tracked for submission.
 notes/
 scratch/
