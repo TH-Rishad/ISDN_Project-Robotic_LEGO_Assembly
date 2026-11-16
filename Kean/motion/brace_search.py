@@ -148,7 +148,7 @@ def check_approach(ex, planner, world, carried, D):
     raise PlannerUnavailable('; '.join(failures))
 
 
-def _retreat_helper(ex, D, then, *, open_first, back_scale=1.):
+def _retreat_helper(ex, D, then, *, open_first, back_scale=1., lift_first=False):
     """Park the helper and continue the candidate loop. B stays at stage."""
     # Drop a waiting hold/close (studfit_011: cur stayed on hold's retracted-wait,
     # so the queued open never started and B hit wait_timeout:stage).
@@ -162,7 +162,14 @@ def _retreat_helper(ex, D, then, *, open_first, back_scale=1.):
     tool = D.rotate(D.qrot(tilt), np.array([0., 0., -1.]))
     # guard_stop leaves open fingers already in the scrape: dwell-open there
     # then short retract displaced B_b_010 (studfit_018). Pull farther back.
-    back = np.asarray(p) - (D.BRACE_BACK * float(back_scale)) * tool
+    # studfit_021: tool-axis-only retract still scraped B_b_010/008 (displaced
+    # max_move 1.89/1.55 mm over STUD_FIT_DISPLACED). Lift world +Z first.
+    p = np.asarray(p, float)
+    if lift_first:
+        lift = p + np.array([0., 0., 0.025])
+        ex.A.push('retract', lift, yaw, grip, .35, tilt=tilt)
+        p = lift
+    back = p - (D.BRACE_BACK * float(back_scale)) * tool
     if open_first:
         g_open = D.BRACE_HALF_W + D.BRACE_CLEAR
         ex.A.push('open', np.asarray(p), yaw, g_open, .4, tilt=tilt, contact=True)
@@ -262,9 +269,11 @@ def install(ex, planner, world, carried, D):
                 self.on_guard_abandon = None
                 self.pending_hold = None
                 # guard_stop: fingers are still open in the scrape — do not dwell
-                # an open move there; pull back farther (studfit_018).
+                # an open move there; lift clear then pull back farther
+                # (studfit_018 / studfit_021).
                 guard = reason == 'guard_stop'
-                _retreat_helper(self, D, attempt, open_first=not guard, back_scale=2.5 if guard else 1.)
+                _retreat_helper(self, D, attempt, open_first=not guard,
+                                back_scale=2.5 if guard else 1., lift_first=guard)
                 return True
 
             # Armed before the approach so a GUARD STOP on brace-in/brace-guard
