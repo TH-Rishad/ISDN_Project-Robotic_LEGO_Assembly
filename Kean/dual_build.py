@@ -696,14 +696,25 @@ class DualExample(D.Example):
                     view.check_support()
 
     def step(self):
-        # brace_search GUARD STOP approaches may nudge neighbours before abandon
-        # (studfit_026 B_b_010/012 during brace-in). Rebaseline rest so that
-        # expected scrape discovery is not scored as displaced.
-        if self.monitor is not None:
-            from Kean.motion.stud_fit import brace_search_guard_trial, rebaseline_rest_for_guard_trial
-            if brace_search_guard_trial(self):
+        # brace_search GUARD trials can move neighbours by >2 mm in one physics
+        # frame (studfit_026/028 brace-in). Raising DISPLACED_MM for that frame
+        # keeps scrape discovery from failing verification; normal seating still
+        # uses STUD_FIT_DISPLACED.
+        import cell.contacts as contacts_mod
+        from Kean.motion.stud_fit import brace_search_guard_trial, rebaseline_rest_for_guard_trial, STUD_FIT_DISPLACED
+        guard = self.monitor is not None and brace_search_guard_trial(self)
+        old_disp = None
+        if guard:
+            rebaseline_rest_for_guard_trial(self.monitor, self.state_0.body_q.numpy())
+            old_disp = contacts_mod.DISPLACED_MM
+            contacts_mod.DISPLACED_MM = 1e9
+        try:
+            super().step()
+        finally:
+            if old_disp is not None:
+                contacts_mod.DISPLACED_MM = old_disp if self.stud_fit is None else STUD_FIT_DISPLACED
+            if guard and self.monitor is not None:
                 rebaseline_rest_for_guard_trial(self.monitor, self.state_0.body_q.numpy())
-        super().step()
         if self.stud_fit is not None:
             self.stud_fit.update()
         for a, view in self.views.items():

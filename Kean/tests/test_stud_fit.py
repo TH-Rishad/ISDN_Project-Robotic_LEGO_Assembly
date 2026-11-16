@@ -302,6 +302,8 @@ class StudFitTest(unittest.TestCase):
         rebaseline_rest_for_guard_trial(mon, body_q)
         np.testing.assert_allclose(mon.rest[0], [.01, .02, .03])
         np.testing.assert_allclose(mon.rest[1], [.04, .05, .06])
+        # studfit_028: within-frame GUARD hits exceed STUD_FIT_DISPLACED; the
+        # dual_build step raises the monitor threshold only while guard_trial.
 
     def test_press_stops_at_the_grip_when_the_margin_would_overload_it(self):
         from Kean.motion.stud_fit import BRACE_HAND, BRACE_PUSH, BRACE_RAMP, brace_release, press_cap, press_ramp
