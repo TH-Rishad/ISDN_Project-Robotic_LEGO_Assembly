@@ -286,11 +286,9 @@ class StudFitTest(unittest.TestCase):
         self.assertTrue(near_support_press({'A': 'supporter', 'B': 'builder'}, arms))
         arms['B'] = NS(phase='retract')
         self.assertTrue(near_support_press({'A': 'supporter', 'B': 'builder'}, arms))
-        # studfit_024: A retract + B stage during brace_search abandon escape.
+        # studfit_025: helper retreat while B stages must NOT relax clearance.
         arms['A'], arms['B'] = NS(phase='retract'), NS(phase='stage')
-        self.assertTrue(near_support_press({'A': 'supporter', 'B': 'builder'}, arms))
-        arms['A'] = NS(phase='open')
-        self.assertTrue(near_support_press({'A': 'supporter', 'B': 'builder'}, arms))
+        self.assertFalse(near_support_press({'A': 'supporter', 'B': 'builder'}, arms))
 
     def test_press_stops_at_the_grip_when_the_margin_would_overload_it(self):
         from Kean.motion.stud_fit import BRACE_HAND, BRACE_PUSH, BRACE_RAMP, brace_release, press_cap, press_ramp

@@ -79,9 +79,8 @@ class BraceSearchTest(unittest.TestCase):
             guard = ex.A.moves.pop(0)
             guard['then']()
             self.closed.assert_not_called()
-            # Post-arrival reject: lateral escape then tool retract (studfit_023).
-            self.assertEqual([m['phase'] for m in ex.A.moves],
-                             ['retract', 'retract', 'retract', 'park'])
+            # Post-arrival reject: tool retract only (no lateral plow — studfit_025).
+            self.assertEqual([m['phase'] for m in ex.A.moves], ['retract', 'park'])
             park = ex.A.moves[-1]
             ex.A.moves.clear()
             park['then']()
@@ -202,15 +201,11 @@ class BraceSearchTest(unittest.TestCase):
             # DualExample.brace_guard_stopped then abandons.
             ex.on_guard_abandon(0)
             self.assertEqual(ex.brace_search_report[0]['error'], 'guard_stop')
-            # Already open in the scrape: Y escape, then +Z, then tool retract,
-            # no dwell-open (studfit_023: 40 mm Y still displaced B_b_012).
-            self.assertEqual([m['phase'] for m in ex.A.moves],
-                             ['retract', 'retract', 'retract', 'park'])
-            y0 = ex.A.cmd[0][1]
-            self.assertAlmostEqual(ex.A.moves[0]['pos'][1],
-                                   y0 + np.sign(y0 or -1.) * 0.06)
-            self.assertAlmostEqual(ex.A.moves[1]['pos'][2], ex.A.moves[0]['pos'][2] + 0.04)
-            self.assertGreater(np.linalg.norm(ex.A.moves[2]['pos'] - ex.A.moves[1]['pos']), .05)
+            # Already open in the scrape: +Z lift then tool retract, no dwell-open
+            # (studfit_022 ≤1.9 mm; studfit_025 large-Y plow broke the joint).
+            self.assertEqual([m['phase'] for m in ex.A.moves], ['retract', 'retract', 'park'])
+            self.assertAlmostEqual(ex.A.moves[0]['pos'][2], ex.A.cmd[0][2] + 0.025)
+            self.assertGreater(np.linalg.norm(ex.A.moves[1]['pos'] - ex.A.moves[0]['pos']), .05)
             self.closed.assert_not_called()
             park = ex.A.moves[-1]
             ex.A.moves.clear()
