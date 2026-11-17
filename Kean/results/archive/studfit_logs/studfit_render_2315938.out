@@ -1,0 +1,79 @@
+Warp 1.13.0 initialized:
+   CUDA Toolkit 12.9, Driver 12.8
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA A30" (24 GiB, sm_80, mempool enabled)
+   Kernel cache:
+     /home/mlieq/.cache/warp/1.13.0
+Warning: Could not get MSAA config, falling back to non-AA.
+Module newton._src.geometry.inertia a7ff42e load on device 'cuda:0' took 38.45 ms  (cached)
+Module newton._src.utils.mesh 1476c2a load on device 'cpu' took 43.81 ms  (cached)
+Module validate_and_correct_inertia_kernel_524fb5ef 524fb5e load on device 'cuda:0' took 32.83 ms  (cached)
+Module newton._src.sim.ik.ik_solver d9f8ff8 load on device 'cuda:0' took 85.24 ms  (cached)
+Module IKOptimizerLM___build_specialized__locals___fk_local_a9d6f4f5 a9d6f4f load on device 'cuda:0' took 70.18 ms  (cached)
+Module newton._src.sim.ik.ik_common ec7ac17 load on device 'cuda:0' took 56.80 ms  (cached)
+Module newton._src.sim.ik.ik_objectives 2ab3ea8 load on device 'cuda:0' took 68.95 ms  (cached)
+Module IKOptimizerLM___build_specialized__locals___compute_motion_subspace_2d_28061874 2806187 load on device 'cuda:0' took 36.60 ms  (cached)
+Module _lm_solve_tiled_9_15_71b73c32 641c3f9 load on device 'cuda:0' took 587.95 ms  (cached)
+Module newton._src.sim.ik.ik_lm_optimizer d941fd7 load on device 'cuda:0' took 8.62 ms  (cached)
+Module newton._src.geometry.sdf_utils 30505d5 load on device 'cuda:0' took 71.00 ms  (cached)
+Module newton._src.geometry.sdf_texture ba97079 load on device 'cuda:0' took 89.46 ms  (cached)
+Module newton._src.sim.graph_coloring 95273ab load on device 'cpu' took 8.38 ms  (cached)
+Module newton._src.solvers.mujoco.kernels f5ae6c7 load on device 'cuda:0' took 104.48 ms  (cached)
+Module mujoco_warp._src.io 00dd7e1 load on device 'cuda:0' took 76.80 ms  (cached)
+Module mujoco_warp._src.smooth 976a5d7 load on device 'cuda:0' took 59.84 ms  (cached)
+Module _solve_LD_sparse_fused__locals__kernel_db9f1437 5e36655 load on device 'cuda:0' took 8.25 ms  (cached)
+Module newton._src.sim.articulation 9875313 load on device 'cuda:0' took 45.29 ms  (cached)
+Module newton._src.viewer.gl.opengl 904290c load on device 'cuda:0' took 2442.79 ms  (compiled)
+Module newton._src.utils.mesh e68c2db load on device 'cuda:0' took 550.91 ms  (compiled)
+Module newton._src.viewer.kernels 6eaf52b load on device 'cuda:0' took 56.45 ms  (cached)
+Module newton._src.geometry.raycast 40f5cfe load on device 'cuda:0' took 14924.81 ms  (compiled)
+Module newton._src.sim.collide 0e6be4c load on device 'cuda:0' took 8.07 ms  (cached)
+Module newton._src.geometry.broad_phase_sap 7baa1de load on device 'cuda:0' took 52.67 ms  (cached)
+Module narrow_phase_primitive_write_contact e070310 load on device 'cuda:0' took 29.92 ms  (cached)
+Module narrow_phase_gjk_mpr_True_write_contact_default_default 00fbe52 load on device 'cuda:0' took 7.86 ms  (cached)
+Module newton._src.geometry.narrow_phase f722f21 load on device 'cuda:0' took 79.79 ms  (cached)
+Module newton._src.geometry.contact_reduction_global 5c84d97 load on device 'cuda:0' took 27.83 ms  (cached)
+Module newton._src.geometry.narrow_phase e577950 load on device 'cuda:0' took 8.57 ms  (cached)
+Module newton._src.geometry.sdf_contact 1cfb221 load on device 'cuda:0' took 72.43 ms  (cached)
+Module narrow_phase_mesh_plane_write_contact_to_reducer_True 0316777 load on device 'cuda:0' took 25.53 ms  (cached)
+Module mesh_triangle_contacts_to_reducer_kernel_98f62989 13e0243 load on device 'cuda:0' took 57.66 ms  (cached)
+Module newton._src.geometry.contact_reduction_global 5db63a2 load on device 'cuda:0' took 29.84 ms  (cached)
+Module sdf_contact_write_contact_to_reducer_False_True e0d3f15 load on device 'cuda:0' took 39.23 ms  (cached)
+Module export_reduced_contacts_write_contact c5c25a3 load on device 'cuda:0' took 61.95 ms  (cached)
+Module mujoco_warp._src.constraint eb0e24d load on device 'cuda:0' took 40.59 ms  (cached)
+Module _efc_contact_init__locals__kernel_c7a6ce3a c7a6ce3 load on device 'cuda:0' took 28.38 ms  (cached)
+Module _efc_contact_jac_sparse__locals__kernel_7bafc28b 7bafc28 load on device 'cuda:0' took 26.75 ms  (cached)
+Module _efc_contact_update__locals__kernel_b43fbfe7 b43fbfe load on device 'cuda:0' took 8.19 ms  (cached)
+Module mujoco_warp._src.forward a76b6a3 load on device 'cuda:0' took 29.91 ms  (cached)
+Module mujoco_warp._src.passive 616927b load on device 'cuda:0' took 9.15 ms  (cached)
+Module mujoco_warp._src.forward 398750d load on device 'cuda:0' took 48.80 ms  (cached)
+Module mujoco_warp._src.support f32a4f8 load on device 'cuda:0' took 9.77 ms  (cached)
+Module mujoco_warp._src.solver 7df28c9 load on device 'cuda:0' took 32.43 ms  (cached)
+Module solve_init_jaref__locals__kernel_c16f89ba c16f89b load on device 'cuda:0' took 8.47 ms  (cached)
+Module mul_m_sparse__locals___mul_m_sparse_32fa3590 32fa359 load on device 'cuda:0' took 33.07 ms  (cached)
+Module update_constraint_efc__locals__kernel_6bfb2757 6bfb275 load on device 'cuda:0' took 34.69 ms  (cached)
+Module update_constraint_gauss_cost__locals__kernel_f44c2fe7 f44c2fe load on device 'cuda:0' took 8.48 ms  (cached)
+Module update_gradient_cholesky_blocked__locals__kernel_70c789cb c505d54 load on device 'cuda:0' took 200.00 ms  (cached)
+Module linesearch_jv_fused__locals__kernel_e1239d31 e1239d3 load on device 'cuda:0' took 7.62 ms  (cached)
+Module linesearch_iterative__locals__kernel_6131c716 3698647 load on device 'cuda:0' took 24.29 ms  (cached)
+Module mujoco_warp._src.sensor bee2d80 load on device 'cuda:0' took 72.97 ms  (cached)
+Module mujoco_warp._src.derivative f06cf21 load on device 'cuda:0' took 14.51 ms  (cached)
+dual: 27 bricks, 5 braced (weakest_joint), 30 clutch welds
+Dual playback: {'A': 'pyramid', 'B': 'S3'}
+Module newton._src.viewer.viewer_gl 4bc0e2f load on device 'cuda:0' took 652.45 ms  (compiled)
+Warp CUDA error 999: unknown error (in function wp_cuda_graphics_register_gl_buffer, /builds/omniverse/warp/warp/native/warp.cu:4711)
+Warp UserWarning: Could not register GL buffer since CUDA/OpenGL interoperability is not available. Falling back to copy operations between the Warp array and the OpenGL buffer.
+Module newton._src.utils.render d9f35ef load on device 'cuda:0' took 182.27 ms  (compiled)
+mp4: 0/1914 frames
+mp4: 200/1914 frames
+mp4: 400/1914 frames
+mp4: 600/1914 frames
+mp4: 800/1914 frames
+mp4: 1000/1914 frames
+mp4: 1200/1914 frames
+mp4: 1400/1914 frames
+mp4: 1600/1914 frames
+mp4: 1800/1914 frames
+mp4: wrote /home/mlieq/ISDN_Project-Robotic_LEGO_Assembly/Kean/results/dual_pyramid_s3_studfit_031/dual_pyramid_s3_studfit_031_8x.mp4 (1914 frames, 64 s at 8x)
+-rw-r--r-- 1 mlieq mlieq 30M Nov 17 10:50 Kean/results/dual_pyramid_s3_studfit_031/dual_pyramid_s3_studfit_031_8x.mp4

@@ -1,0 +1,9 @@
+{
+  "ok": false,
+  "errors": [
+    "invalid frame sequence",
+    "invalid own_steps shape",
+    "invalid roles shape",
+    "invalid task_builds shape"
+  ]
+}

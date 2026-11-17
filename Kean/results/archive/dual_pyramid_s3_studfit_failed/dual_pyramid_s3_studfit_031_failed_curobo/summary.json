@@ -1,0 +1,34 @@
+{
+  "done": false,
+  "failure": null,
+  "error": "ModuleNotFoundError: No module named 'curobo'",
+  "frames": 0,
+  "builds": {
+    "A": {
+      "structure": "pyramid",
+      "placed": 0,
+      "preplaced": 0,
+      "total": 11,
+      "completed_steps": 0,
+      "supports": [],
+      "brace_search": []
+    },
+    "B": {
+      "structure": "S3",
+      "placed": 0,
+      "preplaced": 0,
+      "total": 16,
+      "completed_steps": 0,
+      "supports": [],
+      "brace_search": []
+    }
+  },
+  "contacts": {},
+  "parallel_frames": 0,
+  "diagnostic": false,
+  "motion": {},
+  "reserved_parallel_frames": 0,
+  "initial_settling_xy_m": 1.862645149230957e-07,
+  "ok": false,
+  "full_build": false
+}

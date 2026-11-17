@@ -26,8 +26,9 @@ evidence). Only the local identity file `AGENTS.md` / `kean.id` stays private.
 
 Current simulation packages: `results/instructor_run_001`,
 `results/dual_arch_s3_012`, `results/dual_pyramid_s3_006`,
-`results/dual_pyramid_s3_studfit_030`. Failed and intermediate runs remain
-visible under `results/archive/` (indexed there, not deleted).
+`results/dual_pyramid_s3_studfit_030`, and `results/dual_pyramid_s3_studfit_031`
+(with `dual_pyramid_s3_studfit_031_8x.mp4`). Failed and intermediate runs
+remain visible under `results/archive/` (indexed there, not deleted).
 
 ## Concurrent independent builders
 

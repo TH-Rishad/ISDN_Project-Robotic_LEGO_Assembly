@@ -45,3 +45,7 @@ todo-personal.md
 AGENTS.md
 .cursor/
 config/
+
+# Submission videos (recordings stay ignored)
+!*.mp4
+!results/**/*.mp4

@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/home/mlieq/ISDN_Project-Robotic_LEGO_Assembly/Kean/scripts/dual_build.py", line 182, in <module>
+    main()
+  File "/home/mlieq/ISDN_Project-Robotic_LEGO_Assembly/Kean/scripts/dual_build.py", line 133, in main
+    planner.warmup()
+  File "/home/mlieq/ISDN_Project-Robotic_LEGO_Assembly/Kean/motion/plan_curobo.py", line 106, in warmup
+    self.backend.warmup(self.guard)
+  File "/home/mlieq/ISDN_Project-Robotic_LEGO_Assembly/Kean/motion/plan_curobo.py", line 169, in warmup
+    32 + 4 * len(self.probe.link_slices("full")), self.world_capacity)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mlieq/ISDN_Project-Robotic_LEGO_Assembly/Sakib/brickassembly/scripts/12_curobo_probe.py", line 499, in link_slices
+    from curobo.types import JointState
+ModuleNotFoundError: No module named 'curobo'

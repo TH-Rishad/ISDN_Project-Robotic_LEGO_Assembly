@@ -25,7 +25,7 @@ is not in the package.
 | Criterion 3 — single-cell arch + S3 | Done | `results/instructor_run_001` + `results/verification_instructor_run_001` (verifier exit 0; arch 11/11 support 10; S3 16/16 supports 11, 13, 14) |
 | Dual-builder arch + S3 | Done | `results/dual_arch_s3_012` (`verify_dual` ok) |
 | Dual-builder pyramid + S3 | Done | `results/dual_pyramid_s3_006` (`verify_dual` ok) |
-| Dual-builder pyramid + S3 with `--stud-fit` | Done | `results/dual_pyramid_s3_studfit_030` (`verify_dual` ok/full_build; A 11/11, B 16/16; supports 9, 11, 13, 14, 15; job 2313901, rev `6be3fc9`) |
+| Dual-builder pyramid + S3 with `--stud-fit` | Done | `results/dual_pyramid_s3_studfit_030` (first ok); `results/dual_pyramid_s3_studfit_031` re-run with recording + `dual_pyramid_s3_studfit_031_8x.mp4` (job 2315555, render 2315938; A 11/11, B 16/16; `verify_dual` ok) |
 | Instructor CPU verifier | Done | `scripts/verify_acceptance.py` / `verify_dual` |
 | Failed / intermediate runs | Archived | `results/archive/` (see `results/README.md`) |
 
