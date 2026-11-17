@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "full_build": true,
+  "errors": [],
+  "recorded_parallel_frames": 1907,
+  "grants": [
+    {
+      "arm": "A",
+      "step": 10,
+      "time": 265.5333333334205
+    },
+    {
+      "arm": "B",
+      "step": 13,
+      "time": 349.7500000000106
+    },
+    {
+      "arm": "B",
+      "step": 14,
+      "time": 386.29999999997733
+    },
+    {
+      "arm": "B",
+      "step": 15,
+      "time": 466.3166666665712
+    }
+  ],
+  "frames": 30890
+}

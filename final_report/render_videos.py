@@ -45,6 +45,11 @@ A_FIN_IN = ((-0.24, 0.16, 0.085), (0.0, 0.16, 0.05))
 S3_FIN = ((-0.40, -0.16, 0.14), (0.0, -0.16, 0.075))
 S3_FIN_IN = ((-0.30, -0.16, 0.12), (0.0, -0.16, 0.075))
 
+# Stud-fit run 003: a low view along the arch from the builder's side shows each same-column hold;
+# S3 from inside the cell (its supports reach the piers from the outer side).
+ARCH_LOW = ((-0.24, 0.16, 0.09), (0.0, 0.16, 0.03))
+S3_IN = ((-0.16, 0.0, 0.15), (0.0, -0.17, 0.04))
+
 VIDEOS = {
     "arch": dict(
         run="Kean/results/dual_arch_s3_012", out="dual_arch_s3_30s.mp4",
@@ -72,6 +77,37 @@ VIDEOS = {
             (22.5, 26, 365, 400, S3_SIDE_W, S3_SIDE_W, "Steps 14 and 15: the S3 bridge is complete"),
             (26, 28, 400, 400, A_FIN, A_FIN_IN, "Pyramid 11/11  |  S3 16/16  |  3 supports held  |  verifier: pass"),
             (28, 30, 400, 400, S3_FIN, S3_FIN_IN, "Pyramid 11/11  |  S3 16/16  |  3 supports held  |  verifier: pass"),
+        ]),
+    # Stud-fit runs. pyramid_studfit is a local GPU rerun of Kean's dual_pyramid_s3_studfit_030 (same sources,
+    # same 74 events, timings within 1 s); the HPC recording.npz is not in git.
+    "arch_studfit": dict(
+        run="Kean/results/dual_arch_s3_studfit_007", out="dual_arch_s3_studfit_30s.mp4",
+        title="Dual-arm LEGO assembly with stud fit  |  arm A: arch (11 bricks)   arm B: S3 bridge (16 bricks)",
+        shots=[
+            (0, 3, 0, 45, OV0, OV1, "Stud fit on: bricks are pressed onto studs that resist insertion"),
+            (3, 8, 45, 170, OV1, OV2, "Both arms build at the same time; reserved motions keep them apart"),
+            (8, 12, 170, 268, ARCH_LOW, ARCH_LOW, "Arch steps 6-9: the stacks carry each press, so no support is needed"),
+            (12, 15.5, 278, 305, ARCH_LOW, ARCH_LOW, "Arch crown: arm B holds a stack while arm A presses the crown"),
+            (15.5, 18, 305, 362, S3_IN, S3_IN, "S3 steps 10-12: corbels and pier bricks go in without support"),
+            (18, 21, 362, 388, S3_IN, S3_IN, "S3 step 13: arm A holds the corbel while arm B presses the bridge brick"),
+            (21, 24, 444, 468, S3_IN, S3_IN, "S3 step 14: arm A holds the bridge while arm B presses"),
+            (24, 27, 492, 516, S3_IN, S3_IN, "S3 step 15: arm A holds the bridge while arm B presses the top brick"),
+            (27, 28.5, 516, 516, A_FIN, A_FIN_IN, "Arch 11/11  |  S3 16/16  |  4 supports held  |  stud fit  |  verifier: pass"),
+            (28.5, 30, 516, 516, S3_FIN, S3_FIN_IN, "Arch 11/11  |  S3 16/16  |  4 supports held  |  stud fit  |  verifier: pass"),
+        ]),
+    "pyramid_studfit": dict(
+        run="Kean/results/dual_pyramid_s3_studfit_030_local", out="dual_pyramid_s3_studfit_030_30s.mp4",
+        title="Dual-arm LEGO assembly with stud fit  |  arm A: pyramid (11 bricks)   arm B: S3 bridge (16 bricks)",
+        shots=[
+            (0, 3, 0, 45, OV0, OV1, "Stud fit on: bricks are pressed onto studs that resist insertion"),
+            (3, 10, 45, 247, OV1, OV2, "Both arms build at the same time; reserved motions keep them apart"),
+            (10, 13, 266, 286, S3_SIDE, S3_SIDE, "S3 step 9: arm A holds the structure while B presses"),
+            (13, 16, 324, 345, S3_SIDE, S3_SIDE, "S3 step 11: arm A holds the pier while B places the corbel"),
+            (16, 18.5, 345, 366, PYR_34, PYR_34, "Top brick placed: pyramid complete"),
+            (18.5, 22, 385, 407, S3_SIDE, S3_SIDE, "S3 step 13: arm A grips the pier top under the overhang"),
+            (22, 26, 455, 512, S3_SIDE_W, S3_SIDE_W, "Steps 14 and 15, both supported: the S3 bridge is complete"),
+            (26, 28, 512, 512, A_FIN, A_FIN_IN, "Pyramid 11/11  |  S3 16/16  |  5 supports held  |  stud-fit  |  verifier: pass"),
+            (28, 30, 512, 512, S3_FIN, S3_FIN_IN, "Pyramid 11/11  |  S3 16/16  |  5 supports held  |  stud-fit  |  verifier: pass"),
         ]),
 }
 
@@ -133,7 +169,7 @@ def render(name, ffmpeg):
             banner(img, cfg["title"], 0, .85, True)
             banner(img, caption, H, 1.05, False)
             speed = "final" if t1 == t0 else "%.0fx speed" % ((t1 - t0) / (v1 - v0))
-            label = "sim t = %3.0f s   %s" % (t, speed)
+            label = "sim t = %3.0f s   %s" % (t + cfg.get("time_offset", 0.), speed)
             cv2.putText(img, label, (W - 380, 100), cv2.FONT_HERSHEY_SIMPLEX, .8, (255, 255, 255), 2, cv2.LINE_AA)
             enc.stdin.write(img.tobytes())
         if caption != last:

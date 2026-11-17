@@ -145,12 +145,17 @@ class StudFitTest(unittest.TestCase):
                 candidates=lambda brick, placed, clearance: [(y, .05) for y in util],
                 gripped=lambda placed, y, z: ('a',), _brace_obj=lambda placed, y, z, g, mu: y,
                 _record=lambda brick, placed, choice, r0, strategy, why: (choice and choice[0], why))
-        P = NS(brick_pose=lambda b: (0., -.16, .05), cells=lambda b: ({(0, 0)}, 0), supports=lambda b, p: {})
+        P = NS(brick_pose=lambda b: (0., -.16, .05), cells=lambda b: ({(0, 0)}, 0),
+               supports=lambda b, p: {'a': 1} if b[0] == 'x' else {})
         assign = near_press_assign(P, BR, original=None)
         # -0.17 is nearest but unsafe (0.5 x 3 >= 1); -0.18 is the nearest safe grip.
         self.assertEqual(assign(('x',), [('a',)], 'weakest_joint'), (-.18, 'near_press'))
         r0.s = .1                                                   # safe unsupported, no overhang: none
         self.assertIsNone(assign(('x',), [('a',)], 'weakest_joint'))
+        # A grip holding nothing under the pressed brick (the other column) is skipped
+        BR.gripped = lambda placed, y, z: ('b',)
+        r0.s = 1.
+        self.assertIsNone(assign(('x',), [('a',), ('b',)], 'weakest_joint'))
 
     def test_support_grips_the_bridge_not_the_nearer_pier(self):
         from Kean.motion.stud_fit import bridge_bricks, near_press_assign
