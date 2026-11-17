@@ -1,0 +1,64 @@
+{
+  "ok": false,
+  "full_build": false,
+  "errors": [
+    "recorded arm-arm contact",
+    "contact monitor: arm_arm",
+    "detailed contact evidence: arm_arm",
+    "detailed contact evidence: arm_arm"
+  ],
+  "recorded_parallel_frames": 1123,
+  "grants": [
+    {
+      "arm": "A",
+      "step": 6,
+      "time": 164.58333333335645
+    },
+    {
+      "arm": "A",
+      "step": 7,
+      "time": 200.65000000005182
+    },
+    {
+      "arm": "A",
+      "step": 8,
+      "time": 252.25000000009288
+    },
+    {
+      "arm": "A",
+      "step": 9,
+      "time": 290.23333333339804
+    },
+    {
+      "arm": "A",
+      "step": 10,
+      "time": 341.7666666666845
+    },
+    {
+      "arm": "B",
+      "step": 9,
+      "time": 435.74999999993236
+    },
+    {
+      "arm": "B",
+      "step": 11,
+      "time": 503.7166666665372
+    },
+    {
+      "arm": "B",
+      "step": 13,
+      "time": 560.6166666664855
+    },
+    {
+      "arm": "B",
+      "step": 14,
+      "time": 599.61666666645
+    },
+    {
+      "arm": "B",
+      "step": 15,
+      "time": 637.9666666664151
+    }
+  ],
+  "frames": 40701
+}

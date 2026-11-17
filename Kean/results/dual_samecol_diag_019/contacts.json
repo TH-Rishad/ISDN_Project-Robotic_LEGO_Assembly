@@ -1,0 +1,202 @@
+[
+  {
+    "class": "neighbour_rub",
+    "a": "brick:A_b_009#37",
+    "b": "brick:A_b_010#38",
+    "phase": {
+      "A": "insert",
+      "B": "hold"
+    },
+    "start_frame": 1453,
+    "max_pen_mm": -1.244,
+    "peak_force_n": 1.41,
+    "end_frame": 1930,
+    "duration_frames": 478,
+    "contact_frames": 478,
+    "fragments": 1
+  },
+  {
+    "class": "neighbour_rub",
+    "a": "brick:A_b_008#36",
+    "b": "brick:A_b_010#38",
+    "phase": {
+      "A": "insert",
+      "B": "hold"
+    },
+    "start_frame": 1453,
+    "max_pen_mm": -1.278,
+    "peak_force_n": 1.08,
+    "end_frame": 1943,
+    "duration_frames": 491,
+    "contact_frames": 491,
+    "fragments": 1
+  },
+  {
+    "class": "neighbour_rub",
+    "a": "brick:A_b_007#35",
+    "b": "brick:A_b_010#38",
+    "phase": {
+      "A": "press",
+      "B": "hold"
+    },
+    "start_frame": 1878,
+    "max_pen_mm": -1.601,
+    "peak_force_n": 16.14,
+    "end_frame": 1943,
+    "duration_frames": 66,
+    "contact_frames": 57,
+    "fragments": 2
+  },
+  {
+    "class": "stud_mating",
+    "a": "brick:A_b_006#34",
+    "b": "brick:A_b_010#38",
+    "phase": {
+      "A": "press",
+      "B": "hold"
+    },
+    "start_frame": 1928,
+    "max_pen_mm": -1.598,
+    "peak_force_n": 0.73,
+    "end_frame": 1928,
+    "geometry": {
+      "upper": "A_b_010",
+      "lower": "A_b_006",
+      "stud_shape": 212,
+      "upper_shape": 260,
+      "stud_type": 8,
+      "upper_type": 8,
+      "stud_local_z": 0.0,
+      "contact_frame": 1928,
+      "contact_world": [
+        -0.002088698325678706,
+        0.14171722531318665,
+        0.04249776154756546
+      ],
+      "contact_local": [
+        0.005568833201440849,
+        0.0022446764093161146,
+        0.010564832769839256
+      ],
+      "lower_dims": [
+        0.032,
+        0.016
+      ]
+    },
+    "duration_frames": 1,
+    "contact_frames": 1,
+    "fragments": 1
+  },
+  {
+    "class": "stud_mating",
+    "a": "brick:A_b_007#35",
+    "b": "brick:A_b_010#38",
+    "phase": {
+      "A": "press",
+      "B": "hold"
+    },
+    "start_frame": 1928,
+    "max_pen_mm": -1.601,
+    "peak_force_n": 0.77,
+    "end_frame": 1928,
+    "geometry": {
+      "upper": "A_b_010",
+      "lower": "A_b_007",
+      "stud_shape": 226,
+      "upper_shape": 260,
+      "stud_type": 8,
+      "upper_type": 8,
+      "stud_local_z": 0.0,
+      "contact_frame": 1928,
+      "contact_world": [
+        0.00252269534394145,
+        0.170277938246727,
+        0.04243268817663193
+      ],
+      "contact_local": [
+        -0.013774776140956398,
+        -0.002414317510181953,
+        0.010469196342231098
+      ],
+      "lower_dims": [
+        0.032,
+        0.016
+      ]
+    },
+    "duration_frames": 1,
+    "contact_frames": 1,
+    "fragments": 1
+  },
+  {
+    "class": "neighbour_rub",
+    "a": "brick:A_b_006#34",
+    "b": "brick:A_b_010#38",
+    "phase": {
+      "A": "press",
+      "B": "hold"
+    },
+    "start_frame": 1928,
+    "max_pen_mm": -1.598,
+    "peak_force_n": 23.06,
+    "end_frame": 1943,
+    "duration_frames": 16,
+    "contact_frames": 16,
+    "fragments": 1
+  },
+  {
+    "class": "stud_mating",
+    "a": "brick:B_b_006#45",
+    "b": "brick:B_b_008#48",
+    "phase": {
+      "A": "hold",
+      "B": "press"
+    },
+    "start_frame": 4960,
+    "max_pen_mm": -1.663,
+    "peak_force_n": 0.42,
+    "end_frame": 4960,
+    "geometry": {
+      "upper": "B_b_008",
+      "lower": "B_b_006",
+      "stud_shape": 338,
+      "upper_shape": 368,
+      "stud_type": 8,
+      "upper_type": 8,
+      "stud_local_z": 0.0,
+      "contact_frame": 4960,
+      "contact_world": [
+        0.001870709122158587,
+        -0.18661227822303772,
+        0.042555905878543854
+      ],
+      "contact_local": [
+        0.002120305763784604,
+        0.005406905448172403,
+        0.010554065469801735
+      ],
+      "lower_dims": [
+        0.016,
+        0.016
+      ]
+    },
+    "duration_frames": 1,
+    "contact_frames": 1,
+    "fragments": 1
+  },
+  {
+    "class": "neighbour_rub",
+    "a": "brick:B_b_006#45",
+    "b": "brick:B_b_008#48",
+    "phase": {
+      "A": "hold",
+      "B": "press"
+    },
+    "start_frame": 4960,
+    "max_pen_mm": -1.663,
+    "peak_force_n": 12.11,
+    "end_frame": 4975,
+    "duration_frames": 16,
+    "contact_frames": 16,
+    "fragments": 1
+  }
+]

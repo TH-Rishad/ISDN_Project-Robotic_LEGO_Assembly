@@ -1,0 +1,17 @@
+{
+  "frame": 6120,
+  "sim_time": 102.99999999999544,
+  "phases": {
+    "A": "hold",
+    "B": "pre-insert"
+  },
+  "modes": {
+    "A": "stopped",
+    "B": "stopped"
+  },
+  "steps": {
+    "A": 11,
+    "B": 15
+  },
+  "pending": {}
+}

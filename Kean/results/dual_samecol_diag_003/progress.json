@@ -1,0 +1,17 @@
+{
+  "frame": 4320,
+  "sim_time": 72.99999999999714,
+  "phases": {
+    "A": "stage",
+    "B": "park"
+  },
+  "modes": {
+    "A": "stopped",
+    "B": "stopped"
+  },
+  "steps": {
+    "A": 6,
+    "B": 6
+  },
+  "pending": {}
+}

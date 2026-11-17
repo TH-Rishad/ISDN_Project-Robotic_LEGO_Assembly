@@ -1,0 +1,17 @@
+{
+  "frame": 1320,
+  "sim_time": 22.999999999999975,
+  "phases": {
+    "A": "to feeder",
+    "B": "retract"
+  },
+  "modes": {
+    "A": "idle",
+    "B": "idle"
+  },
+  "steps": {
+    "A": 1,
+    "B": 0
+  },
+  "pending": {}
+}

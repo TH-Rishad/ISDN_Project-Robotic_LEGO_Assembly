@@ -1,0 +1,1032 @@
+{
+  "done": true,
+  "failure": null,
+  "error": null,
+  "frames": 38340,
+  "builds": {
+    "A": {
+      "structure": "arch",
+      "placed": 11,
+      "preplaced": 0,
+      "total": 11,
+      "completed_steps": 11,
+      "supports": [
+        {
+          "step": 6,
+          "requested": true,
+          "planned_feasible": true,
+          "executed": true,
+          "brace_infeasible": false,
+          "guard_stop": false,
+          "guard_frame": null,
+          "realised_grip_N": [
+            37.3,
+            34.79
+          ],
+          "grip_samples": 815,
+          "contacted": [
+            "A_b_003",
+            "A_b_005"
+          ],
+          "gripped_bricks": [
+            "A_b_003",
+            "A_b_005"
+          ],
+          "max_F_N": {
+            "A_b_003": 6.54,
+            "A_b_005": 2.29
+          },
+          "max_M_Nm": {
+            "A_b_003": 0.0563,
+            "A_b_005": 0.0132
+          }
+        },
+        {
+          "step": 7,
+          "requested": true,
+          "planned_feasible": true,
+          "executed": true,
+          "brace_infeasible": false,
+          "guard_stop": false,
+          "guard_frame": null,
+          "realised_grip_N": [
+            36.99,
+            38.24
+          ],
+          "grip_samples": 821,
+          "contacted": [
+            "A_b_004",
+            "A_b_006"
+          ],
+          "gripped_bricks": [
+            "A_b_004",
+            "A_b_006"
+          ],
+          "max_F_N": {
+            "A_b_004": 2.72,
+            "A_b_006": 2.11
+          },
+          "max_M_Nm": {
+            "A_b_004": 0.0221,
+            "A_b_006": 0.0175
+          }
+        },
+        {
+          "step": 8,
+          "requested": true,
+          "planned_feasible": true,
+          "executed": true,
+          "brace_infeasible": false,
+          "guard_stop": false,
+          "guard_frame": null,
+          "realised_grip_N": [
+            38.94,
+            36.91
+          ],
+          "grip_samples": 823,
+          "contacted": [
+            "A_b_005",
+            "A_b_007"
+          ],
+          "gripped_bricks": [
+            "A_b_005",
+            "A_b_007"
+          ],
+          "max_F_N": {
+            "A_b_005": 4.86,
+            "A_b_007": 2.26
+          },
+          "max_M_Nm": {
+            "A_b_005": 0.042,
+            "A_b_007": 0.0307
+          }
+        },
+        {
+          "step": 9,
+          "requested": true,
+          "planned_feasible": true,
+          "executed": true,
+          "brace_infeasible": false,
+          "guard_stop": false,
+          "guard_frame": null,
+          "realised_grip_N": [
+            37.21,
+            38.22
+          ],
+          "grip_samples": 872,
+          "contacted": [
+            "A_b_006",
+            "A_b_008"
+          ],
+          "gripped_bricks": [
+            "A_b_006",
+            "A_b_008"
+          ],
+          "max_F_N": {
+            "A_b_006": 3.22,
+            "A_b_008": 2.11
+          },
+          "max_M_Nm": {
+            "A_b_006": 0.0401,
+            "A_b_008": 0.0131
+          }
+        },
+        {
+          "step": 10,
+          "requested": true,
+          "planned_feasible": true,
+          "executed": true,
+          "brace_infeasible": false,
+          "guard_stop": false,
+          "guard_frame": null,
+          "realised_grip_N": [
+            36.7,
+            38.95
+          ],
+          "grip_samples": 1098,
+          "contacted": [
+            "A_b_006",
+            "A_b_008"
+          ],
+          "gripped_bricks": [
+            "A_b_006",
+            "A_b_008"
+          ],
+          "max_F_N": {
+            "A_b_006": 9.55,
+            "A_b_008": 13.37
+          },
+          "max_M_Nm": {
+            "A_b_006": 0.2689,
+            "A_b_008": 0.1152
+          }
+        }
+      ],
+      "brace_search": [
+        {
+          "step": 6,
+          "pose": [
+            0.0,
+            0.188,
+            0.0248
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry -1.54 mm at A_b_001 (opening 6.82 mm)"
+        },
+        {
+          "step": 6,
+          "pose": [
+            0.0,
+            0.202,
+            0.0268
+          ],
+          "tilt": [
+            -1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": true
+        },
+        {
+          "step": 7,
+          "pose": [
+            0.0,
+            0.14,
+            0.032
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.1046, 0.3]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1046, 0.3]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1046, 0.3]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1046, 0.3]: path clearance -1.71 mm at other arm (sample 58/75); full-sphere-filter goal [0.0, 0.1046, 0.3]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1046, 0.3]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1046, 0.3]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.1046, 0.3]: path clearance -0.18 mm at other arm (sample 55/73); contact-full-sphere-filter goal [0.0, 0.1046, 0.3]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.1046, 0.3]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.1046, 0.3]: cuRobo plan failed: no result (IK/start feasibility)"
+        },
+        {
+          "step": 7,
+          "pose": [
+            0.0,
+            0.118,
+            0.0364
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": true
+        },
+        {
+          "step": 8,
+          "pose": [
+            0.0,
+            0.18,
+            0.0344
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed helper at 7.77 mm opening: path clearance 1.20 mm at A_b_003 (sample 0/0)"
+        },
+        {
+          "step": 8,
+          "pose": [
+            0.0,
+            0.202,
+            0.0364
+          ],
+          "tilt": [
+            -1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": true
+        },
+        {
+          "step": 9,
+          "pose": [
+            0.0,
+            0.14,
+            0.0416
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.1046, 0.3]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1046, 0.3]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1046, 0.3]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1046, 0.3]: path clearance -0.57 mm at other arm (sample 61/77); full-sphere-filter goal [0.0, 0.1046, 0.3]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1046, 0.3]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1046, 0.3]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.1046, 0.3]: path clearance -1.56 mm at other arm (sample 48/63); contact-full-sphere-filter goal [0.0, 0.1046, 0.3]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.1046, 0.3]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.1046, 0.3]: cuRobo plan failed: no result (IK/start feasibility)"
+        },
+        {
+          "step": 9,
+          "pose": [
+            0.0,
+            0.118,
+            0.046
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": true
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.124,
+            0.0296
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry -1.34 mm at A_b_002 (opening 7.14 mm)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.14,
+            0.046
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: helper obstructs carried-brick insertion corridor: -1.52 mm (fingers)"
+        },
+        {
+          "step": 10,
+          "pose": [
+            0.0,
+            0.122,
+            0.046
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": true
+        }
+      ]
+    },
+    "B": {
+      "structure": "S3",
+      "placed": 16,
+      "preplaced": 0,
+      "total": 16,
+      "completed_steps": 16,
+      "supports": [
+        {
+          "step": 9,
+          "requested": true,
+          "planned_feasible": true,
+          "executed": true,
+          "brace_infeasible": false,
+          "guard_stop": false,
+          "guard_frame": null,
+          "realised_grip_N": [
+            35.32,
+            36.39
+          ],
+          "grip_samples": 820,
+          "contacted": [
+            "B_b_007",
+            "B_b_009"
+          ],
+          "gripped_bricks": [
+            "B_b_007",
+            "B_b_009"
+          ],
+          "max_F_N": {
+            "B_b_007": 3.77,
+            "B_b_009": 2.75
+          },
+          "max_M_Nm": {
+            "B_b_007": 0.0237,
+            "B_b_009": 0.0145
+          }
+        },
+        {
+          "step": 11,
+          "requested": true,
+          "planned_feasible": true,
+          "executed": true,
+          "brace_infeasible": false,
+          "guard_stop": false,
+          "guard_frame": null,
+          "realised_grip_N": [
+            35.35,
+            36.38
+          ],
+          "grip_samples": 888,
+          "contacted": [
+            "B_b_009",
+            "B_b_011"
+          ],
+          "gripped_bricks": [
+            "B_b_009",
+            "B_b_011"
+          ],
+          "max_F_N": {
+            "B_b_009": 3.8,
+            "B_b_011": 2.78
+          },
+          "max_M_Nm": {
+            "B_b_009": 0.0315,
+            "B_b_011": 0.0147
+          }
+        },
+        {
+          "step": 13,
+          "requested": true,
+          "planned_feasible": true,
+          "executed": true,
+          "brace_infeasible": false,
+          "guard_stop": false,
+          "guard_frame": null,
+          "realised_grip_N": [
+            39.69,
+            38.74
+          ],
+          "grip_samples": 1006,
+          "contacted": [
+            "B_b_008",
+            "B_b_010"
+          ],
+          "gripped_bricks": [
+            "B_b_008",
+            "B_b_010"
+          ],
+          "max_F_N": {
+            "B_b_008": 22.21,
+            "B_b_010": 20.94
+          },
+          "max_M_Nm": {
+            "B_b_008": 0.184,
+            "B_b_010": 0.3446
+          }
+        },
+        {
+          "step": 14,
+          "requested": true,
+          "planned_feasible": true,
+          "executed": true,
+          "brace_infeasible": false,
+          "guard_stop": true,
+          "guard_frame": 34162,
+          "realised_grip_N": [
+            38.37,
+            39.92
+          ],
+          "grip_samples": 863,
+          "contacted": [
+            "B_b_010",
+            "B_b_012"
+          ],
+          "gripped_bricks": [
+            "B_b_010",
+            "B_b_012"
+          ],
+          "max_F_N": {
+            "B_b_010": 14.97,
+            "B_b_012": 9.69
+          },
+          "max_M_Nm": {
+            "B_b_010": 0.31,
+            "B_b_012": 0.1918
+          }
+        },
+        {
+          "step": 15,
+          "requested": true,
+          "planned_feasible": true,
+          "executed": true,
+          "brace_infeasible": false,
+          "guard_stop": false,
+          "guard_frame": null,
+          "realised_grip_N": [
+            37.49,
+            39.89
+          ],
+          "grip_samples": 876,
+          "contacted": [
+            "B_b_012",
+            "B_b_014",
+            "B_b_015"
+          ],
+          "gripped_bricks": [
+            "B_b_012",
+            "B_b_014"
+          ],
+          "max_F_N": {
+            "B_b_012": 28.03,
+            "B_b_014": 38.78,
+            "B_b_015": 77.63
+          },
+          "max_M_Nm": {
+            "B_b_012": 0.2212,
+            "B_b_014": 0.6078,
+            "B_b_015": 1.1969
+          }
+        }
+      ],
+      "brace_search": [
+        {
+          "step": 9,
+          "pose": [
+            0.0,
+            -0.132,
+            0.0416
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry -1.33 mm at B_b_005 (opening 7.14 mm)"
+        },
+        {
+          "step": 9,
+          "pose": [
+            0.0,
+            -0.118,
+            0.046
+          ],
+          "tilt": [
+            -1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": true
+        },
+        {
+          "step": 11,
+          "pose": [
+            0.0,
+            -0.132,
+            0.0152
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry -1.33 mm at B_b_005 (opening 7.14 mm)"
+        },
+        {
+          "step": 11,
+          "pose": [
+            0.0,
+            -0.118,
+            0.0556
+          ],
+          "tilt": [
+            -1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": true
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.188,
+            0.0536
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry -1.54 mm at B_b_006 (opening 6.82 mm)"
+        },
+        {
+          "step": 13,
+          "pose": [
+            0.0,
+            -0.202,
+            0.0556
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": true
+        },
+        {
+          "step": 14,
+          "pose": [
+            0.0,
+            -0.156,
+            0.0632
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "hover [0.16, -0.136, 0.1696]: boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: path clearance 0.71 mm at other arm (sample 51/88); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); hover [0.16, -0.136, 0.2496]: boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: path clearance 0.90 mm at other arm (sample 53/90); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); hover [0.16, -0.136, 0.3296]: boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: path clearance 0.43 mm at other arm (sample 58/92); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); hover [0.08, -0.136, 0.2496]: boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: path clearance 0.50 mm at other arm (sample 13/63); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); hover [0.0, -0.136, 0.3296]: boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: path clearance -0.12 mm at carried brick / other arm (sample 10/59); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.1301, 0.1097]: cuRobo plan failed: no result (IK/start feasibility)"
+        },
+        {
+          "step": 14,
+          "pose": [
+            0.0,
+            -0.182,
+            0.0652
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "guard_stop"
+        },
+        {
+          "step": 14,
+          "pose": [
+            0.0,
+            -0.168,
+            0.0652
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "guard_stop"
+        },
+        {
+          "step": 14,
+          "pose": [
+            0.0,
+            -0.158,
+            0.0652
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, -0.158, 0.0652]: path clearance 0.89 mm at B_b_010 (sample 13/20); boxed goal [0.0, -0.158, 0.0652]: path clearance 0.74 mm at B_b_010 (sample 13/20); boxed goal [0.0, -0.158, 0.0652]: path clearance 0.74 mm at B_b_010 (sample 13/20); full-sphere-filter goal [0.0, -0.158, 0.0652]: path clearance 0.41 mm at B_b_010 (sample 15/20); full-sphere-filter goal [0.0, -0.158, 0.0652]: path clearance 0.74 mm at B_b_010 (sample 13/20); full-sphere-filter goal [0.0, -0.158, 0.0652]: path clearance 0.74 mm at B_b_010 (sample 13/20); contact-full-sphere-filter goal [0.0, -0.158, 0.0652]: path clearance 1.13 mm at B_b_010 (sample 11/20); contact-full-sphere-filter goal [0.0, -0.158, 0.0652]: path clearance 1.13 mm at B_b_010 (sample 11/20); contact-full-sphere-filter goal [0.0, -0.158, 0.0652]: path clearance 1.13 mm at B_b_010 (sample 11/20)"
+        },
+        {
+          "step": 14,
+          "pose": [
+            0.0,
+            -0.156,
+            0.0652
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, -0.156, 0.0652]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.156, 0.0652]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, -0.156, 0.0652]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.156, 0.0652]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.156, 0.0652]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, -0.156, 0.0652]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, -0.156, 0.0652]: path clearance 1.16 mm at B_b_010 (sample 9/20); contact-full-sphere-filter goal [0.0, -0.156, 0.0652]: path clearance 1.16 mm at B_b_010 (sample 9/20); contact-full-sphere-filter goal [0.0, -0.156, 0.0652]: path clearance 1.16 mm at B_b_010 (sample 9/20)"
+        },
+        {
+          "step": 14,
+          "pose": [
+            0.0,
+            -0.18,
+            0.0652
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": true
+        },
+        {
+          "step": 15,
+          "pose": [
+            0.0,
+            -0.156,
+            0.0728
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: closed finger geometry -1.54 mm at B_b_010 (opening 6.82 mm)"
+        },
+        {
+          "step": 15,
+          "pose": [
+            0.0,
+            -0.158,
+            0.0748
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": true
+        }
+      ]
+    }
+  },
+  "contacts": {
+    "neighbour_rub": {
+      "count": 32,
+      "examples": [
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:A_b_000#28",
+          "phase": {
+            "A": "press",
+            "B": "press"
+          },
+          "start_frame": 862,
+          "max_pen_mm": -1.475,
+          "peak_force_n": 7.46,
+          "end_frame": 889,
+          "duration_frames": 28,
+          "contact_frames": 28,
+          "fragments": 1
+        },
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:B_b_000#39",
+          "phase": {
+            "A": "press",
+            "B": "press"
+          },
+          "start_frame": 933,
+          "max_pen_mm": -1.477,
+          "peak_force_n": 7.72,
+          "end_frame": 1021,
+          "duration_frames": 89,
+          "contact_frames": 89,
+          "fragments": 1
+        },
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:A_b_001#29",
+          "phase": {
+            "A": "press",
+            "B": "press"
+          },
+          "start_frame": 2558,
+          "max_pen_mm": -1.476,
+          "peak_force_n": 9.56,
+          "end_frame": 2643,
+          "duration_frames": 86,
+          "contact_frames": 86,
+          "fragments": 1
+        },
+        {
+          "class": "neighbour_rub",
+          "a": "plate#-1",
+          "b": "brick:B_b_001#40",
+          "phase": {
+            "A": "press",
+            "B": "press"
+          },
+          "start_frame": 2616,
+          "max_pen_mm": -1.476,
+          "peak_force_n": 8.07,
+          "end_frame": 2645,
+          "duration_frames": 30,
+          "contact_frames": 30,
+          "fragments": 1
+        },
+        {
+          "class": "neighbour_rub",
+          "a": "brick:A_b_000#28",
+          "b": "brick:A_b_002#30",
+          "phase": {
+            "A": "press",
+            "B": "press"
+          },
+          "start_frame": 4127,
+          "max_pen_mm": -3.026,
+          "peak_force_n": 12.76,
+          "end_frame": 4211,
+          "duration_frames": 85,
+          "contact_frames": 85,
+          "fragments": 1
+        }
+      ]
+    },
+    "stud_mating": {
+      "count": 25,
+      "examples": [
+        {
+          "class": "stud_mating",
+          "a": "brick:A_b_000#28",
+          "b": "brick:A_b_002#30",
+          "phase": {
+            "A": "press",
+            "B": "press"
+          },
+          "start_frame": 4134,
+          "max_pen_mm": -1.678,
+          "peak_force_n": 0.32,
+          "end_frame": 4211,
+          "geometry": {
+            "upper": "A_b_002",
+            "lower": "A_b_000",
+            "stud_shape": 152,
+            "upper_shape": 177,
+            "stud_type": 8,
+            "upper_type": 7,
+            "stud_local_z": 0.0,
+            "contact_frame": 4211,
+            "contact_world": [
+              -0.004614127334207296,
+              0.12189926207065582,
+              0.01370825432240963
+            ],
+            "contact_local": [
+              -0.0046192389532504485,
+              -0.006102468299995769,
+              0.010505716774263197
+            ],
+            "lower_dims": [
+              0.016,
+              0.016
+            ]
+          },
+          "duration_frames": 78,
+          "contact_frames": 78,
+          "fragments": 1
+        },
+        {
+          "class": "stud_mating",
+          "a": "brick:B_b_000#39",
+          "b": "brick:B_b_002#41",
+          "phase": {
+            "A": "press",
+            "B": "press"
+          },
+          "start_frame": 4194,
+          "max_pen_mm": -1.672,
+          "peak_force_n": 0.32,
+          "end_frame": 4213,
+          "geometry": {
+            "upper": "B_b_002",
+            "lower": "B_b_000",
+            "stud_shape": 278,
+            "upper_shape": 301,
+            "stud_type": 8,
+            "upper_type": 7,
+            "stud_local_z": 0.0,
+            "contact_frame": 4213,
+            "contact_world": [
+              -0.006055496167391539,
+              -0.1876572072505951,
+              0.013699425384402275
+            ],
+            "contact_local": [
+              -0.006048696783898785,
+              0.0043454593541313894,
+              0.010502760103305031
+            ],
+            "lower_dims": [
+              0.016,
+              0.016
+            ]
+          },
+          "duration_frames": 20,
+          "contact_frames": 20,
+          "fragments": 1
+        },
+        {
+          "class": "stud_mating",
+          "a": "brick:B_b_001#40",
+          "b": "brick:B_b_003#42",
+          "phase": {
+            "A": "press",
+            "B": "press"
+          },
+          "start_frame": 5579,
+          "max_pen_mm": -1.675,
+          "peak_force_n": 0.32,
+          "end_frame": 5658,
+          "geometry": {
+            "upper": "B_b_003",
+            "lower": "B_b_001",
+            "stud_shape": 288,
+            "upper_shape": 312,
+            "stud_type": 8,
+            "upper_type": 7,
+            "stud_local_z": 0.0,
+            "contact_frame": 5658,
+            "contact_world": [
+              0.004612303338944912,
+              -0.121906578540802,
+              0.013708533719182014
+            ],
+            "contact_local": [
+              0.0046194883041996366,
+              0.006094354432462535,
+              0.010506009529595557
+            ],
+            "lower_dims": [
+              0.016,
+              0.016
+            ]
+          },
+          "duration_frames": 80,
+          "contact_frames": 80,
+          "fragments": 1
+        },
+        {
+          "class": "stud_mating",
+          "a": "brick:A_b_001#29",
+          "b": "brick:A_b_003#31",
+          "phase": {
+            "A": "press",
+            "B": "press"
+          },
+          "start_frame": 5642,
+          "max_pen_mm": -1.678,
+          "peak_force_n": 0.32,
+          "end_frame": 5661,
+          "geometry": {
+            "upper": "A_b_003",
+            "lower": "A_b_001",
+            "stud_shape": 162,
+            "upper_shape": 184,
+            "stud_type": 8,
+            "upper_type": 7,
+            "stud_local_z": 0.0,
+            "contact_frame": 5661,
+            "contact_world": [
+              0.006050083786249161,
+              0.1963604986667633,
+              0.013696345500648022
+            ],
+            "contact_local": [
+              0.006040537676698907,
+              0.004356725895165797,
+              0.01050398662400914
+            ],
+            "lower_dims": [
+              0.016,
+              0.016
+            ]
+          },
+          "duration_frames": 20,
+          "contact_frames": 20,
+          "fragments": 1
+        },
+        {
+          "class": "stud_mating",
+          "a": "brick:B_b_002#41",
+          "b": "brick:B_b_004#43",
+          "phase": {
+            "A": "press",
+            "B": "press"
+          },
+          "start_frame": 7389,
+          "max_pen_mm": -1.675,
+          "peak_force_n": 0.32,
+          "end_frame": 7431,
+          "geometry": {
+            "upper": "B_b_004",
+            "lower": "B_b_002",
+            "stud_shape": 298,
+            "upper_shape": 322,
+            "stud_type": 8,
+            "upper_type": 7,
+            "stud_local_z": 0.0,
+            "contact_frame": 7431,
+            "contact_world": [
+              0.004332882817834616,
+              -0.18596766889095306,
+              0.023310527205467224
+            ],
+            "contact_local": [
+              0.004357539907956369,
+              0.0060375351282012735,
+              0.010504302614176645
+            ],
+            "lower_dims": [
+              0.016,
+              0.016
+            ]
+          },
+          "duration_frames": 43,
+          "contact_frames": 43,
+          "fragments": 1
+        }
+      ]
+    }
+  },
+  "parallel_frames": 909,
+  "diagnostic": false,
+  "motion": {
+    "strict": true,
+    "workarounds": [],
+    "failures": [],
+    "plans": 203,
+    "plan_failures": 0,
+    "captures": 0,
+    "segments": 203,
+    "min_clearance_m": -0.001087255214522952,
+    "clearance_scope": "executed joints during planned playback; full spheres, measured fingers"
+  },
+  "reserved_parallel_frames": 1526,
+  "initial_settling_xy_m": 5.960464477539063e-08,
+  "ok": true,
+  "full_build": true
+}

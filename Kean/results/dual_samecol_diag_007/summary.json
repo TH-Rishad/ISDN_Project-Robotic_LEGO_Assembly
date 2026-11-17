@@ -1,0 +1,735 @@
+{
+  "done": false,
+  "failure": "motion_plan_failed",
+  "error": null,
+  "frames": 3143,
+  "builds": {
+    "A": {
+      "structure": "arch",
+      "placed": 1,
+      "preplaced": 6,
+      "total": 11,
+      "completed_steps": 6,
+      "supports": [
+        {
+          "step": 6,
+          "requested": true,
+          "planned_feasible": true,
+          "executed": true,
+          "brace_infeasible": false,
+          "guard_stop": true,
+          "guard_frame": 1505,
+          "realised_grip_N": [
+            38.51,
+            38.32
+          ],
+          "grip_samples": 874,
+          "contacted": [
+            "A_b_000",
+            "A_b_002",
+            "A_b_004",
+            "A_b_006"
+          ],
+          "gripped_bricks": [
+            "A_b_002",
+            "A_b_004"
+          ],
+          "max_F_N": {
+            "A_b_004": 26.87,
+            "A_b_000": 8.25,
+            "A_b_002": 5.33,
+            "A_b_006": 14.51
+          },
+          "max_M_Nm": {
+            "A_b_004": 0.1497,
+            "A_b_000": 0.0513,
+            "A_b_002": 0.0741,
+            "A_b_006": 0.1443
+          }
+        }
+      ],
+      "brace_search": [
+        {
+          "step": 6,
+          "pose": [
+            0.0,
+            0.132,
+            0.02
+          ],
+          "tilt": [
+            0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "hover [-0.16, 0.136, 0.1696]: boxed goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [-0.0001, 0.1288, 0.0709]: path clearance 0.15 mm at other arm (sample 50/61); full-sphere-filter goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); hover [-0.16, 0.136, 0.2496]: boxed goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [-0.0001, 0.1288, 0.0709]: path clearance 0.18 mm at other arm (sample 53/67); full-sphere-filter goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); hover [-0.16, 0.136, 0.3296]: boxed goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [-0.0001, 0.1288, 0.0709]: path clearance -0.56 mm at other arm (sample 75/88); full-sphere-filter goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); hover [-0.08, 0.136, 0.2496]: boxed goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [-0.0001, 0.1288, 0.0709]: path clearance 0.43 mm at other arm (sample 45/59); full-sphere-filter goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); hover [0.0, 0.136, 0.3296]: boxed goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [-0.0001, 0.1288, 0.0709]: path clearance -0.81 mm at other arm (sample 50/59); full-sphere-filter goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [-0.0001, 0.1288, 0.0709]: cuRobo plan failed: no result (IK/start feasibility)"
+        },
+        {
+          "step": 6,
+          "pose": [
+            0.0,
+            0.118,
+            0.02
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.0697, 0.0329]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.0697, 0.0329]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.0697, 0.0329]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0697, 0.0329]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0697, 0.0329]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.0697, 0.0329]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.0697, 0.0329]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.0697, 0.0329]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.0697, 0.0329]: cuRobo plan failed: no result (IK/start feasibility)"
+        },
+        {
+          "step": 6,
+          "pose": [
+            0.0,
+            0.13,
+            0.02
+          ],
+          "tilt": [
+            1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "guard_stop"
+        },
+        {
+          "step": 6,
+          "pose": [
+            0.0,
+            0.138,
+            0.02
+          ],
+          "tilt": [
+            -1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.1863, 0.0329]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1863, 0.0329]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1863, 0.0329]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1863, 0.0329]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1863, 0.0329]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1863, 0.0329]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.1863, 0.0329]: path clearance 1.07 mm at A_b_005 (sample 34/39); contact-full-sphere-filter goal [0.0, 0.1863, 0.0329]: path clearance 1.07 mm at A_b_005 (sample 34/39); contact-full-sphere-filter goal [0.0, 0.1863, 0.0329]: path clearance 1.07 mm at A_b_005 (sample 34/39)"
+        },
+        {
+          "step": 6,
+          "pose": [
+            0.0,
+            0.136,
+            0.02
+          ],
+          "tilt": [
+            -1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.1457, 0.0226]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1457, 0.0226]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.1457, 0.0226]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1457, 0.0226]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1457, 0.0226]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.1457, 0.0226]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.1457, 0.0226]: path clearance 1.19 mm at A_b_005 (sample 12/39); contact-full-sphere-filter goal [0.0, 0.1457, 0.0226]: path clearance 1.19 mm at A_b_005 (sample 12/39); contact-full-sphere-filter goal [0.0, 0.1457, 0.0226]: path clearance 0.89 mm at A_b_005 (sample 5/20)"
+        },
+        {
+          "step": 6,
+          "pose": [
+            0.0,
+            0.13,
+            0.02
+          ],
+          "tilt": [
+            1.0472,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": true
+        }
+      ]
+    },
+    "B": {
+      "structure": "S3",
+      "placed": 0,
+      "preplaced": 6,
+      "total": 16,
+      "completed_steps": 6,
+      "supports": [],
+      "brace_search": []
+    }
+  },
+  "contacts": {
+    "stud_mating": {
+      "count": 1,
+      "examples": [
+        {
+          "class": "stud_mating",
+          "a": "brick:A_b_004#32",
+          "b": "brick:A_b_006#34",
+          "phase": {
+            "A": "press",
+            "B": "hold"
+          },
+          "start_frame": 2868,
+          "max_pen_mm": -1.646,
+          "peak_force_n": 0.42,
+          "end_frame": 2868,
+          "geometry": {
+            "upper": "A_b_006",
+            "lower": "A_b_004",
+            "stud_shape": 192,
+            "upper_shape": 212,
+            "stud_type": 8,
+            "upper_type": 8,
+            "stud_local_z": 0.0,
+            "contact_frame": 2868,
+            "contact_world": [
+              -0.001999872736632824,
+              0.13355030119419098,
+              0.03293128311634064
+            ],
+            "contact_local": [
+              -0.002119620800554702,
+              0.0053928193563747145,
+              0.010594635814613593
+            ],
+            "lower_dims": [
+              0.016,
+              0.016
+            ]
+          },
+          "duration_frames": 1,
+          "contact_frames": 1,
+          "fragments": 1
+        }
+      ]
+    },
+    "neighbour_rub": {
+      "count": 1,
+      "examples": [
+        {
+          "class": "neighbour_rub",
+          "a": "brick:A_b_004#32",
+          "b": "brick:A_b_006#34",
+          "phase": {
+            "A": "press",
+            "B": "hold"
+          },
+          "start_frame": 2868,
+          "max_pen_mm": -1.646,
+          "peak_force_n": 12.0,
+          "end_frame": 2883,
+          "duration_frames": 16,
+          "contact_frames": 16,
+          "fragments": 1
+        }
+      ]
+    }
+  },
+  "parallel_frames": 0,
+  "diagnostic": true,
+  "motion": {
+    "strict": true,
+    "workarounds": [
+      {
+        "step": 6,
+        "arm": "A",
+        "phase": "pre-insert",
+        "method": "full-sphere-filter"
+      }
+    ],
+    "failures": [
+      {
+        "arm": "A",
+        "phase": "clearance",
+        "error": "boxed goal [-0.1496, -0.0068, 0.3509]: cuRobo plan failed: unknown status; boxed goal [-0.1496, -0.0068, 0.3509]: cuRobo plan failed: unknown status; boxed goal [-0.1496, -0.0068, 0.3509]: cuRobo plan failed: unknown status; full-sphere-filter goal [-0.1496, -0.0068, 0.3509]: path clearance -0.05 mm at other arm (sample 10/63); full-sphere-filter goal [-0.1496, -0.0068, 0.3509]: cuRobo plan failed: unknown status; full-sphere-filter goal [-0.1496, -0.0068, 0.3509]: cuRobo plan failed: unknown status; full-sphere-filter goal [-0.1496, -0.0068, 0.3509]: cuRobo plan failed: unknown status",
+        "step": 6,
+        "request": {
+          "arm": "A",
+          "q": [
+            0.2737702429294586,
+            0.03163500875234604,
+            0.005642901640385389,
+            -2.496108293533325,
+            -0.0009151879348792136,
+            2.5376429557800293,
+            -0.5052744150161743
+          ],
+          "ee": [
+            0.0028932851273566484,
+            0.12992773950099945,
+            0.17033988237380981
+          ],
+          "goal": [
+            -0.14960098987032724,
+            -0.006828756006558609,
+            0.3509006376266479
+          ],
+          "quat": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "zone_clear": true,
+          "dt": 0.02,
+          "yaw": 1.5707963267948966,
+          "boxes": [
+            {
+              "name": "table",
+              "dims": [
+                2.0,
+                2.0,
+                0.1
+              ],
+              "c": [
+                0.0,
+                0.0,
+                -0.05
+              ],
+              "yaw": 0.0
+            },
+            {
+              "name": "plate_A",
+              "dims": [
+                0.048,
+                0.112,
+                0.0032
+              ],
+              "c": [
+                0.0,
+                0.16,
+                0.0016
+              ],
+              "yaw": 0.0
+            },
+            {
+              "name": "plate_B",
+              "dims": [
+                0.048,
+                0.112,
+                0.0032
+              ],
+              "c": [
+                0.0,
+                -0.16,
+                0.0016
+              ],
+              "yaw": 0.0
+            },
+            {
+              "name": "A_b_000",
+              "dims": [
+                0.016,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                1.3885370435673394e-06,
+                0.12799975275993347,
+                0.008852814143151044
+              ],
+              "yaw": 0.0002950762907363384
+            },
+            {
+              "name": "A_b_001",
+              "dims": [
+                0.016,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                6.247301355021788e-26,
+                0.19200000166893005,
+                0.008849987579137086
+              ],
+              "yaw": 1.0435621546105315e-31
+            },
+            {
+              "name": "A_b_002",
+              "dims": [
+                0.016,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                1.552295907458756e-05,
+                0.1280091106891632,
+                0.01845953548848629
+              ],
+              "yaw": 0.00016236058123967123
+            },
+            {
+              "name": "A_b_003",
+              "dims": [
+                0.016,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                -1.1237916454072232e-15,
+                0.19200000166893005,
+                0.018449971736967562
+              ],
+              "yaw": 2.898959734311218e-31
+            },
+            {
+              "name": "A_b_004",
+              "dims": [
+                0.016,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                1.9473862266750075e-05,
+                0.12803664803504944,
+                0.02806702191531658
+              ],
+              "yaw": -0.0005399938079475915
+            },
+            {
+              "name": "A_b_005",
+              "dims": [
+                0.016,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                -3.745973563078989e-15,
+                0.19200000166893005,
+                0.028049965673685073
+              ],
+              "yaw": 3.9090603842805957e-31
+            },
+            {
+              "name": "A_b_006",
+              "dims": [
+                0.032,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                1.652497667237185e-05,
+                0.13608607649803162,
+                0.03763186680674553
+              ],
+              "yaw": 1.5692988684997737
+            },
+            {
+              "name": "A_b_007",
+              "dims": [
+                0.032,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                -0.10000000149011612,
+                0.36000001430511475,
+                0.005653886771537509
+              ],
+              "yaw": 1.5707963566088678
+            },
+            {
+              "name": "A_b_008",
+              "dims": [
+                0.016,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                -0.17000000178813934,
+                0.4300000071525574,
+                0.005648284531216086
+              ],
+              "yaw": -4.041225893183491e-05
+            },
+            {
+              "name": "A_b_009",
+              "dims": [
+                0.016,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                -0.3100000023841858,
+                0.5,
+                0.005648284530988712
+              ],
+              "yaw": -4.083029087690642e-05
+            },
+            {
+              "name": "A_b_010",
+              "dims": [
+                0.048,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                -0.23999999463558197,
+                0.5,
+                0.005656465776095865
+              ],
+              "yaw": 1.5707963586461169
+            },
+            {
+              "name": "B_b_000",
+              "dims": [
+                0.016,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                -8.110984627308846e-26,
+                -0.19200000166893005,
+                0.008849987579137086
+              ],
+              "yaw": -9.027130696764866e-32
+            },
+            {
+              "name": "B_b_001",
+              "dims": [
+                0.016,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                3.1166433740012353e-26,
+                -0.12800000607967377,
+                0.008849987579137086
+              ],
+              "yaw": -3.6109417338265115e-32
+            },
+            {
+              "name": "B_b_002",
+              "dims": [
+                0.016,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                -1.1237916454072232e-15,
+                -0.19200000166893005,
+                0.018449971736967562
+              ],
+              "yaw": -2.8774893299934093e-31
+            },
+            {
+              "name": "B_b_003",
+              "dims": [
+                0.016,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                -1.1237916454072232e-15,
+                -0.12800000607967377,
+                0.018449971736967562
+              ],
+              "yaw": -9.283020535514359e-32
+            },
+            {
+              "name": "B_b_004",
+              "dims": [
+                0.016,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                -3.745973563078989e-15,
+                -0.19200000166893005,
+                0.028049965673685073
+              ],
+              "yaw": -3.951483975401696e-31
+            },
+            {
+              "name": "B_b_005",
+              "dims": [
+                0.016,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                -3.745973563078989e-15,
+                -0.12800000607967377,
+                0.028049965673685073
+              ],
+              "yaw": -1.2845655328994768e-31
+            },
+            {
+              "name": "B_b_006",
+              "dims": [
+                0.016,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                0.23999999463558197,
+                -0.4300000071525574,
+                0.005648284523258007
+              ],
+              "yaw": -4.082861726506603e-05
+            },
+            {
+              "name": "B_b_007",
+              "dims": [
+                0.016,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                0.10000000149011612,
+                -0.36000001430511475,
+                0.005648284530875025
+              ],
+              "yaw": -4.08284605231677e-05
+            },
+            {
+              "name": "B_b_009",
+              "dims": [
+                0.016,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                0.17000000178813934,
+                -0.4300000071525574,
+                0.005648284536900428
+              ],
+              "yaw": -4.0828810666297006e-05
+            },
+            {
+              "name": "B_b_008",
+              "dims": [
+                0.032,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                0.3100000023841858,
+                -0.5,
+                0.0056516882979707585
+              ],
+              "yaw": 1.5707965199129155
+            },
+            {
+              "name": "B_b_011",
+              "dims": [
+                0.016,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                0.23999999463558197,
+                -0.5,
+                0.005648284531102399
+              ],
+              "yaw": -4.082988663560667e-05
+            },
+            {
+              "name": "B_b_010",
+              "dims": [
+                0.048,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                0.10000000149011612,
+                -0.4300000071525574,
+                0.005656604605914617
+              ],
+              "yaw": 1.5707963867912136
+            },
+            {
+              "name": "B_b_013",
+              "dims": [
+                0.016,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                0.17000000178813934,
+                -0.5,
+                0.0056482820136210645
+              ],
+              "yaw": 4.130664808779305e-05
+            },
+            {
+              "name": "B_b_012",
+              "dims": [
+                0.032,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                0.10000000149011612,
+                -0.5,
+                0.0056526882182737605
+              ],
+              "yaw": 1.5707964241428216
+            },
+            {
+              "name": "B_b_014",
+              "dims": [
+                0.032,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                0.3799999952316284,
+                -0.4300000071525574,
+                0.005653269284661655
+              ],
+              "yaw": 1.5707964789783329
+            },
+            {
+              "name": "B_b_015",
+              "dims": [
+                0.032,
+                0.016,
+                0.0113
+              ],
+              "c": [
+                0.3799999952316284,
+                -0.5,
+                0.005653335347400934
+              ],
+              "yaw": 1.570796468031499
+            }
+          ],
+          "other_q": [
+            -0.4763147532939911,
+            0.6749278903007507,
+            0.4983229339122772,
+            -2.2798757553100586,
+            -1.5795354843139648,
+            1.8014262914657593,
+            0.5071662068367004,
+            0.007849408313632011,
+            0.007766796741634607
+          ],
+          "full_path": true,
+          "grip": 0.01,
+          "carried": null,
+          "alternate_goals": [],
+          "contact_tail": false,
+          "tilt": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "allowed_finger_contacts": [],
+          "proposal_build": null,
+          "clearance": 0.001
+        }
+      }
+    ],
+    "plans": 18,
+    "plan_failures": 1,
+    "captures": 0,
+    "segments": 18,
+    "min_clearance_m": -0.0011251426977423803,
+    "clearance_scope": "executed joints during planned playback; full spheres, measured fingers"
+  },
+  "reserved_parallel_frames": 3,
+  "initial_settling_xy_m": 3.745973563078989e-15,
+  "ok": false,
+  "full_build": false
+}

@@ -1,0 +1,59 @@
+{
+  "ok": false,
+  "full_build": false,
+  "errors": [
+    "recorded arm-arm contact",
+    "recorded execution failure: A:gate_miss",
+    "A: incomplete/nonmonotonic own-build progress",
+    "A step 10: no recorded mating",
+    "B: incomplete/nonmonotonic own-build progress",
+    "B step 9: no recorded mating",
+    "B step 9: no insertion frames",
+    "B step 9: no measured two-finger support force",
+    "B step 9: support was not requested before pickup",
+    "B step 10: no recorded mating",
+    "B step 10: no insertion frames",
+    "B step 11: no recorded mating",
+    "B step 11: no insertion frames",
+    "B step 11: no measured two-finger support force",
+    "B step 11: support was not requested before pickup",
+    "B step 12: no recorded mating",
+    "B step 12: no insertion frames",
+    "B step 13: no recorded mating",
+    "B step 13: no insertion frames",
+    "B step 13: no measured two-finger support force",
+    "B step 13: support was not requested before pickup",
+    "B step 14: no recorded mating",
+    "B step 14: no insertion frames",
+    "B step 14: no measured two-finger support force",
+    "B step 14: support was not requested before pickup",
+    "B step 15: no recorded mating",
+    "B step 15: no insertion frames",
+    "B step 15: no measured two-finger support force",
+    "B step 15: support was not requested before pickup",
+    "unserved support request",
+    "contact monitor: arm_arm",
+    "detailed contact evidence: arm_arm",
+    "detailed contact evidence: arm_arm",
+    "execution did not finish cleanly"
+  ],
+  "recorded_parallel_frames": 1544,
+  "grants": [
+    {
+      "arm": "A",
+      "step": 6,
+      "time": 164.58333333335645
+    },
+    {
+      "arm": "A",
+      "step": 7,
+      "time": 200.6666666667185
+    },
+    {
+      "arm": "A",
+      "step": 10,
+      "time": 318.93333333337193
+    }
+  ],
+  "frames": 21021
+}

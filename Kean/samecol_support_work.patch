@@ -1,0 +1,816 @@
+diff --git a/Kean/dual_build.py b/Kean/dual_build.py
+index f931e32..a2e2729 100644
+--- a/Kean/dual_build.py
++++ b/Kean/dual_build.py
+@@ -16,6 +16,21 @@ from Kean.acceptance import bricks_for
+ from Kean.dual_coordinator import Coordinator
+ from Kean.motion.world import brick_boxes, plate_box, box_gap
+ 
++# (structure, step) pairs that keep run 030's support handling under --stud-fit: the builder
++# stages at its park and escapes before the support lets go, and a rejected helper parks
++# directly. User's choice for S3's last step: dual_arch_s3_studfit_003 broke B_b_014 on B_b_012
++# (u 2.1) on the support's approach there, with the same 75 deg pose run 030 held.
++LEGACY_SUPPORT = {('S3', 15)}
++# Per-step stud-fit support settings, copied into the step's brace by plans_for:
++#   release_lift: the builder slides its closed fingers up this far before opening on the stud
++#     tops (the stud-fit hold keeps the brick there). Arch 7's opening fingertips grazed the hold
++#     (0.6 N, dual_arch_s3_studfit_003/004), and a hold kept 3 mm under the brick was out of
++#     reach (all IK-infeasible, dual_arch_s3_studfit_005).
++#   press_headroom: the supported press may reach 1.0x and pushes through at 0.75x of needed
++#     (the crown's press peaked 60.8 N vs 60.5 needed in run 003, 54.0 N in run 004: gate miss).
++STEP_TUNING = {('arch', 7): dict(release_lift=0.003), ('arch', 10): dict(press_headroom=True)}
++STAGE_BACK = 0.10  # m, stud-fit supported steps: loaded builder waits this far behind its park, toward its base
++
+ 
+ def plans_for(names, separation=.32, stud_fit=False):
+     """Generate plans in independent frames; keep grid/force data together.
+@@ -54,8 +69,15 @@ def plans_for(names, separation=.32, stud_fit=False):
+             plan.update(structure_id=name, context_name=internal, owner=arm)
+             for step in plan['sequence']:
+                 step['placer_arm'] = arm
++                if stud_fit and step.get('brace') and (name, step['step']) in STEP_TUNING:
++                    step['brace'].update(STEP_TUNING[(name, step['step'])])
+                 if step['requires_brace'] and not step['brace'].get('feasible', True):
+                     raise ValueError('%s step %s has no feasible generated support' % (arm, step['step']))
++                if stud_fit and step.get('brace') and not step['brace'].get('feasible', True):
++                    # The planner records an infeasible support as no support at all; under stud
++                    # fit that silently dropped arch 6/7's forced overhang supports.
++                    raise ValueError('%s step %s needs a support but none is feasible (%s)'
++                                     % (arm, step['step'], step['brace'].get('rationale')))
+             plans[arm] = plan
+             connections.extend(D.ST.connections(bricks))
+     finally:
+@@ -190,6 +212,22 @@ class Build:
+     def fail(self, reason):
+         self.cell.fail(self.owner + ':' + reason)
+ 
++    def legacy_support(self, n):
++        """Step n keeps run 030's support handling (LEGACY_SUPPORT)."""
++        return (self.plan.get('structure_id'), n) in LEGACY_SUPPORT
++
++    def stage_pose(self, n=None):
++        """Where the loaded or just-released builder waits beside a support: its park, but under
++        --stud-fit STAGE_BACK nearer its own base (not for a LEGACY_SUPPORT step). Same-column supports reach the arch's
++        centre-facing column from above the cell centre, where the park sits: 45/60 deg
++        approaches missed the staged builder by 0.18-0.76 mm (dual_samecol_diag_006), and the
++        retreat to the park hit the holding arm (-0.05 mm, dual_samecol_diag_007)."""
++        stage = self.parks[self.B].copy()
++        if getattr(self.cell, 'stud_fit', None) is not None and not (n is not None and self.legacy_support(n)):
++            back = np.asarray(self.B.base[0][:2], float) - stage[:2]
++            stage[:2] += STAGE_BACK * back / np.linalg.norm(back)
++        return stage
++
+     def start(self, n):
+         self.b_step, self.active = n, True
+         with self.planner_frame():
+@@ -230,9 +268,10 @@ class Build:
+             lift = self.B.moves[lift_index]
+             staged = lift['then']
+             lift['then'] = None
+-            self.B.push('transport', self.parks[self.B], lift['yaw'], lift['grip'], 1.5, then=staged)
++            stage = self.stage_pose(n)
++            self.B.push('transport', stage, lift['yaw'], lift['grip'], 1.5, then=staged)
+             self.B.moves.insert(lift_index + 1, self.B.moves.pop())
+-            self.B.moves[lift_index + 2]['pos'] = self.parks[self.B].copy()
++            self.B.moves[lift_index + 2]['pos'] = stage.copy()
+         # An ordinary step also ends empty-handed at a checked safe park pose.
+         if not self.plan['sequence'][n]['requires_brace']:
+             self.B.push('clearance', self.parks[self.B], 0., .01, 1.5)
+@@ -251,6 +290,45 @@ class Build:
+             top_press(self.B.moves, self.target[bid][0], press=D.PRESS, tip_below_tcp=D.TIP_BELOW_TCP,
+                       brick_h=D.P.BRICK_H, stud_h=D.ex.STUD_HEIGHT,
+                       grasp_offset=step['grasp'].get('tcp_offset_m', [0., 0.]))
++            lift = (step.get('brace') or {}).get('release_lift') if step['requires_brace'] else None
++            if lift:
++                # After top_press: it takes the first 'release' as the one whose callback moves to
++                # the press, and a lift spliced in first marked the brick placed before its press
++                # (unintended press contacts, dual_samecol_diag_027).
++                release = next(m for m in self.B.moves if m['phase'] == 'release')
++                k = self.B.moves.index(release)
++                closed = self.B.moves[k - 1]['grip']
++                release['pos'] = release['pos'] + [0., 0., lift]
++                self.B.moves.insert(k, dict(release, grip=closed, then=None, dur=0.3))
++            if step['requires_brace'] and getattr(self.cell, 'support_after_place', False):
++                self.support_after_place(n)
++
++    def support_after_place(self, n):
++        """--support-after-place (diagnostic order): the builder sets the brick on the stud tops,
++        backs off to its stage, the helper grips, and only then the builder returns for the
++        closed-tip press. The default order grips before the loaded builder leaves its stage.
++        Hovering over the brick instead left no planned helper approach to the arch's left
++        column (all IK-infeasible or ~1.1 mm from the builder, dual_arch_placefirst_diag_001)."""
++        moves = self.B.moves
++        transport = next(m for m in moves if m['phase'] == 'transport' and m['then'] is not None)
++        staged, transport['then'] = transport['then'], None
++        next(m for m in moves if m['phase'] == 'stage')['wait'] = None
++        release = next(m for m in moves if m['phase'] == 'release')
++        rise = next(m for m in moves[moves.index(release):] if m['phase'] == 'press')
++        stage = self.stage_pose(n)
++        up = np.array(rise['pos'], float)
++        up[2] = max(up[2], stage[2])
++        k = moves.index(rise) + 1
++        moves[k:k] = [
++            # Straight up as a contact move: the press hover is sized for a seated brick, so over
++            # one still on the stud tops the open tips sat 0.3 mm in it and a planned move refused
++            # to start (dual_arch_placefirst_diag_002).
++            dict(rise, phase='clearance', pos=up, dur=1.0, then=None, wait=None, contact=True),
++            dict(rise, phase='clearance', pos=stage.copy(), dur=1.5, then=staged, wait=None, contact=False),
++            # Wait in a 'stage' of its own: a waiting move keeps its reservation (diag_016).
++            dict(rise, phase='stage', pos=stage.copy(), dur=0.2, then=None, contact=False,
++                 wait=lambda: n in self.braced),
++        ]
+ 
+     def finger_model(self):
+         checker = self.cell.tick.clearance
+@@ -802,9 +880,9 @@ class DualExample(D.Example):
+     def allowed_finger_contacts(self, arm, phase):
+         if self.roles[arm] != 'supporter' or phase not in ('brace-in', 'brace-guard', 'close', 'hold', 'open', 'retract'):
+             return ()
++        from Kean.motion.stud_fit import support_contacts
+         view = self.role_views[arm]
+-        brace = view.plan['sequence'][view.b_step]['brace']
+-        return tuple(brace.get('gripped_bricks') or [brace['target_brick_id']])
++        return support_contacts(D.P, view.plan, view.b_step, self.stud_fit is not None)
+ 
+     def neighbours_of(self, bid):
+         if not hasattr(self, '_neighbours'):
+@@ -842,9 +920,8 @@ class DualExample(D.Example):
+         if owner is not None:
+             view = self.views[owner]
+             if view.A.phase in view.brace_contact_phases:
+-                from Kean.motion.stud_fit import helper_brace_finger_ok
+-                brace = view.plan['sequence'][view.b_step]['brace']
+-                gripped = brace.get('gripped_bricks') or [brace['target_brick_id']]
++                from Kean.motion.stud_fit import helper_brace_finger_ok, support_contacts
++                gripped = support_contacts(D.P, view.plan, view.b_step, self.stud_fit is not None)
+                 active = view.plan['sequence'][view.b_step]['brick_id']
+                 if helper_brace_finger_ok(pair, view.A.name[0], gripped, active,
+                                           self.stud_fit is not None):
+@@ -931,8 +1008,8 @@ class DualExample(D.Example):
+                     k = next(b['grid_pos'][2] for b in view.plan['bricks'] if b['id'] == active)
+                     permitted.update(b['id'] for b in view.plan['bricks'] if b['grid_pos'][2] in (k, k - 1))
+             elif self.roles[arm] == 'supporter' and self.arms[arm].phase in ('brace-in', 'brace-guard', 'close', 'hold', 'open', 'retract'):
+-                brace = view.plan['sequence'][view.b_step]['brace']
+-                permitted.update(brace.get('gripped_bricks') or [brace['target_brick_id']])
++                from Kean.motion.stud_fit import support_contacts
++                permitted.update(support_contacts(D.P, view.plan, view.b_step, self.stud_fit is not None))
+                 if self.stud_fit is not None and view.b_step is not None:
+                     # Near-press: the builder's brick approaches the holding hand
+                     # (command_clearance A:B_b_014 at 0.56 mm, dual_studfit_diag_031).
+diff --git a/Kean/motion/brace_search.py b/Kean/motion/brace_search.py
+index 805bd97..8b0ece9 100644
+--- a/Kean/motion/brace_search.py
++++ b/Kean/motion/brace_search.py
+@@ -7,6 +7,8 @@ import numpy as np
+ from Kean.motion.plan_curobo import Request, PlannerUnavailable
+ from Kean.motion.tick import planner_yaw, resolve_wrap
+ 
++RETREAT_Z = 0.22  # m, --stud-fit: a rejected helper lifts this high before parking
++
+ 
+ def candidates(ex, n, original, D, limit=8):
+     """Reuse the support generator and force model; preserve the required brace."""
+@@ -21,15 +23,28 @@ def candidates(ex, n, original, D, limit=8):
+     order = P.sequence(P.STRUCTURES[ex.name])
+     brick, placed = order[n], order[:n]
+     pose = original['brace_pose']
+-    positions = bracing.candidates(brick, placed)
++    clear, path = None, None
++    from Kean.motion.stud_fit import column_candidates, column_clearance, load_path, under_press
++    if getattr(ex, 'brace_near_first', False) and under_press(P, ex.plan, n, original):
++        # --stud-fit same-column grip: retries stay on the pressed column, as planned
++        # (stud_fit.near_press_assign). Bridge grips keep run 030's retries: these extra
++        # positions crowded out its winning 75 deg hold at S3 step 14 (dual_samecol_diag_021).
++        clear, path = column_clearance(P, bracing, brick), load_path(P, brick, placed)
++    # Same-column grips need the planner's height offsets too: no quarter-brick height fits the
++    # arch's 3-brick columns, and arch step 7 had nothing to retry (dual_samecol_diag_025).
++    positions = (column_candidates(P, bracing, brick, placed, clear) if clear is not None
++                 else bracing.candidates(brick, placed, clear))
+     lateral = getattr(ex, 'brace_lateral_offsets', ())
+     if lateral:
+         positions = [(y + dy, z) for y, z in positions for dy in (0., *lateral)
+-                     if bracing.feasible(brick, placed, y + dy, z)]
++                     if bracing.feasible(brick, placed, y + dy, z, clear)]
+     offsets = getattr(ex, 'brace_height_offsets', ())
+     if offsets:
+         positions = [(y, z + dz) for y, z in positions for dz in (0., *offsets)
+-                     if bracing.feasible(brick, placed, y, z + dz)]
++                     if bracing.feasible(brick, placed, y, z + dz, clear)]
++    if path is not None:
++        positions = [(y, z) for y, z in positions
++                     if bracing.gripped(placed, y, z) and set(bracing.gripped(placed, y, z)) <= path]
+     # Cover different columns before spending physical trials on nearby heights.
+     # The old target-first ordering exhausted all eight trials at y=-36 mm.
+     ys = sorted({round(y, 8) for y, _ in positions},
+@@ -67,6 +82,8 @@ def candidates(ex, n, original, D, limit=8):
+                                 strategy=original.get('strategy', 'weakest_joint'))
+         if not pick.get('feasible'):
+             continue
++        # Per-step stud-fit settings (dual_build.STEP_TUNING) ride along with every retry.
++        pick.update({k: original[k] for k in ('press_headroom', 'release_lift') if k in original})
+         # Do not trade the support's load capacity for motion clearance.
+         if pick['predicted_util_braced'] > original['predicted_util_braced'] + 1e-4:
+             continue
+@@ -184,6 +201,13 @@ def _retreat_helper(ex, D, then, *, open_first, back_scale=1., lift_first=False)
+         ex.A.push('open', np.asarray(p), yaw, g_open, .4, tilt=tilt, contact=True)
+         grip = g_open
+     ex.A.push('retract', back, yaw, grip, .8 if not open_first else .6, tilt=tilt)
++    legacy = hasattr(ex, 'legacy_support') and ex.legacy_support(ex.b_step)
++    if getattr(ex, 'stud_fit', None) is not None and not legacy:
++        # Straight up before parking: from the low retreat pose by the column, planning the park
++        # directly failed ("unknown status", dual_samecol_diag_026 arch 9; pyramid_s3_studfit_031).
++        up = np.array(back, float)
++        up[2] = max(up[2], RETREAT_Z)
++        ex.A.push('retract', up, yaw, grip, .8, tilt=tilt)
+     ex.A.push('park', ex.parks[ex.A], 0., 0., 1.5, then=done)
+ 
+ 
+@@ -229,6 +253,20 @@ def install(ex, planner, world, carried, D):
+         def pose_key(pick):
+             return tuple(np.round(pick['brace_pose'], 5))
+ 
++        def tilt_key(pick):
++            return tuple(np.round(pick['brace_tilt_rotvec'], 4))
++
++        guard_leans = []  # (y, tilt) of GUARD STOPs: that lean scrapes the whole column
++        # Lean-specific burns are for same-column grips (arch 6); bridge retries keep run 030's.
++        from Kean.motion.stud_fit import under_press
++        column = getattr(self, 'brace_near_first', False) and under_press(D.P, self.plan, n, brace)
++
++        def burned(pick):
++            if pose_key(pick) in skip_poses or pose_key(pick) + tilt_key(pick) in skip_poses:
++                return True
++            return any(t == tilt_key(pick) and abs(pick['brace_pose'][1] - y) < avoid_y_tol
++                       for y, t in guard_leans)
++
+         def take_pick():
+             while True:
+                 if deferred and not avoid_ys:
+@@ -238,12 +276,12 @@ def install(ex, planner, world, carried, D):
+                 except StopIteration:
+                     while deferred:
+                         pick = deferred.pop(0)
+-                        if pose_key(pick) in skip_poses:
++                        if burned(pick):
+                             print('brace search skip same pose step %d: %s' % (n, pick['brace_pose']), flush=True)
+                             continue
+                         return pick
+                     return None
+-                if pose_key(pick) in skip_poses:
++                if burned(pick):
+                     print('brace search skip same pose step %d: %s' % (n, pick['brace_pose']), flush=True)
+                     continue
+                 if avoid_ys and any(abs(pick['brace_pose'][1] - y) < avoid_y_tol for y in avoid_ys):
+@@ -275,8 +313,16 @@ def install(ex, planner, world, carried, D):
+                 print('brace search rejected %s step %d' % (reason, n), flush=True)
+                 # Guard-stop and grip failures burn this TCP: open/retract through
+                 # the scrape displaces neighbours (studfit_017 B_b_010).
+-                if reason.startswith('support_') or reason == 'guard_stop':
++                if reason.startswith('support_') or (reason == 'guard_stop' and not column):
+                     skip_poses.add(pose_key(pick))
++                elif reason == 'guard_stop':
++                    # Only this lean: arch step 6's 75 deg approaches from the cell centre all
++                    # scraped the column top, and the pose burn also dropped every 60/45 deg
++                    # twin (dual_samecol_diag_003).
++                    skip_poses.add(pose_key(pick) + tilt_key(pick))
++                    # Every 75 deg twin on that column then scraped the same top brick, and the
++                    # third broke A_b_000 off the plate at u 1.112 (dual_samecol_diag_005).
++                    guard_leans.append((float(pick['brace_pose'][1]), tilt_key(pick)))
+                 if reason == 'guard_stop':
+                     avoid_ys.append(float(pick['brace_pose'][1]))
+                 self.before_braced = None
+@@ -304,8 +350,9 @@ def install(ex, planner, world, carried, D):
+                     # Closed-finger reject at this column: a nearby Y twin often
+                     # GUARD STOPs into the same scrape, and the retreat displaces
+                     # neighbours (studfit_021/022 step 13: -0.188 plan → -0.19
+-                    # GUARD STOP → B_b_010/008 displaced).
+-                    skip_poses.add(pose_key(pick))
++                    # GUARD STOP → B_b_010/008 displaced). This lean only: the reject is
++                    # lean-specific (IK, clearance), and other leans are other approaches.
++                    skip_poses.add(pose_key(pick) + (tilt_key(pick) if column else ()))
+                     avoid_ys.append(float(pick['brace_pose'][1]))
+                     self.A.moves.clear()
+                     self.on_guard_abandon = None
+@@ -321,9 +368,12 @@ def install(ex, planner, world, carried, D):
+                 if record.get('error') == 'guard_stop':
+                     return
+                 rebase()
++                placed_first = getattr(getattr(self, 'cell', None), 'support_after_place', False)
+                 try:
+-                    check_approach(self, planner, world, carried, D)
+-                    if hasattr(self, 'check_insertion_clearance'):
++                    # --support-after-place: the brick is already on the studs; no approach to check.
++                    if not placed_first:
++                        check_approach(self, planner, world, carried, D)
++                    if hasattr(self, 'check_insertion_clearance') and not placed_first:
+                         self.check_insertion_clearance()
+                 except PlannerUnavailable as exc:
+                     record['error'] = str(exc)
+@@ -344,7 +394,8 @@ def install(ex, planner, world, carried, D):
+                 # releasing B from stage; refuse and try the next pose if not.
+                 def before_braced(_n):
+                     try:
+-                        check_approach(self, planner, world, carried, D)
++                        if not placed_first:
++                            check_approach(self, planner, world, carried, D)
+                     except PlannerUnavailable as exc:
+                         abandon_hold('held approach: ' + str(exc))
+                         return False  # do not braced.add; retreat already queued
+diff --git a/Kean/motion/coordinated.py b/Kean/motion/coordinated.py
+index eb54595..05b1180 100644
+--- a/Kean/motion/coordinated.py
++++ b/Kean/motion/coordinated.py
+@@ -39,9 +39,41 @@ def install(example):
+             raise RuntimeError('shared placement queue no longer ends in retract')
+         released = move['then']
+         move['then'] = None
+-        ex.B.push('clearance', ex.parks[ex.B], move['yaw'], move['grip'], 1.5,
++        n = step.get('step')
++        legacy = hasattr(ex, 'legacy_support') and ex.legacy_support(n)
++        stage = ex.stage_pose(n) if hasattr(ex, 'stage_pose') else ex.parks[ex.B]
++        if getattr(ex, 'stud_fit', None) is not None and not legacy:
++            # Under stud fit the support lets go first: atop its retract the builder announces
++            # the release and waits (a 'stage') until the helper is idle, then escapes. The brick
++            # has snapped by then. Escaping past a holding support had no planned way out: from
++            # the arch's left column even a straight lift started in collision
++            # (dual_samecol_diag_009-011), and from step 9's outward 75 deg hold it cut -2.31 mm
++            # (dual_arch_s3_studfit_002).
++            fired, retracted = [], released
++
++            def announce():
++                if not fired:
++                    fired.append(True)
++                    if retracted is not None:
++                        retracted()
++
++            def lifted():
++                """Runs once the builder has risen off the pressed brick (Build.start splices
++                the stud-fit press in before the retract later)."""
++                announce()
++                return ex.A.idle()
++            # Wait in a 'stage' of its own: a waiting retract keeps its motion reservation, and
++            # the helper's 'open' could never begin (dual_samecol_diag_016).
++            ex.B.push('stage', move['pos'], move['yaw'], move['grip'], 0.2, wait=lifted)
++            released = None
++            # Straight up first: a same-column support leans out from under the pressed brick,
++            # and the diagonal escape cut its wrist (-1.6/-3.7 mm, dual_samecol_diag_009/010).
++            up = np.array(move['pos'], float)
++            up[2] = max(up[2], stage[2])
++            ex.B.push('clearance', up, move['yaw'], move['grip'], 1.0)
++        ex.B.push('clearance', stage, move['yaw'], move['grip'], 1.5,
+                   then=released)
+-        ex.B.push('stage', ex.parks[ex.B], move['yaw'], move['grip'], 0.2,
++        ex.B.push('stage', stage, move['yaw'], move['grip'], 0.2,
+                   wait=lambda: ex.A.idle())
+         _clear_transport(ex)
+ 
+diff --git a/Kean/motion/stud_fit.py b/Kean/motion/stud_fit.py
+index 8987cdb..29dcf38 100644
+--- a/Kean/motion/stud_fit.py
++++ b/Kean/motion/stud_fit.py
+@@ -52,6 +52,16 @@ SETTLE = 0.25       # s after the push-through before the snap: the press bent S
+ POST_SNAP = 0.5     # minimum s after a braced snap; breaker also stays off while the
+                     # support still holds (diag_046 broke at u 1.290 after the grace alone)
+ HAND_KEEP_OUT = 0.020  # m, planner keep-out between the support grip and the pressed brick
++CENTRE_LEAN = 60.  # deg, same-column support leaning toward the cell centre (centre_tilt)
++SUPPORT_PAD_HALF = 0.0085  # m, bracing.PAD_HALF (Panda pad half-size)
++COLUMN_TOP_CLEAR = 0.0015  # m, a same-column support's tilted pad corner below the pressed brick. At
++                    # 0.4 mm the builder's fingertips met it (arch step 6, dual_arch_s3_studfit_002).
++                    # Not more: arch 6's lower 60 deg holds (z 0.0152/0.0164) brought the hand within
++                    # 0.95/0.99 mm of the baseplate, under the 1 mm guard (dual_samecol_diag_024).
++COLUMN_DZ = (-.0012, .0012, -.0024, .0024)  # m, height offsets for column_candidates
++PLATE_SINK = 0.001  # m the modelled corner may sit below the plate's stud tops: at 1.3 mm into them
++                    # (z 0.0152, 60 deg) the real hand measured 0.95 mm and tripped the 1 mm guard
++                    # (dual_arch_s3_studfit_003); fingertips are rounder than the square pad model.
+ CORRIDOR_CLEAR = 0.0012   # m, helper clearance from the insertion box without stud resistance
+ CORRIDOR_OVERLAP = 0.0015  # m: diag_032 fingers were 1.04-1.16 mm into the corridor; runtime 1.08 mm
+ SUPPORT_PATH_OVERLAP = 0.002  # m: studfit_008 B step 14 pre-insert path was -1.69 mm into the
+@@ -71,6 +81,8 @@ TOUCH = 0.002       # m: tips this close above the held brick's stud tops count
+                     # measured 0.05-0.15 mm above nominal in dual_studfit_diag_008)
+ BRACE_HAND = 0.90   # supported hand / needed
+ BRACE_PUSH = 0.85   # supported release fraction of needed
++HEADROOM_HAND = 1.0  # supported hand / needed, for a press_headroom step (dual_build.STEP_TUNING)
++HEADROOM_PUSH = 0.75  # supported release fraction of needed, same
+ BRACE_RAMP = 2.0    # s: slower supported press
+ 
+ 
+@@ -163,6 +175,15 @@ def support_motion_floor(stud_fit):
+     return -SUPPORT_PATH_OVERLAP if stud_fit else 0.001
+ 
+ 
++# Builder phases beside a holding support. 'clearance' is the escape that starts at the pressed
++# brick while the support still holds: from a 60 deg same-column grip the planner's best route out
++# was -1.60 mm at the holding arm (dual_samecol_diag_009).
++BUILDER_NEAR_SUPPORT = ('pre-insert', 'insert', 'press', 'release', 'retract', 'clearance')
++# Helper phases beside a builder in those phases. 'open'/'retract': a centre-leaning support lets go
++# first while the builder waits atop its retract (coordinated.install, --stud-fit).
++HELPER_NEAR_BUILDER = ('brace-in', 'brace-guard', 'close', 'hold', 'open', 'retract')
++
++
+ def near_support_press(roles, arms):
+     """True when one arm holds a support and the other is seating nearby.
+ 
+@@ -172,9 +193,8 @@ def near_support_press(roles, arms):
+     to plow a lateral escape through the tower (joint_break)."""
+     for helper, builder in (('A', 'B'), ('B', 'A')):
+         if (roles.get(helper) == 'supporter'
+-                and getattr(arms.get(helper), 'phase', None) in ('brace-in', 'brace-guard', 'close', 'hold')
+-                and getattr(arms.get(builder), 'phase', None) in (
+-                    'pre-insert', 'insert', 'press', 'release', 'retract')):
++                and getattr(arms.get(helper), 'phase', None) in HELPER_NEAR_BUILDER
++                and getattr(arms.get(builder), 'phase', None) in BUILDER_NEAR_SUPPORT):
+             return True
+     return False
+ 
+@@ -241,32 +261,118 @@ def helper_brace_finger_ok(pair, helper, gripped, active, stud_fit):
+ 
+ 
+ def overhanging(P, brick, placed):
+-    """True when `brick`, or any brick under it down to the baseplate, has a
+-    stud cell with nothing beneath it: the press then loads a joint that ties
+-    an overhang to the rest. S3 step 15 sits on the bridge from the overhang to
+-    the column and broke that 2-stud joint at u 1.03-1.13 unsupported
+-    (dual_studfit_diag_018/019); the planner's rigid model passed it."""
+-    by_id = {b[0]: b for b in placed}
+-    todo, seen = [brick], set()
+-    while todo:
+-        b = todo.pop()
+-        if b[0] in seen:
+-            continue
+-        seen.add(b[0])
+-        own, k = P.cells(b)
+-        if k == 0:
+-            continue
++    """True when a stud cell in the column under `brick`'s footprint has nothing beneath it, at
++    any course down to the baseplate: the press then loads a joint that ties an overhang to the
++    rest. S3 step 15 sits on the bridge from the overhang to the column and broke that 2-stud
++    joint at u 1.03-1.13 unsupported (dual_studfit_diag_018/019); the planner's rigid model passed
++    it. A brick set straight on a column (arch steps 8/9, on the column end of an overhanging 2x4)
++    loads only that column: it needs no forced support."""
++    own, k = P.cells(brick)
++    for layer in range(k - 1, -1, -1):
+         under = set()
+         for p in placed:
+             pc, pk = P.cells(p)
+-            if pk == k - 1:
++            if pk == layer:
+                 under |= own & pc
+         if under != own:
+             return True
+-        todo.extend(by_id[sid] for sid in P.supports(b, placed))
+     return False
+ 
+ 
++def load_path(P, brick, placed):
++    """Ids of the placed bricks under `brick`, down to the baseplate: the column(s) its press loads."""
++    by_id = {b[0]: b for b in placed}
++    out, todo = set(), list(P.supports(brick, placed))
++    while todo:
++        sid = todo.pop()
++        if sid not in out and sid in by_id:
++            out.add(sid)
++            todo.extend(P.supports(by_id[sid], placed))
++    return out
++
++
++def column_clearance(P, BR, brick):
++    """Support clearance: BR's y keep-out from the press, or a pad wholly below the pressed brick.
++    The keep-out alone barred every grip on the pressed column, so overhang supports landed on
++    the other column, off the load path (dual_arch_s3_studfit_001 arch 6-9, S3 9 and 11)."""
++    _, py, pz = P.brick_pose(brick)
++    floor = P.VOXEL_ORIGIN[2] + P.STUD_H - PLATE_SINK
++
++    def clear(b, y, z, lean):
++        if abs(y - py) >= BR.HAND_CLEARANCE_Y:
++            return True
++        reach = pad_reach(centre_tilt(lean, y) or lean)
++        return z + reach <= pz - COLUMN_TOP_CLEAR + 1e-9 and z - reach >= floor - 1e-9
++    return clear
++
++
++def pad_reach(tilt):
++    """Height of a support pad's corner above (and below) its centre at a lean about x."""
++    a = abs(float(tilt[0]))
++    return SUPPORT_PAD_HALF * (math.cos(a) + math.sin(a))
++
++
++def under_press(P, plan, n, brace):
++    """True when step n's support pad lies wholly under the pressed brick: a same-column grip
++    (column_clearance). The column-only rules (finger contacts, retry positions, lean burns)
++    apply to those alone; grips beside the press (S3's bridge) keep the run-030 behaviour."""
++    pose = brace.get('brace_pose')
++    if pose is None:
++        return False
++    k = next(b['grid_pos'][2] for b in plan['bricks'] if b['id'] == plan['sequence'][n]['brick_id'])
++    return pose[2] + SUPPORT_PAD_HALF <= plan['voxel_origin'][2] + k * P.BRICK_H + 1e-9
++
++
++def support_contacts(P, plan, n, stud_fit):
++    """Bricks a support's fingers may touch at step n: the gripped ones and, for a --stud-fit
++    grip wholly under the pressed brick (column_clearance), the rest of the pressed column and of
++    each gripped column. Closed on a flush column, such a finger overlaps the bricks next to its
++    pad by the same squeeze as the gripped ones (-1.28 mm at A_b_000 arch 6, -1.33 mm at
++    A_b_008 under the crown: dual_arch_s3_studfit_002, dual_samecol_diag_018). Grips beside the
++    press keep the gripped bricks only: allowing more let S3's 45 deg bridge holds through, and
++    step 15's broke B_b_014 on B_b_012 (dual_samecol_diag_020; 75 deg held in run 030)."""
++    brace = plan['sequence'][n]['brace']
++    out = set(brace.get('gripped_bricks') or [brace['target_brick_id']])
++    rows = {b['id']: (b['id'], b['type'], *b['grid_pos'], b['yaw_index']) for b in plan['bricks']}
++    seq = [s['brick_id'] for s in plan['sequence']]
++    if stud_fit and under_press(P, plan, n, brace):
++        placed = [rows[i] for i in seq[:n]]
++        out |= load_path(P, rows[seq[n]], placed)
++        column = set().union(*(P.cells(rows[g])[0] for g in out if g in rows))
++        out |= {b[0] for b in placed if P.cells(b)[0] & column}
++    return tuple(sorted(out))
++
++
++def column_candidates(P, BR, brick, placed, clearance=None):
++    """Grips under the pressed brick, on the planner's quarter-brick heights and COLUMN_DZ off them.
++    The quarter heights alone had none on the arch's 3-brick columns once the tilted pad kept
++    COLUMN_TOP_CLEAR and the plate floor: each one either crowded the top, sank into the plate's
++    studs or held one brick (no_feasible_grasp, arch 6/7); 1.2 mm under the mid-brick height holds
++    two. brace_search already retries the same offsets (brace_height_offsets)."""
++    clear = clearance or column_clearance(P, BR, brick)
++    raw = BR.candidates(brick, placed, lambda *a: True)
++    out = []
++    for y, z in raw:
++        for dz in (0., *COLUMN_DZ):
++            if (y, z + dz) not in out and BR.feasible(brick, placed, y, z + dz, clear):
++                out.append((y, z + dz))
++    return out
++
++
++def on_column(BR, placed, cands, path):
++    """Grips holding only bricks on the press's load path."""
++    return [c for c in cands if set(BR.gripped(placed, *c)) <= path and BR.gripped(placed, *c)]
++
++
++def centre_tilt(lean, y):
++    """A support leaning toward the cell centre (y = 0) grips at CENTRE_LEAN, not lean_for's 45 deg:
++    at 45 deg the arch's left column hold rose into the builder's descending hand (arm-arm contact,
++    -2.02 mm, dual_samecol_diag_017 step 8); 60 deg held at step 6. None keeps lean_for's."""
++    if float(lean[0]) * y <= 0:
++        return None
++    return [math.copysign(math.radians(CENTRE_LEAN), float(lean[0])), 0., 0.]
++
++
+ def near_press_assign(P, BR, original):
+     """bracing.assign for --stud-fit plans. The same safety test, plus a support
+     forced where `overhanging`. A grip on the bridge (bridge_bricks) wins over
+@@ -283,12 +389,20 @@ def near_press_assign(P, BR, original):
+         if r0.s * safety_factor < 1.0 and not forced:
+             return None
+         joint_bricks = {b for j, u in r0.util.items() if u * safety_factor >= 1.0 for b in j if b is not None}
+-        cands = BR.candidates(brick, placed, clearance)
++        # On-path grips clear of the press by the keep-out (the run-validated S3 bridge grips) first;
++        # only without one, grips under the pressed brick on its own column.
++        path = load_path(P, brick, placed)
++        cands = on_column(BR, placed, BR.candidates(brick, placed, clearance), path)
++        column = not cands
++        if column:
++            cands = on_column(BR, placed, column_candidates(P, BR, brick, placed, clearance), path)
+         if not cands:
+             return BR._record(brick, placed, None, r0, strategy, 'no_feasible_grasp')
+         pool = [c for c in cands if set(BR.gripped(placed, *c)) & joint_bricks] or cands
+         bridges = bridge_bricks(P, brick, placed)
+-        on_bridge = [c for c in cands if set(BR.gripped(placed, *c)) & bridges]
++        # A grip under the press skips the bridge preference (S3's bridge grips are beside it):
++        # it only reached arch 9's bridge brick A_b_007 with an inward 60 deg lean into the arch.
++        on_bridge = [] if column else [c for c in cands if set(BR.gripped(placed, *c)) & bridges]
+         if on_bridge:
+             pool = on_bridge
+         _, py, pz = P.brick_pose(brick)
+@@ -298,12 +412,21 @@ def near_press_assign(P, BR, original):
+             r = BR.predicted(brick, placed, br)
+             scored.append((r.s, y, z, br, r))
+         safe = [c for c in scored if c[0] * safety_factor < 1.0]
+-        pick = (min(safe, key=lambda c: (round(math.hypot(c[1] - py, c[2] - pz), 4), c[0])) if safe
++        # Equally near, the hand outside the structure's footprint: arch step 9's 2x2 sits centred
++        # on its column, and the inward grip leaned into the arch's gap under the crown.
++        cy = float(np.mean([P.brick_pose(b)[1] for b in [*placed, brick]]))
++        inward = lambda c: -math.copysign(1., BR.lean_for(brick, c[1])[0]) != math.copysign(1., c[1] - cy)
++        near = lambda c: round(math.hypot(c[1] - py, c[2] - pz), 4)
++        # A grip under the press leans out of the structure first, then nearest: arch step 9's
++        # inward 60 deg grip reached 2.4 mm higher than the outward one and won on distance alone.
++        order = (lambda c: (inward(c), near(c), c[0])) if column else (lambda c: (near(c), inward(c), c[0]))
++        pick = (min(safe, key=order) if safe
+                 else min(scored, key=lambda c: c[0]))
+         _, y, z, br, r = pick
+         return BR._record(brick, placed, (y, z, br, r), r0, strategy,
+                           'near_press_bridge' if on_bridge else
+-                          'near_press_overhang' if forced else 'near_press')
++                          'near_press_overhang' if forced else 'near_press',
++                          tilt=centre_tilt(BR.lean_for(brick, y), y))
+     return assign
+ 
+ 
+@@ -360,7 +483,7 @@ def press_cap(needed_n, brace):
+     margin still broke B_b_014 on B_b_012 (diag_035-037). No brace: full
+     margin."""
+     if brace and brace.get('brace_force_N'):
+-        return BRACE_HAND * needed_n
++        return (HEADROOM_HAND if brace.get('press_headroom') else BRACE_HAND) * needed_n
+     return MARGIN * needed_n
+ 
+ 
+@@ -370,7 +493,7 @@ def brace_release(needed_n, brace):
+     Supported presses release under needed so push-through wins against raw
+     JointBreaker samples (diag_037). Unbraced keeps the full insertion force."""
+     if brace and brace.get('brace_force_N'):
+-        return BRACE_PUSH * needed_n
++        return (HEADROOM_PUSH if brace.get('press_headroom') else BRACE_PUSH) * needed_n
+     return needed_n
+ 
+ 
+diff --git a/Kean/motion/tick.py b/Kean/motion/tick.py
+index ac65d68..5df5f1e 100644
+--- a/Kean/motion/tick.py
++++ b/Kean/motion/tick.py
+@@ -190,9 +190,9 @@ class Tick:
+             # (dual_pyramid_s3_studfit_007 B step 14 pre-insert).
+             ex = self.example
+             if getattr(ex, 'stud_fit', None) is not None and hasattr(ex, 'roles') and hasattr(ex, 'arms'):
+-                from Kean.motion.stud_fit import near_support_press, support_motion_floor
++                from Kean.motion.stud_fit import BUILDER_NEAR_SUPPORT, near_support_press, support_motion_floor
+                 if near_support_press(ex.roles, ex.arms) or (
+-                        move.get('phase') in ('pre-insert', 'insert', 'press', 'release', 'retract')
++                        move.get('phase') in BUILDER_NEAR_SUPPORT
+                         and any(ex.roles.get(h) == 'supporter'
+                                 and getattr(ex.arms.get(h), 'phase', None)
+                                 in ('brace-in', 'brace-guard', 'close', 'hold')
+diff --git a/Kean/scripts/dual_build.py b/Kean/scripts/dual_build.py
+index b69ea8a..e6bdf44 100644
+--- a/Kean/scripts/dual_build.py
++++ b/Kean/scripts/dual_build.py
+@@ -63,6 +63,8 @@ def main():
+                         help='diagnostic: keep simulating and recording S seconds past the first failure')
+     parser.add_argument('--stud-fit', action='store_true',
+                         help='studs resist insertion: n x 8.9 N push to seat (Kean/motion/stud_fit.py)')
++    parser.add_argument('--support-after-place', action='store_true',
++                        help='diagnostic order (--stud-fit): set the brick on the studs, then support, then press')
+     args = parser.parse_args()
+     out = args.out if args.out.is_absolute() else ROOT / args.out
+     out = out.resolve()
+@@ -116,6 +118,7 @@ def main():
+     write(out / 'provenance.json', provenance)
+     example = DualExample(viewer, cell_args, plans, connections, out, starts=starts, step_limit=args.step_limit, feeders=feeders,
+                           stud_fit=args.stud_fit)
++    example.support_after_place = args.support_after_place
+     example.settle_feeders()
+     example.monitor = ContactMonitor(example)
+     if args.stud_fit:
+diff --git a/Kean/tests/test_coordinated.py b/Kean/tests/test_coordinated.py
+index ea3c3fb..fa3f8b1 100644
+--- a/Kean/tests/test_coordinated.py
++++ b/Kean/tests/test_coordinated.py
+@@ -96,6 +96,41 @@ class CoordinationTest(unittest.TestCase):
+         ex.A.moves.clear()
+         self.assertTrue(wait['wait']())
+ 
++    def test_stud_fit_support_lets_go_before_the_builder_escapes(self):
++        ex = Ex()
++        ex.legacy, ex.stud_fit = False, object()
++        ex.parks = {ex.B: np.array([.3, 0., .2])}
++        released = Mock()
++        ex.queue_place = lambda step: ex.B.push('retract', [0, 0, .1], 0., .02, .8, then=released)
++        install(ex)
++        ex.queue_place({'requires_brace': True, 'brace': {}})
++        retract, hold, up, escape, wait = ex.B.moves
++        self.assertIsNone(retract['wait'])                      # no reservation held while waiting
++        self.assertEqual([m['phase'] for m in (hold, up, escape)], ['stage', 'clearance', 'clearance'])
++        self.assertAlmostEqual(up['pos'][2], .2)                # straight up to the stage height
++        self.assertIsNone(escape['then'])
++        ex.A.push('hold', [0, 0, .2], 0, 0, 1)
++        self.assertFalse(hold['wait']())                        # atop the retract until A is idle...
++        released.assert_called_once()                           # ...after letting the support go
++        hold['wait']()
++        released.assert_called_once()                           # never twice
++        ex.A.moves.clear()
++        self.assertTrue(hold['wait']())
++
++    def test_legacy_support_step_keeps_run_030_escape_first(self):
++        ex = Ex()
++        ex.legacy, ex.stud_fit = False, object()
++        ex.parks = {ex.B: np.array([.3, 0., .2])}
++        ex.legacy_support = lambda n: n == 15                   # S3's last step (LEGACY_SUPPORT)
++        released = Mock()
++        ex.queue_place = lambda step: ex.B.push('retract', [0, 0, .1], 0., .02, .8, then=released)
++        install(ex)
++        ex.queue_place({'step': 15, 'requires_brace': True, 'brace': {}})
++        retract, escape, wait = ex.B.moves                      # no lift-and-wait stage
++        self.assertIsNone(retract['wait'])
++        escape['then']()                                        # the support lets go after the escape
++        released.assert_called_once()
++
+     def test_braced_transport_hovers_on_the_placer_side(self):
+         ex = Ex()
+         ex.legacy = False
+diff --git a/Kean/tests/test_stud_fit.py b/Kean/tests/test_stud_fit.py
+index 3d81c7a..4e2d883 100644
+--- a/Kean/tests/test_stud_fit.py
++++ b/Kean/tests/test_stud_fit.py
+@@ -133,7 +133,8 @@ class StudFitTest(unittest.TestCase):
+         lone = [('q0', '2x2', 0, 8, 0, 0)]
+         self.assertFalse(overhanging(P, pier[1], pier[:1]))
+         self.assertTrue(overhanging(P, corbel, pier))
+-        self.assertTrue(overhanging(P, on_corbel, pier + [corbel]))
++        self.assertFalse(overhanging(P, on_corbel, pier + [corbel]))   # straight on the pier: arch 8/9
++        self.assertTrue(overhanging(P, ('o', '2x2', 0, 4, 3, 0), pier + [corbel]))  # on the corbel's overhang
+         self.assertFalse(overhanging(P, ('r', '2x2', 0, 8, 1, 0), lone))
+ 
+     def test_support_nearest_the_press_among_safe_grips(self):
+@@ -144,14 +145,81 @@ class StudFitTest(unittest.TestCase):
+                 predicted=lambda brick, placed, br=None: r0 if br is None else NS(s=util[br]),
+                 candidates=lambda brick, placed, clearance: [(y, .05) for y in util],
+                 gripped=lambda placed, y, z: ('a',), _brace_obj=lambda placed, y, z, g, mu: y,
+-                _record=lambda brick, placed, choice, r0, strategy, why: (choice and choice[0], why))
+-        P = NS(brick_pose=lambda b: (0., -.16, .05), cells=lambda b: ({(0, 0)}, 0), supports=lambda b, p: {})
++                _record=lambda brick, placed, choice, r0, strategy, why, tilt=None: (choice and choice[0], why),
++                lean_for=lambda brick, y: [.7854, 0., 0.])
++        P = NS(brick_pose=lambda b: (0., -.16, .05), cells=lambda b: ({(0, 0)}, 0),
++               supports=lambda b, p: {'a': 1} if b[0] == 'x' else {})
+         assign = near_press_assign(P, BR, original=None)
+         # -0.17 is nearest but unsafe (0.5 x 3 >= 1); -0.18 is the nearest safe grip.
+         self.assertEqual(assign(('x',), [('a',)], 'weakest_joint'), (-.18, 'near_press'))
+         r0.s = .1                                                   # safe unsupported, no overhang: none
+         self.assertIsNone(assign(('x',), [('a',)], 'weakest_joint'))
+ 
++    def test_press_headroom_only_where_tuned(self):
++        from Kean.motion.stud_fit import brace_release, press_cap
++        crown = {'brace_force_N': 42.9, 'press_headroom': True}
++        bridge = {'brace_force_N': 42.9}
++        self.assertAlmostEqual(press_cap(71.2, crown), 71.2)
++        self.assertAlmostEqual(brace_release(71.2, crown), 53.4)
++        self.assertAlmostEqual(press_cap(71.2, bridge), 64.08)       # S3 keeps 0.9x / 0.85x
++        self.assertAlmostEqual(brace_release(71.2, bridge), 60.52)
++
++    def test_overhang_support_stays_on_the_pressed_column(self):
++        from Kean.motion.stud_fit import column_clearance, load_path, on_column
++        foot = {'2x2': (2, 2), '2x4': (2, 4)}
++
++        def cells(b):
++            nx, ny = foot[b[1]]
++            return {(b[2] + a, b[3] + c) for a in range(nx) for c in range(ny)}, b[4]
++
++        def supports(b, placed):
++            own, k = cells(b)
++            return {p[0]: len(own & cells(p)[0]) for p in placed if cells(p)[1] == k - 1 and own & cells(p)[0]}
++
++        pitch, h = .008, .0096
++        # arch step 6: a 2x4 at j 0-3, layer 3, on the left tower (j 0-1); the right tower is j 8-9
++        left = [('L%d' % k, '2x2', 0, 0, k, 0) for k in range(3)]
++        right = [('R%d' % k, '2x2', 0, 8, k, 0) for k in range(3)]
++        brick = ('new', '2x4', 0, 0, 3, 0)
++        P = NS(cells=cells, supports=supports, brick_pose=lambda b: (0., (b[3] + foot[b[1]][1] / 2) * pitch, b[4] * h),
++               VOXEL_ORIGIN=(0., 0., 0.), STUD_H=.0018)
++        self.assertEqual(load_path(P, brick, left + right), {'L0', 'L1', 'L2'})
++        BR = NS(HAND_CLEARANCE_Y=.020, PAD_HALF=.0085,
++                gripped=lambda placed, y, z: tuple(sorted({b[0] for b in placed if (b[3] == 0) == (y < .04)
++                                                           and b[4] * h < z + .0085 and z - .0085 < (b[4] + 1) * h})))
++        clear = column_clearance(P, BR, brick)
++        lean = [.7854, 0., 0.]                                       # toward the cell centre: 60 deg pad
++        self.assertFalse(clear(brick, .008, 2.5 * h, lean))        # pad reaches the new brick: blocked
++        self.assertFalse(clear(brick, .008, 1.75 * h, lean))       # tilted corner 0.4 mm under it
++        self.assertFalse(clear(brick, .008, 1.25 * h, lean))       # corner sunk into the plate's studs
++        self.assertTrue(clear(brick, .008, 1.4 * h, lean))         # clear of both, same column
++        self.assertTrue(clear(brick, .068, 2.5 * h, lean))         # other column, outside the keep-out
++        grips = on_column(BR, left + right, [(.008, 1.4 * h), (.068, 2. * h)], load_path(P, brick, left + right))
++        self.assertEqual(grips, [(.008, 1.4 * h)])                   # the other tower is off the load path
++        # The finger may touch L0 under the pad (same column), never the other tower.
++        from Kean.motion.stud_fit import support_contacts
++        rows = left + right + [brick]
++        plan = {'bricks': [dict(id=b[0], type=b[1], grid_pos=list(b[2:5]), yaw_index=b[5]) for b in rows],
++                'sequence': [dict(brick_id=b[0]) for b in rows]}
++        plan['voxel_origin'] = [0., 0., 0.]
++        P.BRICK_H = h
++        plan['sequence'][-1]['brace'] = {'gripped_bricks': ['L1', 'L2'], 'target_brick_id': 'L2',
++                                         'brace_pose': [0., .008, 1.75 * h]}
++        self.assertEqual(support_contacts(P, plan, 6, True), ('L0', 'L1', 'L2'))
++        self.assertEqual(support_contacts(P, plan, 6, False), ('L1', 'L2'))
++        # Gripping the other column (R1/R2) also allows R0 under them: the whole gripped column,
++        # as the crown's grip squeezed A_b_008 stacked on its gripped bricks
++        plan['sequence'][-1]['brace'] = {'gripped_bricks': ['R1', 'R2'], 'target_brick_id': 'R2',
++                                         'brace_pose': [0., .068, 1.75 * h]}
++        self.assertEqual(support_contacts(P, plan, 6, True), ('L0', 'L1', 'L2', 'R0', 'R1', 'R2'))
++        # A grip beside the press (S3's bridge) keeps the gripped bricks only
++        plan['sequence'][-1]['brace']['brace_pose'] = [0., .068, 2.5 * h]
++        self.assertEqual(support_contacts(P, plan, 6, True), ('R1', 'R2'))
++        from Kean.motion.stud_fit import centre_tilt
++        self.assertAlmostEqual(centre_tilt([.7854, 0, 0], .13)[0], 1.0472, 4)   # arch left column: 60 deg
++        self.assertIsNone(centre_tilt([.7854, 0, 0], -.19))                     # S3 pier leans outward
++        self.assertIsNone(centre_tilt([-.7854, 0, 0], .19))                     # arch right column too
++
+     def test_support_grips_the_bridge_not_the_nearer_pier(self):
+         from Kean.motion.stud_fit import bridge_bricks, near_press_assign
+         foot = {'2x2': (2, 2), '2x4': (2, 4)}
+@@ -178,7 +246,8 @@ class StudFitTest(unittest.TestCase):
+                 candidates=lambda brick, placed, clearance: [(-.20, .05), (-.04, .05)],
+                 gripped=lambda placed, y, z: ('col',) if y < -.1 else ('br',),
+                 _brace_obj=lambda placed, y, z, g, mu: y,
+-                _record=lambda brick, placed, choice, r0, strategy, why: (choice and choice[0], why))
++                _record=lambda brick, placed, choice, r0, strategy, why, tilt=None: (choice and choice[0], why),
++                lean_for=lambda brick, y: [.7854, 0., 0.])
+         assign = near_press_assign(P, BR, original=None)
+         self.assertEqual(assign(crown, placed, 'weakest_joint'), (-.04, 'near_press_bridge'))
+ 

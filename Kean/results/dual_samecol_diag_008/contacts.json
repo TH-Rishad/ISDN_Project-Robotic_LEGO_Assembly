@@ -1,0 +1,186 @@
+[
+  {
+    "class": "stud_mating",
+    "a": "brick:B_b_006#45",
+    "b": "brick:B_b_008#48",
+    "phase": {
+      "A": "hold",
+      "B": "press"
+    },
+    "start_frame": 2391,
+    "max_pen_mm": -1.656,
+    "peak_force_n": 0.42,
+    "end_frame": 2391,
+    "geometry": {
+      "upper": "B_b_008",
+      "lower": "B_b_006",
+      "stud_shape": 318,
+      "upper_shape": 348,
+      "stud_type": 8,
+      "upper_type": 8,
+      "stud_local_z": 0.0,
+      "contact_frame": 2391,
+      "contact_world": [
+        -0.002565422561019659,
+        -0.1897745281457901,
+        0.04253692924976349
+      ],
+      "contact_local": [
+        -0.0024096651920138693,
+        0.0022573337752162864,
+        0.010570058739104927
+      ],
+      "lower_dims": [
+        0.016,
+        0.016
+      ]
+    },
+    "duration_frames": 1,
+    "contact_frames": 1,
+    "fragments": 1
+  },
+  {
+    "class": "neighbour_rub",
+    "a": "brick:B_b_006#45",
+    "b": "brick:B_b_008#48",
+    "phase": {
+      "A": "hold",
+      "B": "press"
+    },
+    "start_frame": 2391,
+    "max_pen_mm": -1.656,
+    "peak_force_n": 13.4,
+    "end_frame": 2406,
+    "duration_frames": 16,
+    "contact_frames": 16,
+    "fragments": 1
+  },
+  {
+    "class": "neighbour_rub",
+    "a": "brick:B_b_009#47",
+    "b": "brick:B_b_011#49",
+    "phase": {
+      "A": "park",
+      "B": "insert"
+    },
+    "start_frame": 3478,
+    "max_pen_mm": -3.009,
+    "peak_force_n": 12.78,
+    "end_frame": 3629,
+    "duration_frames": 152,
+    "contact_frames": 137,
+    "fragments": 2
+  },
+  {
+    "class": "stud_mating",
+    "a": "brick:B_b_009#47",
+    "b": "brick:B_b_011#49",
+    "phase": {
+      "A": "park",
+      "B": "press"
+    },
+    "start_frame": 3614,
+    "max_pen_mm": -1.678,
+    "peak_force_n": 0.32,
+    "end_frame": 3629,
+    "geometry": {
+      "upper": "B_b_011",
+      "lower": "B_b_009",
+      "stud_shape": 338,
+      "upper_shape": 365,
+      "stud_type": 8,
+      "upper_type": 7,
+      "stud_local_z": 0.0,
+      "contact_frame": 3629,
+      "contact_world": [
+        -0.006243143230676651,
+        -0.13263386487960815,
+        0.05207192897796631
+      ],
+      "contact_local": [
+        -0.006101194605214032,
+        -0.0046198924688315565,
+        0.010505191532823907
+      ],
+      "lower_dims": [
+        0.016,
+        0.016
+      ]
+    },
+    "duration_frames": 16,
+    "contact_frames": 16,
+    "fragments": 1
+  },
+  {
+    "class": "neighbour_rub",
+    "a": "brick:B_b_008#48",
+    "b": "brick:B_b_010#50",
+    "phase": {
+      "A": "hold",
+      "B": "insert"
+    },
+    "start_frame": 5392,
+    "max_pen_mm": -0.0,
+    "peak_force_n": 0.01,
+    "end_frame": 5392,
+    "duration_frames": 1,
+    "contact_frames": 1,
+    "fragments": 1
+  },
+  {
+    "class": "stud_mating",
+    "a": "brick:B_b_008#48",
+    "b": "brick:B_b_010#50",
+    "phase": {
+      "A": "hold",
+      "B": "press"
+    },
+    "start_frame": 5611,
+    "max_pen_mm": -1.695,
+    "peak_force_n": 0.78,
+    "end_frame": 5611,
+    "geometry": {
+      "upper": "B_b_010",
+      "lower": "B_b_008",
+      "stud_shape": 348,
+      "upper_shape": 372,
+      "stud_type": 8,
+      "upper_type": 8,
+      "stud_local_z": 0.0,
+      "contact_frame": 5611,
+      "contact_world": [
+        0.0020634294487535954,
+        -0.1739138960838318,
+        0.05234199017286301
+      ],
+      "contact_local": [
+        0.01043443873258075,
+        -0.0022185163425752115,
+        0.010505420180035406
+      ],
+      "lower_dims": [
+        0.032,
+        0.016
+      ]
+    },
+    "duration_frames": 1,
+    "contact_frames": 1,
+    "fragments": 1
+  },
+  {
+    "class": "neighbour_rub",
+    "a": "brick:B_b_008#48",
+    "b": "brick:B_b_010#50",
+    "phase": {
+      "A": "hold",
+      "B": "press"
+    },
+    "start_frame": 5611,
+    "max_pen_mm": -1.695,
+    "peak_force_n": 53.9,
+    "end_frame": 5626,
+    "duration_frames": 16,
+    "contact_frames": 16,
+    "fragments": 1
+  }
+]

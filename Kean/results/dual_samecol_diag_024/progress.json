@@ -1,0 +1,17 @@
+{
+  "frame": 1080,
+  "sim_time": 19.000000000000203,
+  "phases": {
+    "A": "stage",
+    "B": "brace-guard"
+  },
+  "modes": {
+    "A": "stopped",
+    "B": "stopped"
+  },
+  "steps": {
+    "A": 6,
+    "B": 6
+  },
+  "pending": {}
+}

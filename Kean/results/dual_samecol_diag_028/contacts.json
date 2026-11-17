@@ -1,0 +1,114 @@
+[
+  {
+    "class": "stud_mating",
+    "a": "brick:A_b_005#33",
+    "b": "brick:A_b_007#35",
+    "phase": {
+      "A": "press",
+      "B": "hold"
+    },
+    "start_frame": 1713,
+    "max_pen_mm": -1.657,
+    "peak_force_n": 0.42,
+    "end_frame": 1713,
+    "geometry": {
+      "upper": "A_b_007",
+      "lower": "A_b_005",
+      "stud_shape": 202,
+      "upper_shape": 226,
+      "stud_type": 8,
+      "upper_type": 8,
+      "stud_local_z": 0.0,
+      "contact_frame": 1713,
+      "contact_world": [
+        -0.0020329291000962257,
+        0.18638986349105835,
+        0.03275815024971962
+      ],
+      "contact_local": [
+        -0.0022242835297808187,
+        -0.005604954400481821,
+        0.010351251018742475
+      ],
+      "lower_dims": [
+        0.016,
+        0.016
+      ]
+    },
+    "duration_frames": 1,
+    "contact_frames": 1,
+    "fragments": 1
+  },
+  {
+    "class": "neighbour_rub",
+    "a": "brick:A_b_005#33",
+    "b": "brick:A_b_007#35",
+    "phase": {
+      "A": "press",
+      "B": "hold"
+    },
+    "start_frame": 1713,
+    "max_pen_mm": -1.657,
+    "peak_force_n": 12.2,
+    "end_frame": 1728,
+    "duration_frames": 16,
+    "contact_frames": 16,
+    "fragments": 1
+  },
+  {
+    "class": "neighbour_rub",
+    "a": "brick:B_b_004#43",
+    "b": "brick:B_b_006#45",
+    "phase": {
+      "A": "stage",
+      "B": "insert"
+    },
+    "start_frame": 2988,
+    "max_pen_mm": -1.676,
+    "peak_force_n": 10.68,
+    "end_frame": 3143,
+    "duration_frames": 156,
+    "contact_frames": 156,
+    "fragments": 1
+  },
+  {
+    "class": "stud_mating",
+    "a": "brick:B_b_004#43",
+    "b": "brick:B_b_006#45",
+    "phase": {
+      "A": "stage",
+      "B": "press"
+    },
+    "start_frame": 3128,
+    "max_pen_mm": -1.676,
+    "peak_force_n": 0.32,
+    "end_frame": 3143,
+    "geometry": {
+      "upper": "B_b_006",
+      "lower": "B_b_004",
+      "stud_shape": 318,
+      "upper_shape": 341,
+      "stud_type": 8,
+      "upper_type": 7,
+      "stud_local_z": 0.0,
+      "contact_frame": 3143,
+      "contact_world": [
+        -0.006095506716519594,
+        -0.18892022967338562,
+        0.03290668502449989
+      ],
+      "contact_local": [
+        -0.006101272945768516,
+        0.0030817089420772862,
+        0.010505670173849204
+      ],
+      "lower_dims": [
+        0.016,
+        0.016
+      ]
+    },
+    "duration_frames": 16,
+    "contact_frames": 16,
+    "fragments": 1
+  }
+]

@@ -1,0 +1,287 @@
+{
+  "done": true,
+  "failure": null,
+  "error": null,
+  "frames": 3341,
+  "builds": {
+    "A": {
+      "structure": "arch",
+      "placed": 1,
+      "preplaced": 7,
+      "total": 11,
+      "completed_steps": 8,
+      "supports": [
+        {
+          "step": 7,
+          "requested": true,
+          "planned_feasible": true,
+          "executed": true,
+          "brace_infeasible": false,
+          "guard_stop": false,
+          "guard_frame": null,
+          "realised_grip_N": [
+            36.63,
+            37.96
+          ],
+          "grip_samples": 730,
+          "contacted": [
+            "A_b_001",
+            "A_b_003",
+            "A_b_005"
+          ],
+          "gripped_bricks": [
+            "A_b_003",
+            "A_b_005"
+          ],
+          "max_F_N": {
+            "A_b_005": 5.88,
+            "A_b_003": 4.62,
+            "A_b_001": 7.4
+          },
+          "max_M_Nm": {
+            "A_b_005": 0.0945,
+            "A_b_003": 0.0917,
+            "A_b_001": 0.0727
+          }
+        }
+      ],
+      "brace_search": [
+        {
+          "step": 7,
+          "pose": [
+            0.0,
+            0.188,
+            0.0164
+          ],
+          "tilt": [
+            -0.7854,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": false,
+          "error": "helper approach: boxed goal [0.0, 0.188, 0.0164]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.188, 0.0164]: cuRobo plan failed: no result (IK/start feasibility); boxed goal [0.0, 0.188, 0.0164]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.188, 0.0164]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.188, 0.0164]: cuRobo plan failed: no result (IK/start feasibility); full-sphere-filter goal [0.0, 0.188, 0.0164]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.188, 0.0164]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.188, 0.0164]: cuRobo plan failed: no result (IK/start feasibility); contact-full-sphere-filter goal [0.0, 0.188, 0.0164]: cuRobo plan failed: no result (IK/start feasibility)"
+        },
+        {
+          "step": 7,
+          "pose": [
+            0.0,
+            0.202,
+            0.0184
+          ],
+          "tilt": [
+            -1.309,
+            0.0,
+            0.0
+          ],
+          "helper_yaw": null,
+          "accepted": true
+        }
+      ]
+    },
+    "B": {
+      "structure": "S3",
+      "placed": 1,
+      "preplaced": 6,
+      "total": 16,
+      "completed_steps": 7,
+      "supports": [],
+      "brace_search": []
+    }
+  },
+  "contacts": {
+    "unintended": {
+      "count": 4,
+      "examples": [
+        {
+          "class": "unintended",
+          "a": "A_finger#13",
+          "b": "brick:A_b_007#35",
+          "phase": {
+            "A": "press",
+            "B": "hold"
+          },
+          "start_frame": 1622,
+          "max_pen_mm": -0.011,
+          "peak_force_n": 0.6,
+          "end_frame": 1625,
+          "duration_frames": 4,
+          "contact_frames": 2,
+          "fragments": 2
+        },
+        {
+          "class": "unintended",
+          "a": "A_finger#12",
+          "b": "brick:A_b_007#35",
+          "phase": {
+            "A": "press",
+            "B": "hold"
+          },
+          "start_frame": 1624,
+          "max_pen_mm": -0.017,
+          "peak_force_n": 1.26,
+          "end_frame": 1625,
+          "duration_frames": 2,
+          "contact_frames": 2,
+          "fragments": 1
+        },
+        {
+          "class": "unintended",
+          "a": "A_finger#12",
+          "b": "brick:A_b_007#35",
+          "phase": {
+            "A": "press",
+            "B": "hold"
+          },
+          "start_frame": 1696,
+          "max_pen_mm": -0.112,
+          "peak_force_n": 6.86,
+          "end_frame": 1723,
+          "duration_frames": 28,
+          "contact_frames": 19,
+          "fragments": 2
+        },
+        {
+          "class": "unintended",
+          "a": "A_finger#13",
+          "b": "brick:A_b_007#35",
+          "phase": {
+            "A": "press",
+            "B": "hold"
+          },
+          "start_frame": 1696,
+          "max_pen_mm": -0.248,
+          "peak_force_n": 28.78,
+          "end_frame": 1735,
+          "duration_frames": 40,
+          "contact_frames": 33,
+          "fragments": 2
+        }
+      ]
+    },
+    "penetration": {
+      "count": 1,
+      "examples": [
+        {
+          "class": "penetration",
+          "a": "brick:A_b_005#33",
+          "b": "brick:A_b_007#35",
+          "phase": {
+            "A": "press",
+            "B": "hold"
+          },
+          "start_frame": 1714,
+          "max_pen_mm": -1.651,
+          "peak_force_n": 0.42,
+          "end_frame": 1714,
+          "duration_frames": 1,
+          "contact_frames": 1,
+          "fragments": 1
+        }
+      ]
+    },
+    "displaced": {
+      "count": 1,
+      "examples": [
+        {
+          "brick": "A_b_007",
+          "class": "displaced",
+          "phase": {
+            "A": "press",
+            "B": "hold"
+          },
+          "start_frame": 1723,
+          "end_frame": 1723,
+          "duration_frames": 1,
+          "contact_frames": 1,
+          "fragments": 1,
+          "path_mm": 2.0,
+          "max_move_mm": 2.0
+        }
+      ]
+    },
+    "neighbour_rub": {
+      "count": 1,
+      "examples": [
+        {
+          "class": "neighbour_rub",
+          "a": "brick:B_b_004#43",
+          "b": "brick:B_b_006#45",
+          "phase": {
+            "A": "stage",
+            "B": "insert"
+          },
+          "start_frame": 2989,
+          "max_pen_mm": -1.676,
+          "peak_force_n": 11.2,
+          "end_frame": 3144,
+          "duration_frames": 156,
+          "contact_frames": 156,
+          "fragments": 1
+        }
+      ]
+    },
+    "stud_mating": {
+      "count": 1,
+      "examples": [
+        {
+          "class": "stud_mating",
+          "a": "brick:B_b_004#43",
+          "b": "brick:B_b_006#45",
+          "phase": {
+            "A": "stage",
+            "B": "press"
+          },
+          "start_frame": 3129,
+          "max_pen_mm": -1.676,
+          "peak_force_n": 0.32,
+          "end_frame": 3144,
+          "geometry": {
+            "upper": "B_b_006",
+            "lower": "B_b_004",
+            "stud_shape": 318,
+            "upper_shape": 341,
+            "stud_type": 8,
+            "upper_type": 7,
+            "stud_local_z": 0.0,
+            "contact_frame": 3144,
+            "contact_world": [
+              -0.006085187662392855,
+              -0.18846756219863892,
+              0.03290584683418274
+            ],
+            "contact_local": [
+              -0.0060899413479253576,
+              0.003535004321210362,
+              0.010504713895017245
+            ],
+            "lower_dims": [
+              0.016,
+              0.016
+            ]
+          },
+          "duration_frames": 16,
+          "contact_frames": 16,
+          "fragments": 1
+        }
+      ]
+    }
+  },
+  "parallel_frames": 0,
+  "diagnostic": true,
+  "motion": {
+    "strict": true,
+    "workarounds": [],
+    "failures": [],
+    "plans": 16,
+    "plan_failures": 0,
+    "captures": 0,
+    "segments": 16,
+    "min_clearance_m": 0.001221469064840438,
+    "clearance_scope": "executed joints during planned playback; full spheres, measured fingers"
+  },
+  "reserved_parallel_frames": 3,
+  "initial_settling_xy_m": 6.705522537231445e-07,
+  "ok": false,
+  "full_build": false
+}

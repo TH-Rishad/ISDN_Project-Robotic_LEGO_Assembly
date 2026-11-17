@@ -1,0 +1,62 @@
+{
+  "ok": false,
+  "full_build": false,
+  "errors": [
+    "recorded arm-arm contact",
+    "recorded broken joint",
+    "recorded execution failure: joint_break",
+    "B: incomplete/nonmonotonic own-build progress",
+    "B step 15: no recorded mating",
+    "B step 15: no insertion frames",
+    "B step 15: no measured two-finger support force",
+    "unserved support request",
+    "contact monitor: arm_arm",
+    "detailed contact evidence: arm_arm",
+    "detailed contact evidence: arm_arm",
+    "execution did not finish cleanly"
+  ],
+  "recorded_parallel_frames": 1545,
+  "grants": [
+    {
+      "arm": "A",
+      "step": 6,
+      "time": 164.58333333335645
+    },
+    {
+      "arm": "A",
+      "step": 7,
+      "time": 200.6666666667185
+    },
+    {
+      "arm": "A",
+      "step": 10,
+      "time": 318.93333333337193
+    },
+    {
+      "arm": "B",
+      "step": 9,
+      "time": 360.96666666666704
+    },
+    {
+      "arm": "B",
+      "step": 11,
+      "time": 429.6166666666046
+    },
+    {
+      "arm": "B",
+      "step": 13,
+      "time": 487.6999999998851
+    },
+    {
+      "arm": "B",
+      "step": 14,
+      "time": 529.4499999998471
+    },
+    {
+      "arm": "B",
+      "step": 15,
+      "time": 581.4833333331331
+    }
+  ],
+  "frames": 35725
+}

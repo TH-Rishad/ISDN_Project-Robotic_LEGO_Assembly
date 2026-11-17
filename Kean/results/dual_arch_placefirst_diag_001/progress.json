@@ -1,0 +1,17 @@
+{
+  "frame": 1320,
+  "sim_time": 22.999999999999975,
+  "phases": {
+    "A": "release",
+    "B": "park"
+  },
+  "modes": {
+    "A": "stopped",
+    "B": "stopped"
+  },
+  "steps": {
+    "A": 6,
+    "B": 6
+  },
+  "pending": {}
+}

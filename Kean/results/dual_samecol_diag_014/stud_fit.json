@@ -1,0 +1,17 @@
+[
+  {
+    "brick": "A_b_006",
+    "event": "held",
+    "time": 45.95,
+    "dz_mm": 1.97,
+    "needed_N": 35.6
+  },
+  {
+    "brick": "A_b_006",
+    "event": "pushed_through",
+    "time": 48.783,
+    "peak_N": 30.5,
+    "needed_N": 35.6,
+    "hand_N": 5.1
+  }
+]
