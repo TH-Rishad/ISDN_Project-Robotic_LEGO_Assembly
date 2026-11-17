@@ -1,0 +1,234 @@
+{
+ "source": "planner.build_plan and bracing.assign",
+ "image_input": false,
+ "strategy": "weakest_joint",
+ "structures": [
+  {
+   "structure": "arch",
+   "kind": "shape",
+   "strategy": "weakest_joint",
+   "bricks": 11,
+   "brace_required_count": 1,
+   "single_arm_fails": false,
+   "steps": [
+    {
+     "step": 0,
+     "brick_id": "b_000",
+     "requires_brace": false,
+     "support_pose": null,
+     "support_brick": null
+    },
+    {
+     "step": 1,
+     "brick_id": "b_001",
+     "requires_brace": false,
+     "support_pose": null,
+     "support_brick": null
+    },
+    {
+     "step": 2,
+     "brick_id": "b_002",
+     "requires_brace": false,
+     "support_pose": null,
+     "support_brick": null
+    },
+    {
+     "step": 3,
+     "brick_id": "b_003",
+     "requires_brace": false,
+     "support_pose": null,
+     "support_brick": null
+    },
+    {
+     "step": 4,
+     "brick_id": "b_004",
+     "requires_brace": false,
+     "support_pose": null,
+     "support_brick": null
+    },
+    {
+     "step": 5,
+     "brick_id": "b_005",
+     "requires_brace": false,
+     "support_pose": null,
+     "support_brick": null
+    },
+    {
+     "step": 6,
+     "brick_id": "b_006",
+     "requires_brace": false,
+     "support_pose": null,
+     "support_brick": null
+    },
+    {
+     "step": 7,
+     "brick_id": "b_007",
+     "requires_brace": false,
+     "support_pose": null,
+     "support_brick": null
+    },
+    {
+     "step": 8,
+     "brick_id": "b_008",
+     "requires_brace": false,
+     "support_pose": null,
+     "support_brick": null
+    },
+    {
+     "step": 9,
+     "brick_id": "b_009",
+     "requires_brace": false,
+     "support_pose": null,
+     "support_brick": null
+    },
+    {
+     "step": 10,
+     "brick_id": "b_010",
+     "requires_brace": true,
+     "support_pose": [
+      0.0,
+      -0.036,
+      0.0152
+     ],
+     "support_brick": "b_002"
+    }
+   ]
+  },
+  {
+   "structure": "S3",
+   "kind": "structure",
+   "strategy": "weakest_joint",
+   "bricks": 16,
+   "brace_required_count": 3,
+   "single_arm_fails": true,
+   "steps": [
+    {
+     "step": 0,
+     "brick_id": "b_000",
+     "requires_brace": false,
+     "support_pose": null,
+     "support_brick": null
+    },
+    {
+     "step": 1,
+     "brick_id": "b_001",
+     "requires_brace": false,
+     "support_pose": null,
+     "support_brick": null
+    },
+    {
+     "step": 2,
+     "brick_id": "b_002",
+     "requires_brace": false,
+     "support_pose": null,
+     "support_brick": null
+    },
+    {
+     "step": 3,
+     "brick_id": "b_003",
+     "requires_brace": false,
+     "support_pose": null,
+     "support_brick": null
+    },
+    {
+     "step": 4,
+     "brick_id": "b_004",
+     "requires_brace": false,
+     "support_pose": null,
+     "support_brick": null
+    },
+    {
+     "step": 5,
+     "brick_id": "b_005",
+     "requires_brace": false,
+     "support_pose": null,
+     "support_brick": null
+    },
+    {
+     "step": 6,
+     "brick_id": "b_006",
+     "requires_brace": false,
+     "support_pose": null,
+     "support_brick": null
+    },
+    {
+     "step": 7,
+     "brick_id": "b_007",
+     "requires_brace": false,
+     "support_pose": null,
+     "support_brick": null
+    },
+    {
+     "step": 8,
+     "brick_id": "b_009",
+     "requires_brace": false,
+     "support_pose": null,
+     "support_brick": null
+    },
+    {
+     "step": 9,
+     "brick_id": "b_008",
+     "requires_brace": false,
+     "support_pose": null,
+     "support_brick": null
+    },
+    {
+     "step": 10,
+     "brick_id": "b_011",
+     "requires_brace": false,
+     "support_pose": null,
+     "support_brick": null
+    },
+    {
+     "step": 11,
+     "brick_id": "b_010",
+     "requires_brace": true,
+     "support_pose": [
+      0.0,
+      0.028,
+      0.0152
+     ],
+     "support_brick": "b_003"
+    },
+    {
+     "step": 12,
+     "brick_id": "b_013",
+     "requires_brace": false,
+     "support_pose": null,
+     "support_brick": null
+    },
+    {
+     "step": 13,
+     "brick_id": "b_012",
+     "requires_brace": true,
+     "support_pose": [
+      0.0,
+      -0.036,
+      0.0488
+     ],
+     "support_brick": "b_008"
+    },
+    {
+     "step": 14,
+     "brick_id": "b_014",
+     "requires_brace": true,
+     "support_pose": [
+      0.0,
+      -0.02,
+      0.0512
+     ],
+     "support_brick": "b_008"
+    },
+    {
+     "step": 15,
+     "brick_id": "b_015",
+     "requires_brace": false,
+     "support_pose": null,
+     "support_brick": null
+    }
+   ]
+  }
+ ],
+ "ok": true,
+ "reasons": []
+}
