@@ -267,6 +267,18 @@ def overhanging(P, brick, placed):
     return False
 
 
+def load_path(P, brick, placed):
+    """Ids of the placed bricks under `brick`, down to the baseplate: the column(s) its press loads."""
+    by_id = {b[0]: b for b in placed}
+    out, todo = set(), list(P.supports(brick, placed))
+    while todo:
+        sid = todo.pop()
+        if sid not in out and sid in by_id:
+            out.add(sid)
+            todo.extend(P.supports(by_id[sid], placed))
+    return out
+
+
 def near_press_assign(P, BR, original):
     """bracing.assign for --stud-fit plans. The same safety test, plus a support
     forced where `overhanging`. A grip on the bridge (bridge_bricks) wins over
@@ -301,6 +313,10 @@ def near_press_assign(P, BR, original):
         pick = (min(safe, key=lambda c: (round(math.hypot(c[1] - py, c[2] - pz), 4), c[0])) if safe
                 else min(scored, key=lambda c: c[0]))
         _, y, z, br, r = pick
+        # A grip holding none of the bricks under the pressed brick is on the other column and
+        # carries none of the press (arch 6-9, S3 9 and 11 in dual_arch_s3_studfit_001): skip it.
+        if not set(BR.gripped(placed, y, z)) & load_path(P, brick, placed):
+            return None
         return BR._record(brick, placed, (y, z, br, r), r0, strategy,
                           'near_press_bridge' if on_bridge else
                           'near_press_overhang' if forced else 'near_press')
