@@ -1,0 +1,44 @@
+# Personal ignores for Richard's workspace
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+env/
+venv/
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary / build
+*.tmp
+*.log
+*.bak
+build/
+dist/
+
+# Recorder dumps. JSON summaries stay.
+*.npz
+
+# Personal scratch only. Submission documents stay tracked.
+notes/
+scratch/
+*.md.bak
+todo-personal.md
+
+# Identity and local tooling. Do not push.
+# richard.id mirrors the Kean/kean.id convention.
+AGENTS.md
+.cursor/
+config/
+richard.id
