@@ -1,0 +1,17 @@
+{
+ "git_revision": null,
+ "dirty_hashes": {},
+ "config": {
+  "image_input": false,
+  "strategy": "weakest_joint",
+  "max_frames": 60000,
+  "seeds": {
+   "arch": 0,
+   "S3": 0
+  }
+ },
+ "simulator": null,
+ "plan_hashes": {},
+ "python": "3.12.16",
+ "hostname": "f6f611694d6d"
+}
