@@ -5,6 +5,7 @@
 Simulation stills come from render_stills.py (needs the GPU); this script is CPU only.
 """
 import json
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -179,7 +180,7 @@ axs[1].legend(handles=[Patch(color="#9ecae1", label="no support needed"),
 save(fig, "utilisation.png")
 
 
-def side_elevation(ax, bricks, step, brace):
+def side_elevation(ax, bricks, step, brace, ytop=10.5, used=None, press_label="press %.0f N"):
     """S3 seen from the side (y-z): placed bricks, the new brick, the support pad."""
     order = P.sequence(bricks)
     for n, b in enumerate(order[:step + 1]):
@@ -191,17 +192,21 @@ def side_elevation(ax, bricks, step, brace):
     y0 = brace["origin"][1]
     py, pz = (brace["brace_pose"][1] - y0) / P.PITCH, (brace["brace_pose"][2] - brace["origin"][2]) / P.BRICK_H
     h = .0085 / P.PITCH
+    if used is not None:        # planned grip dashed, the grip the run used filled
+        ax.add_patch(Rectangle((py - h, pz - .0085 / P.BRICK_H), 2 * h, 2 * .0085 / P.BRICK_H,
+                               fill=False, edgecolor="#1b5e20", lw=1.2, ls="--"))
+        py, pz = (used[1] - y0) / P.PITCH, (used[2] - brace["origin"][2]) / P.BRICK_H
     ax.add_patch(Rectangle((py - h, pz - .0085 / P.BRICK_H), 2 * h, 2 * .0085 / P.BRICK_H,
                            facecolor="#2ca02c", alpha=.55, edgecolor="#1b5e20", lw=1.5))
     ax.annotate("helper's finger pads", (py, pz), (5, 2.5), fontsize=8, ha="center",
                 arrowprops=dict(arrowstyle="->"))
     tgt = order[step]
     nx, ny = P.footprint(tgt[1], tgt[5])
-    ax.annotate("press %.0f N" % brace["press_nominal_N"], (tgt[3] + ny / 2, tgt[4] + 1),
+    ax.annotate(press_label % brace["press_nominal_N"], (tgt[3] + ny / 2, tgt[4] + 1),
                 (tgt[3] + ny / 2, tgt[4] + 2.3), ha="center", fontsize=8,
                 arrowprops=dict(arrowstyle="-|>", lw=2, color="#d62728"))
     ax.set_xlim(-1, 12)
-    ax.set_ylim(-.3, 10.5)
+    ax.set_ylim(-.3, ytop)
     ax.set_aspect(P.BRICK_H / P.PITCH)
     ax.set_xlabel("y (studs)")
     ax.set_ylabel("layer")
@@ -309,12 +314,17 @@ CAUSE = {"gate_miss": "brick missed the snap check", "motion_plan_failed": "no c
          "support_not_established": "support grip not established", "support_lost": "support grip lost",
          "wait_timeout": "scheduler wait timed out", "command_clearance": "clearance guard stopped an arm",
          "joint_break": "a stud joint broke"}
+RESULTS = ROOT / "Kean" / "results"
+# Failed runs were moved to archive/ once run 030 passed; only full runs NNN, not diagnostics or local re-runs.
+runs = {}
+for run in [*RESULTS.glob("dual_pyramid_s3_studfit_*"), *RESULTS.glob("archive/*/dual_pyramid_s3_studfit_*")]:
+    if re.fullmatch(r"dual_pyramid_s3_studfit_\d{3}", run.name) and (run / "summary.json").is_file():
+        runs[run.name] = run
 rows = []
-for run in sorted((ROOT / "Kean" / "results").glob("dual_pyramid_s3_studfit_0*")):
-    s, vf = run / "summary.json", run / "verification.json"
-    if not s.is_file():
-        continue
-    s, v = json.loads(s.read_text()), json.loads(vf.read_text()) if vf.is_file() else {}
+for name in sorted(runs):
+    run = runs[name]
+    s, vf = json.loads((run / "summary.json").read_text()), run / "verification.json"
+    v = json.loads(vf.read_text()) if vf.is_file() else {}
     fail = s.get("failure") or ""
     key = fail.split(":")[1] if fail.startswith(("A:", "B:")) else fail.split(":")[0]
     if v.get("ok"):
@@ -325,22 +335,147 @@ for run in sorted((ROOT / "Kean" / "results").glob("dual_pyramid_s3_studfit_0*")
         label = "all placed; verifier: %s" % ", ".join(sorted({e.split(": ")[-1] for e in v.get("errors", [])
                                                                if e.startswith("contact monitor")}))
     b = s["builds"]
-    rows.append((run.name[-3:], b["A"]["placed"], b["B"]["placed"], label))
+    rows.append((name[-3:], b["A"]["placed"], b["B"]["placed"], label))
 facts["studfit_runs"] = rows
-fig, ax = plt.subplots(figsize=(11, .3 * len(rows) + 1.0))
+fig, ax = plt.subplots(figsize=(11, .26 * len(rows) + 1.0))
 for n, (name, a, bb, label) in enumerate(rows):
     ax.barh(n, a, color="#1f77b4", height=.6)
     ax.barh(n, bb, left=a, color="#ff7f0e", height=.6)
-    ax.text(28.5, n, label, va="center", fontsize=8)
+    ax.text(28.5, n, label, va="center", fontsize=8, fontweight="bold" if "PASS" in label else None,
+            color="#2e7d32" if "PASS" in label else "k")
 ax.axvline(27, color="k", ls="--", lw=1)
 ax.set_yticks(range(len(rows)))
-ax.set_yticklabels(["run " + r[0] for r in rows])
+ax.set_yticklabels(["run " + r[0] for r in rows], fontsize=8)
 ax.invert_yaxis()
 ax.set_xlim(0, 46)
 ax.set_xticks([0, 5, 10, 15, 20, 27])
 ax.set_xlabel("bricks placed, out of 27 (blue: pyramid, 11; orange: S3, 16)")
-ax.set_title("Full pyramid + S3 builds with real stud insertion force (--stud-fit)", fontsize=10)
+ax.set_title("Every saved full pyramid + S3 build with real stud insertion force (--stud-fit)", fontsize=10)
 save(fig, "studfit_progress.png")
+
+# ---- 7. stud-fit press force per brick, the two passing stud-fit runs ------------
+SF_RUNS = {"arch + S3 (run 007)": RESULTS / "dual_arch_s3_studfit_007",
+           "pyramid + S3 (run 030)": RESULTS / "dual_pyramid_s3_studfit_030"}
+fig, axs = plt.subplots(1, 2, figsize=(12, 3.3), sharey=True)
+for ax, (lab, run) in zip(axs, SF_RUNS.items()):
+    supported = {st["brick_id"] for a in "AB" for st in json.loads((run / "plans" / (a + ".json")).read_text())["sequence"]
+                 if st["requires_brace"]}
+    order = [json.loads(line)["brick_id"] for line in (run / "episodes.jsonl").read_text().splitlines()]
+    push = {e["brick"]: e for e in json.loads((run / "stud_fit.json").read_text()) if e["event"] == "pushed_through"}
+    ratio = [push[b]["peak_N"] / push[b]["needed_N"] for b in order]
+    ax.bar(range(len(order)), ratio, color=["#2ca02c" if b in supported else "#9ecae1" for b in order])
+    ax.axhline(1.0, color="k", ls="--", lw=1)
+    ax.set_title(lab, fontsize=10)
+    ax.set_xlabel("bricks in the order they were seated")
+    ax.set_xticks([])
+    facts.setdefault("studfit_press", {})[run.name] = dict(
+        supported=sorted(supported), min_ratio_supported=round(min(r for b, r in zip(order, ratio) if b in supported), 3),
+        min_ratio_unsupported=round(min(r for b, r in zip(order, ratio) if b not in supported), 3))
+axs[0].set_ylabel("peak push / force needed")
+from matplotlib.patches import Patch  # noqa: E402
+fig.legend(handles=[Patch(color="#9ecae1", label="unsupported brick: full force needed"),
+                    Patch(color="#2ca02c", label="supported brick: let through at 0.85x the force")],
+           frameon=False, fontsize=9, loc="upper center", ncol=2, bbox_to_anchor=(.5, 1.08))
+save(fig, "studfit_press.png")
+
+for run in (RESULTS / "dual_arch_s3_studfit_007", RESULTS / "dual_pyramid_s3_studfit_030",
+            RESULTS / "dual_pyramid_s3_studfit_031"):
+    s = json.loads((run / "summary.json").read_text())
+    v = json.loads((run / "verification.json").read_text())
+    ep = [json.loads(line) for line in (run / "episodes.jsonl").read_text().splitlines()]
+    facts[run.name] = dict(
+        verifier_ok=v["ok"], full_build=v["full_build"], frames=v["frames"], sim_s=round(v["frames"] / 60, 1),
+        parallel_frames=v["recorded_parallel_frames"],
+        placed={a: "%d/%d" % (s["builds"][a]["placed"], s["builds"][a]["total"]) for a in "AB"},
+        supports=[(a, x["step"], x["realised_grip_N"]) for a in "AB" for x in s["builds"][a]["supports"]],
+        support_attempts_rejected=sum(not x["accepted"] for a in "AB" for x in s["builds"][a]["brace_search"]),
+        plans=s["motion"]["plans"], plan_failures=s["motion"]["plan_failures"],
+        min_clearance_mm=round(s["motion"]["min_clearance_m"] * 1000, 2),
+        contacts={k: c["count"] for k, c in s["contacts"].items() if isinstance(c, dict) and "count" in c},
+        max_lateral_mm=max(e["final_error_mm"] for e in ep), max_abs_dz_mm=max(abs(e["dz_mm"]) for e in ep),
+        max_tilt_deg=max(e["tilt_deg"] for e in ep))
+
+
+# ---- 8. the final run (dual_arch_s3_studfit_007) ------------------------------------
+FINAL = RESULTS / "dual_arch_s3_studfit_007"
+fA, fB = plan(FINAL, "A"), plan(FINAL, "B")
+
+fig, axs = plt.subplots(1, 2, figsize=(11, 3.3), gridspec_kw={"width_ratios": [11, 16]})
+for ax, pl, title in zip(axs, (fA, fB), ("Arch (arm A)", "S3 (arm B)")):
+    seq = pl["sequence"]
+    u0 = [st["predicted_util_unbraced"] or 0 for st in seq]
+    ub = [st["brace"]["predicted_util_braced"] if st["requires_brace"] else np.nan for st in seq]
+    x = np.arange(len(seq))
+    ax.bar(x - .2, u0, .4, color=["#d62728" if st["requires_brace"] else "#ff9f1c" if u * 3 >= 1 else "#9ecae1"
+                                  for st, u in zip(seq, u0)])
+    ax.bar(x + .2, ub, .4, color="#2ca02c")
+    ax.axhline(1 / 3, color="k", ls="--", lw=1)
+    ax.text(-.6, 1 / 3 + .03, "load limit for building alone (u x 3 >= 1)", ha="left", fontsize=8)
+    ax.set_xticks(x)
+    ax.set_xlabel("build step")
+    ax.set_title(title)
+    ax.set_ylim(0, max(max(u0) * 1.12, .6))
+axs[0].set_ylabel("predicted joint load u\n(load / strength, worst joint)")
+axs[1].legend(handles=[Patch(color="#9ecae1", label="safe without help"),
+                       Patch(color="#d62728", label="without help; step gets a support"),
+                       Patch(color="#ff9f1c", label="over the limit, but no reachable grip helps"),
+                       Patch(color="#2ca02c", label="with the planned support")], loc="upper left", frameon=False,
+              fontsize=8)
+save(fig, "final_load.png")
+
+fig, axs = plt.subplots(1, 4, figsize=(15, 4.0), gridspec_kw={"width_ratios": [1.1, 1, 1, 1]})
+fsum = json.loads((FINAL / "summary.json").read_text())
+used_pose = {(a, x["step"]): x["pose"] for a in "AB" for x in fsum["builds"][a]["brace_search"] if x["accepted"]}
+for ax, arm, pl, step, label, ytop in ((axs[0], "A", fA, 10, "Arch", 7.5), (axs[1], "B", fB, 13, "S3", 10.5),
+                                       (axs[2], "B", fB, 14, "S3", 10.5), (axs[3], "B", fB, 15, "S3", 10.5)):
+    st = pl["sequence"][step]
+    bricks = [(b["id"], b["type"], *b["grid_pos"], b["yaw_index"]) for b in pl["bricks"]]
+    side_elevation(ax, bricks, step, dict(st["brace"], origin=pl["voxel_origin"]), ytop=ytop,
+                   used=used_pose[(arm, step)], press_label="planned press %.0f N")
+    ax.set_title("%s step %d: load %.2f -> %.2f" % (label, step, st["predicted_util_unbraced"],
+                                                   st["brace"]["predicted_util_braced"]), fontsize=9)
+save(fig, "final_supports.png")
+
+timeline(FINAL, "final_timeline.png", ["B: S3", "A: arch"])
+
+rows = [json.loads(line) for line in (FINAL / "episodes.jsonl").read_text().splitlines()]
+fig, axs = plt.subplots(1, 2, figsize=(11, 3.1))
+for arm, lab in (("A", "arch (arm A)"), ("B", "S3 (arm B)")):
+    r = [e for e in rows if e["structure"].startswith(arm)]
+    axs[0].scatter([e["final_error_mm"] for e in r], [e["dz_mm"] for e in r], s=26, alpha=.8, label=lab)
+axs[0].add_patch(Rectangle((0, -1.5), 2.0, 3.0, fill=False, ls="--", lw=1.2))
+axs[0].text(1.95, 1.3, "snap check limits", ha="right", fontsize=8)
+axs[0].set_xlim(0, 2.3)
+axs[0].set_ylim(-1.8, 1.8)
+axs[0].set_xlabel("sideways error (mm)")
+axs[0].set_ylabel("height error (mm)")
+axs[0].legend(fontsize=8, frameon=False, loc="lower right")
+axs[0].set_title("Every brick at its snap check")
+axs[1].hist([e["tilt_deg"] for e in rows], bins=np.linspace(0, 5, 21), color="#1f77b4")
+axs[1].axvline(5, color="k", ls="--")
+axs[1].set_xlabel("tilt at snap (deg); limit 5 deg")
+axs[1].set_ylabel("bricks")
+axs[1].set_title("Tilt of every brick")
+save(fig, "final_snap.png")
+
+supported = {st["brick_id"] for pl in (fA, fB) for st in pl["sequence"] if st["requires_brace"]}
+order = [e["brick_id"] for e in rows]
+push = {e["brick"]: e for e in json.loads((FINAL / "stud_fit.json").read_text()) if e["event"] == "pushed_through"}
+fig, ax = plt.subplots(figsize=(11, 3.0))
+ax.bar(range(len(order)), [push[b]["peak_N"] for b in order],
+       color=["#2ca02c" if b in supported else "#9ecae1" for b in order], label="push when the brick went in")
+ax.scatter(range(len(order)), [push[b]["needed_N"] for b in order], marker="_", s=260, color="k", zorder=3,
+           label="force its studs need (n x 8.9 N)")
+ax.set_xticks(range(len(order)))
+ax.set_xticklabels([("A" if b.startswith("A") else "B") + b[-2:].lstrip("0").rjust(1, "0") for b in order],
+                   fontsize=7, rotation=90)
+ax.set_ylabel("force (N)")
+ax.set_xlabel("bricks in the order they were seated (A = arch, B = S3)")
+ax.legend(handles=[Patch(color="#9ecae1", label="unsupported brick: push"),
+                   Patch(color="#2ca02c", label="supported brick: push"),
+                   plt.Line2D([], [], marker="_", ls="", color="k", markersize=14, label="force the studs need")],
+          frameon=False, fontsize=8, loc="upper left")
+save(fig, "final_press.png")
 
 (OUT / "facts.json").write_text(json.dumps(facts, indent=1))
 print(json.dumps(facts, indent=1))

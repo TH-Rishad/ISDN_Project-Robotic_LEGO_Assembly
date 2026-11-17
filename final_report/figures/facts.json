@@ -309,6 +309,285 @@
    11,
    16,
    "all placed; verifier: displaced, unintended"
+  ],
+  [
+   "018",
+   11,
+   16,
+   "all placed; verifier: displaced, unintended"
+  ],
+  [
+   "020",
+   11,
+   14,
+   "clearance guard stopped an arm"
+  ],
+  [
+   "021",
+   11,
+   16,
+   "all placed; verifier: displaced"
+  ],
+  [
+   "022",
+   11,
+   16,
+   "all placed; verifier: displaced"
+  ],
+  [
+   "023",
+   11,
+   16,
+   "all placed; verifier: displaced"
+  ],
+  [
+   "024",
+   11,
+   14,
+   "clearance guard stopped an arm"
+  ],
+  [
+   "025",
+   11,
+   14,
+   "a stud joint broke"
+  ],
+  [
+   "026",
+   11,
+   16,
+   "all placed; verifier: displaced"
+  ],
+  [
+   "027",
+   11,
+   16,
+   "all placed; verifier: displaced"
+  ],
+  [
+   "029",
+   11,
+   16,
+   "all placed; verifier: displaced"
+  ],
+  [
+   "030",
+   11,
+   16,
+   "verifier PASS"
+  ],
+  [
+   "031",
+   11,
+   16,
+   "verifier PASS"
   ]
- ]
+ ],
+ "studfit_press": {
+  "dual_arch_s3_studfit_007": {
+   "supported": [
+    "A_b_010",
+    "B_b_012",
+    "B_b_014",
+    "B_b_015"
+   ],
+   "min_ratio_supported": 0.854,
+   "min_ratio_unsupported": 1.0
+  },
+  "dual_pyramid_s3_studfit_030": {
+   "supported": [
+    "B_b_008",
+    "B_b_010",
+    "B_b_012",
+    "B_b_014",
+    "B_b_015"
+   ],
+   "min_ratio_supported": 0.851,
+   "min_ratio_unsupported": 1.003
+  }
+ },
+ "dual_arch_s3_studfit_007": {
+  "verifier_ok": true,
+  "full_build": true,
+  "frames": 30890,
+  "sim_s": 514.8,
+  "parallel_frames": 1907,
+  "placed": {
+   "A": "11/11",
+   "B": "16/16"
+  },
+  "supports": [
+   [
+    "A",
+    10,
+    [
+     36.7,
+     38.97
+    ]
+   ],
+   [
+    "B",
+    13,
+    [
+     39.65,
+     38.7
+    ]
+   ],
+   [
+    "B",
+    14,
+    [
+     39.59,
+     38.81
+    ]
+   ],
+   [
+    "B",
+    15,
+    [
+     38.52,
+     39.43
+    ]
+   ]
+  ],
+  "support_attempts_rejected": 11,
+  "plans": 199,
+  "plan_failures": 0,
+  "min_clearance_mm": -0.9,
+  "contacts": {
+   "neighbour_rub": 32,
+   "stud_mating": 24
+  },
+  "max_lateral_mm": 1.46,
+  "max_abs_dz_mm": 0.47,
+  "max_tilt_deg": 1.85
+ },
+ "dual_pyramid_s3_studfit_030": {
+  "verifier_ok": true,
+  "full_build": true,
+  "frames": 30674,
+  "sim_s": 511.2,
+  "parallel_frames": 2315,
+  "placed": {
+   "A": "11/11",
+   "B": "16/16"
+  },
+  "supports": [
+   [
+    "B",
+    9,
+    [
+     35.33,
+     37.1
+    ]
+   ],
+   [
+    "B",
+    11,
+    [
+     35.54,
+     36.85
+    ]
+   ],
+   [
+    "B",
+    13,
+    [
+     39.72,
+     38.7
+    ]
+   ],
+   [
+    "B",
+    14,
+    [
+     38.55,
+     39.7
+    ]
+   ],
+   [
+    "B",
+    15,
+    [
+     37.61,
+     39.55
+    ]
+   ]
+  ],
+  "support_attempts_rejected": 9,
+  "plans": 207,
+  "plan_failures": 0,
+  "min_clearance_mm": -1.09,
+  "contacts": {
+   "neighbour_rub": 54,
+   "stud_mating": 23
+  },
+  "max_lateral_mm": 1.44,
+  "max_abs_dz_mm": 0.45,
+  "max_tilt_deg": 1.76
+ },
+ "dual_pyramid_s3_studfit_031": {
+  "verifier_ok": true,
+  "full_build": true,
+  "frames": 30620,
+  "sim_s": 510.3,
+  "parallel_frames": 2317,
+  "placed": {
+   "A": "11/11",
+   "B": "16/16"
+  },
+  "supports": [
+   [
+    "B",
+    9,
+    [
+     35.33,
+     37.12
+    ]
+   ],
+   [
+    "B",
+    11,
+    [
+     35.55,
+     36.87
+    ]
+   ],
+   [
+    "B",
+    13,
+    [
+     39.72,
+     38.71
+    ]
+   ],
+   [
+    "B",
+    14,
+    [
+     38.58,
+     39.69
+    ]
+   ],
+   [
+    "B",
+    15,
+    [
+     37.61,
+     39.68
+    ]
+   ]
+  ],
+  "support_attempts_rejected": 9,
+  "plans": 207,
+  "plan_failures": 0,
+  "min_clearance_mm": -1.09,
+  "contacts": {
+   "neighbour_rub": 52,
+   "stud_mating": 23
+  },
+  "max_lateral_mm": 1.44,
+  "max_abs_dz_mm": 0.54,
+  "max_tilt_deg": 2.08
+ }
 }
