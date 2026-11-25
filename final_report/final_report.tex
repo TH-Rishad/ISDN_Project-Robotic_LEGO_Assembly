@@ -1045,15 +1045,47 @@ meets all three requirements of the brief.
 
 \appendix
 \section{Reproducing the final run}
-From the repository root, with the shared environment \texttt{Sakib/.venv}:
+You need a Linux machine (Ubuntu~22.04 or~24.04, x86\_64) with an NVIDIA GPU
+whose driver supports CUDA~$\ge$\,12.8 (\texttt{nvidia-smi} prints it), plus
+\texttt{git} and either \href{https://docs.astral.sh/uv/}{\texttt{uv}}
+(recommended) or Python~3.12 with \texttt{venv}. Network access is required on
+the first install: PyPI, the PyTorch wheel index, and GitHub (cuRobo and the
+Newton FR3 robot asset). A desktop or browser is only needed if you open the
+live viewer; headless runs need none. Full environment notes live in
+\texttt{Sakib/SETUP.md}.
+
+Clone the repository and build the shared environment. The setup script creates
+\texttt{Sakib/.venv}; pass \texttt{--with-curobo} so the GPU motion planner is
+available (about 6\,GB for the venv, plus cuRobo and a one-time Newton asset
+download):
+\begin{verbatim}
+git clone \
+  https://github.com/TH-Rishad/ISDN_Project-Robotic_LEGO_Assembly.git
+cd ISDN_Project-Robotic_LEGO_Assembly
+bash Sakib/setup_env.sh --with-curobo
+\end{verbatim}
+Options: \texttt{--cuda cu128|cu130} forces the torch build;
+\texttt{--cpu} installs CPU torch (Newton still runs, slowly; cuRobo is
+unavailable). Re-run the script to repair or upgrade.
+
+From the repository root, with that environment, rebuild the final dual-arm
+simulation (arch + S3 with stud fit), check it, and replay it:
 \begin{verbatim}
 # full build with stud fit (about 35 min on one GPU); use a new folder
 bash Kean/scripts/dual_build.sh --build-a arch --build-b S3 --stud-fit \
     --out Kean/results/my_run
 Sakib/.venv/bin/python -m Kean.verify_dual --run Kean/results/my_run
 bash Kean/scripts/play_run.sh --run Kean/results/my_run --port 8081 --loop
+# open http://localhost:8081  (omit --port/--loop for a one-shot replay)
+\end{verbatim}
+Omit \texttt{--stud-fit} for a faster non-resistant build. Add
+\texttt{--viewer viser --port 8081} on \texttt{dual\_build.sh} to watch the
+live run in the browser; omit the viewer flags for headless execution.
+\texttt{accept.sh} / \texttt{dual\_build.sh} refuse to overwrite an existing
+output folder---always pass a fresh \texttt{--out}.
 
-# this report's figures (CPU) and simulation pictures (GPU)
+To regenerate this report's figures from the saved run:
+\begin{verbatim}
 Sakib/.venv/bin/python final_report/make_figures.py
 Sakib/.venv/bin/python final_report/render_stills.py \
     Kean/results/dual_arch_s3_studfit_007 final_report/stills \
