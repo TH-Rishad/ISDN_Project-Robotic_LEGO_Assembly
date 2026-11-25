@@ -72,8 +72,8 @@ hold, how the bricks and the physics are simulated, how each arm picks, carries
 and presses bricks without hitting anything, how the two arms take turns and
 help each other, and how the system decides that the job is done. In the final
 run both structures were completed (27 of 27 bricks), all four planned
-supports were held, every brick ended within 1.5\,mm of its target, and an
-independent check of the saved run passed.
+supports were held, every brick passed its placement check with less than
+1.5\,mm of lateral error, and an independent check of the saved run passed.
 \end{abstract}
 
 \tableofcontents
@@ -104,13 +104,13 @@ All numbers are read from its saved files by \texttt{final\_report/make\_figures
 \begin{tabularx}{\linewidth}{@{}lX@{}}
 \toprule
 Structures & Arm A: arch from a drawing (11 bricks). Arm B: S3 bridge from a brick list (16 bricks) \\
-Brick fit & Real stud resistance: every brick must be pushed on ($n \times 8.9$\,N for $n$ studs) \\
+Brick fit & Simulated stud resistance: $n \times 8.9$\,N nominal insertion force for $n$ studs, with an 85\% threshold on supported steps \\
 Bricks placed & 11/11 and 16/16 \\
 Supports & 4, all held by the other arm: arch step 10; S3 steps 13, 14, 15 \\
 Time & 515\,s of simulated time; both arms building at the same time for 1{,}907 frames \\
 Arm motions planned & 199, none failed \\
-Placement accuracy & every brick within 1.46\,mm sideways, 0.47\,mm in height, 1.85$^\circ$ tilt \\
-Contacts & only intended ones (32 bricks rubbing a neighbour while seating, 24 stud matings) \\
+Placement accuracy & at the snap check: at most 1.46\,mm sideways, 0.47\,mm in height, 1.85$^\circ$ tilt \\
+Contacts & 32 neighbour-rub events (including baseplate contact), 24 stud-mating events, zero unintended contacts \\
 Independent check & pass: complete build, all supports held, nothing broken \\
 \bottomrule
 \end{tabularx}
@@ -242,9 +242,9 @@ pushed. The simulation reproduces this with a ``stud fit'' rule
 \item When a brick comes down to within 0.3\,mm of the stud tops it lands on, and is
       within 2\,mm of its spot sideways, it is \textbf{held on the stud tops}, as if the
       studs were blocking it.
-\item The engine measures how hard the brick is being pushed down. Each stud needs
-      \textbf{8.9\,N}, so a brick on 4 studs needs 35.6\,N and a brick on 8 studs needs
-      71.2\,N.
+\item The engine measures how hard the brick is being pushed down. The nominal
+      force is \textbf{8.9\,N} per stud: 35.6\,N for 4 studs and 71.2\,N for
+      8 studs. Supported steps use 85\% of this threshold (\S\ref{sec:supportpress}).
 \item When the push is big enough, the brick \textbf{slides straight down} onto the
       studs, keeping its sideways position and rotation (the studs guide it).
 \item A quarter of a second later the \textbf{snap check} (\S\ref{sec:done}) decides whether
@@ -299,7 +299,7 @@ on, and the holding hand is there to absorb that load
 \node[step, below=of s] (c) {Each arm turns its hand target into joint angles};
 \node[step, below=of c] (t) {16 small steps: find contacts, move everything};
 \node[ask, below=of t] (q0) {Brick reached the stud tops?};
-\node[step=36mm, right=10mm of q0] (h) {Hold it there until pushed with $n\times 8.9$\,N, then let it slide down};
+\node[step=36mm, right=10mm of q0] (h) {Hold it there until the push reaches the insertion threshold, then let it slide down};
 \node[ask, below=of q0, yshift=-2mm] (q1) {Seated brick passes the snap check?};
 \node[step=34mm, right=10mm of q1] (glue) {Switch its welds on};
 \node[ask, below=of q1, yshift=-3mm] (q2) {Any weld at $u\ge1$ twice in a row?};
@@ -308,7 +308,7 @@ on, and the holding hand is there to absorb that load
 \node[stop, below=of r] (n) {Next frame};
 \draw[arr] (s)--(c); \draw[arr] (c)--(t); \draw[arr] (t)--(q0);
 \draw[arr] (q0)-- node[lab, above]{yes} (h);
-\draw[arr] (h) |- (q1.east);
+\draw[arr] (h.south) -- ++(0,-3mm) -| (q1.45);
 \draw[arr] (q0)-- node[lab, right]{no} (q1);
 \draw[arr] (q1)-- node[lab, above]{yes} (glue);
 \draw[arr] (glue) |- (q2.east);
@@ -712,9 +712,9 @@ arm pushed through them. Instead (Figure~\ref{fig:press}):
 
 \begin{figure}[H]
 \centering
-\begin{subfigure}{.32\linewidth}\includegraphics[width=\linewidth]{fin_on_studs.jpg}\caption{Brick lowered onto the stud tops.}\end{subfigure}\hfill
-\begin{subfigure}{.32\linewidth}\includegraphics[width=\linewidth]{fin_press.jpg}\caption{Pressed down with closed fingertips.}\end{subfigure}\hfill
-\begin{subfigure}{.32\linewidth}\includegraphics[width=\linewidth]{fin_seated.jpg}\caption{Seated; the hand lifts away.}\end{subfigure}
+\begin{subfigure}[t]{.32\linewidth}\includegraphics[width=\linewidth]{fin_on_studs.jpg}\caption{Brick lowered onto the stud tops.}\end{subfigure}\hfill
+\begin{subfigure}[t]{.32\linewidth}\includegraphics[width=\linewidth]{fin_press.jpg}\caption{Pressed down with closed fingertips.}\end{subfigure}\hfill
+\begin{subfigure}[t]{.32\linewidth}\includegraphics[width=\linewidth]{fin_seated.jpg}\caption{Seated; the hand lifts away.}\end{subfigure}
 \caption{The press from above (arch step 4: a 2$\times$2 on 4 studs, needing 35.6\,N).}
 \label{fig:press}
 \end{figure}
@@ -729,8 +729,8 @@ Figure~\ref{fig:pressdata} shows the result for all 27 bricks.
 \begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{final_press.png}
-\caption{The push on every brick at the moment it went through, against the force
-its studs need. Unsupported bricks (blue) went through at the full force or a
+\caption{The push on every brick at insertion, compared with its nominal stud
+insertion force. Unsupported bricks (blue) went through at the full force or a
 little more. The four supported bricks (green) went through at 85\% of it.}
 \label{fig:pressdata}
 \end{figure}
@@ -776,9 +776,9 @@ The helper's measured grip during the four holds was 37--40\,N per finger.
 
 \begin{figure}[H]
 \centering
-\begin{subfigure}{.32\linewidth}\includegraphics[width=\linewidth]{sim_sf_crown_low.jpg}\caption{Arch crown: A presses, B holds the left leg.}\end{subfigure}\hfill
-\begin{subfigure}{.32\linewidth}\includegraphics[width=\linewidth]{sim_sf_s3_13_side.jpg}\caption{S3 step 13: A holds, B presses.}\end{subfigure}\hfill
-\begin{subfigure}{.32\linewidth}\includegraphics[width=\linewidth]{sim_sf_s3_15_side.jpg}\caption{S3 step 15: A holds, B presses the top brick.}\end{subfigure}
+\begin{subfigure}[t]{.32\linewidth}\includegraphics[width=\linewidth]{sim_sf_crown_low.jpg}\caption{Arch crown: A presses, B holds the left leg.}\end{subfigure}\hfill
+\begin{subfigure}[t]{.32\linewidth}\includegraphics[width=\linewidth]{sim_sf_s3_13_side.jpg}\caption{S3 step 13: A holds, B presses.}\end{subfigure}\hfill
+\begin{subfigure}[t]{.32\linewidth}\includegraphics[width=\linewidth]{sim_sf_s3_15_side.jpg}\caption{S3 step 15: A holds, B presses the top brick.}\end{subfigure}
 \caption{Supported presses in the final run. The helper's hand comes in from the side,
 leaning away from the pressing hand.}
 \end{figure}
@@ -857,9 +857,9 @@ counted, and resting positions are measured again afterwards.
 \subsection{In the final run}
 199 arm motions were planned and all succeeded. The smallest gap recorded during
 planned motion was $-0.90$\,mm, an overlap inside the allowance next to a holding
-helper. The contact audit found only intended contacts: 32 bricks rubbing a
-neighbour while seating and 24 stud matings. There were no unintended contacts
-and no arm-to-arm contact.
+helper. The contact audit logged 32 neighbour-rub events, including baseplate
+contact, and 24 stud-mating events. There were no unintended or arm-to-arm
+contacts.
 
 \why{Spheres make distance checks fast and safe, and using the same model in the
 planner and the checker means they agree about geometry. Booking space keeps each
@@ -1078,15 +1078,23 @@ Sakib/.venv/bin/python -m Kean.verify_dual --run Kean/results/my_run
 bash Kean/scripts/play_run.sh --run Kean/results/my_run --port 8081 --loop
 # open http://localhost:8081  (omit --port/--loop for a one-shot replay)
 \end{verbatim}
-Omit \texttt{--stud-fit} for a faster non-resistant build. Add
-\texttt{--viewer viser --port 8081} on \texttt{dual\_build.sh} to watch the
-live run in the browser; omit the viewer flags for headless execution.
-\texttt{accept.sh} / \texttt{dual\_build.sh} refuse to overwrite an existing
-output folder---always pass a fresh \texttt{--out}.
+Omit \texttt{--stud-fit} for a faster build without stud resistance. To watch
+the build live, add \texttt{--viewer viser --port 8081} to the build command.
+For headless execution, omit the viewer flags. Pass a fresh \texttt{--out}
+directory because the build scripts refuse to overwrite an existing directory.
 
-To regenerate this report's figures from the saved run:
+Regenerate the data figures from the logs included in the repository:
 \begin{verbatim}
 Sakib/.venv/bin/python final_report/make_figures.py
+\end{verbatim}
+
+To re-verify, replay or render stills from the exact reported run, obtain the
+original \texttt{recording.npz} from the project team and place it in
+\path{Kean/results/dual_arch_s3_studfit_007}. The repository includes the
+saved verifier output and logs. The fresh-run commands above produce a separate
+recording that can also be used with the still renderer. For example, to render
+a still from the exact run once its recording is available:
+\begin{verbatim}
 Sakib/.venv/bin/python final_report/render_stills.py \
     Kean/results/dual_arch_s3_studfit_007 final_report/stills \
     a:516:-0.25,0.16,0.06,-5,0

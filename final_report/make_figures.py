@@ -459,8 +459,8 @@ axs[1].set_title("Tilt of every brick")
 save(fig, "final_snap.png")
 
 supported = {st["brick_id"] for pl in (fA, fB) for st in pl["sequence"] if st["requires_brace"]}
-order = [e["brick_id"] for e in rows]
 push = {e["brick"]: e for e in json.loads((FINAL / "stud_fit.json").read_text()) if e["event"] == "pushed_through"}
+order = sorted(push, key=lambda brick: push[brick]["time"])
 fig, ax = plt.subplots(figsize=(11, 3.0))
 ax.bar(range(len(order)), [push[b]["peak_N"] for b in order],
        color=["#2ca02c" if b in supported else "#9ecae1" for b in order], label="push when the brick went in")
@@ -470,7 +470,7 @@ ax.set_xticks(range(len(order)))
 ax.set_xticklabels([("A" if b.startswith("A") else "B") + b[-2:].lstrip("0").rjust(1, "0") for b in order],
                    fontsize=7, rotation=90)
 ax.set_ylabel("force (N)")
-ax.set_xlabel("bricks in the order they were seated (A = arch, B = S3)")
+ax.set_xlabel("bricks in order of insertion (A = arch, B = S3)")
 ax.legend(handles=[Patch(color="#9ecae1", label="unsupported brick: push"),
                    Patch(color="#2ca02c", label="supported brick: push"),
                    plt.Line2D([], [], marker="_", ls="", color="k", markersize=14, label="force the studs need")],
